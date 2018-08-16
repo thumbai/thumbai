@@ -1,0 +1,17 @@
+# ---------------------------------------------------------------------------
+# i18n messages for gorepositree.com application
+#
+# Doc: https://docs.aahframework.org/i18n.html
+# ---------------------------------------------------------------------------
+
+# This structure is example purpose
+# So choose your suitable structure for your application
+label {
+  pages {
+    app {
+      index {
+        title = "aah framework application - Home"
+      }
+    }
+  }
+}

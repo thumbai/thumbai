@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    {{ block "title" . }}
+    <title>Default page title from master layout</title>
+    {{ end }}
+    {{ import "head_tags.html" . }}
+  </head>
+  <body>
+    {{ block "body" . -}}
+    <p>Default body content from master layout</p>
+    {{ end }}
+    {{ import "footer_scripts.html" . }}
+  </body>
+</html>
