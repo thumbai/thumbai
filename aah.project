@@ -13,7 +13,7 @@
 build {
   # Application binary name
   # Default value is `name` attribute value from `aah.conf`
-  #binary_name = "gorepositree.com"
+  binary_name = "gorepositree"
 
   # Used as fallback if
   #   - `git commit sha` or
