@@ -83,7 +83,7 @@ hot_reload {
     # delivers up-to-date file on environment profile `dev`.
     dir_excludes = [".*"]
 
-    file_excludes = [".*", "_test.go", "LICENSE", "README.md"]
+    file_excludes = [".*", "_test.go", "LICENSE", "README.md", "vanity-store"]
   }
 }
 

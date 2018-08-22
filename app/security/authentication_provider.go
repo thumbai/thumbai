@@ -1,9 +1,9 @@
 package security
 
 import (
-	"aahframework.org/aah.v0"
-	"aahframework.org/config.v0"
-	"aahframework.org/security.v0/authc"
+	"aahframe.work/aah"
+	"aahframe.work/aah/config"
+	"aahframe.work/aah/security/authc"
 )
 
 var _ authc.Authenticator = (*AuthenticationProvider)(nil)

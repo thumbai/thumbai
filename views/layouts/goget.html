@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Package - {{ .Host }}{{ .Pkg.Path }}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="go-import" content="{{ .Host }}{{ .Pkg.Path }} {{ .Pkg.VCS }} {{ .Pkg.Repo }}">
+<meta name="go-source" content="{{ .Host }}{{ .Pkg.Path }} {{ .Pkg.Src }}">
+<!-- <meta http-equiv="refresh" content="0; url=https://godoc.org/{{ .Host }}/{{ .Pkg.Path }}"> -->
+</head>
+<body>
+{{ block "body" . -}}
+<p>Nothing to see here.</p>
+{{ end }}
+</body>
+</html>
+    

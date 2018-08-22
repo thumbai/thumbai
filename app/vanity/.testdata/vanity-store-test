@@ -1,0 +1,29 @@
+{
+  "aahframe.work": [
+    {
+      "path": "/aah",
+      "repo": "https://github.com/go-aah/aah.git",
+      "vcs": "git"
+    },
+    {
+      "path": "/cli",
+      "repo": "https://github.com/go-aah/tools.git",
+      "vcs": "git"
+    },
+    {
+      "path": "/cache/provider/inmemory",
+      "repo": "https://github.com/go-aah/inmemory-cache-provider.git",
+      "vcs": "git"
+    },
+    {
+      "path": "/cache/provider/redis",
+      "repo": "https://github.com/go-aah/redis-cache-provider.git",
+      "vcs": "git"
+    },
+    {
+      "path": "/cache/provider/memcache",
+      "repo": "https://github.com/go-aah/memcache-cache-provider.git",
+      "vcs": "git"
+    }
+  ]
+}

@@ -3,9 +3,8 @@ package v1
 import (
 	"fmt"
 
-	"aahframework.org/aah.v0"
-	"aahframework.org/ahttp.v0"
-
+	"aahframe.work/aah"
+	"aahframe.work/aah/ahttp"
 	"gorepositree.com/app/models"
 )
 

@@ -4,12 +4,11 @@
 package main
 
 import (
+	"aahframe.work/aah"
+	"gorepositree.com/app/data"
+	"gorepositree.com/app/proxypass"
 	"gorepositree.com/app/security"
-
-	"aahframework.org/aah.v0"
-
-	// Registering HTML minifier
-	_ "github.com/aah-cb/minify"
+	"gorepositree.com/app/vanity"
 )
 
 func init() {
@@ -36,10 +35,11 @@ func init() {
 	// Event: OnStart
 	// Doc: https://docs.aahframework.org/server-extension.html#event-onstart
 	//
-	// aah.OnStart(db.Connect)
-	// aah.OnStart(cache.Load)
 	aah.OnStart(SubscribeHTTPEvents)
 	aah.OnStart(SubscribeWebSocketEvents)
+	aah.OnStart(data.Load, 1)
+	aah.OnStart(vanity.Load, 2)
+	aah.OnStart(proxypass.Load, 3)
 
 	// Event: OnPreShutdown
 	// Doc: https://docs.aahframework.org/server-extension.html#event-onpreshutdown
@@ -49,8 +49,7 @@ func init() {
 	// Event: OnPostShutdown
 	// Doc: https://docs.aahframework.org/server-extension.html#event-onpostshutdown
 	//
-	// aah.OnPostShutdown(cache.Flush)
-	// aah.OnPostShutdown(db.Disconnect)
+	aah.OnPostShutdown(data.Persist)
 
 	//‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 	// Middleware's
@@ -61,10 +60,10 @@ func init() {
 	//__________________________________________________________________________
 	aah.AppHTTPEngine().Middlewares(
 		aah.RouteMiddleware,
-		aah.CORSMiddleware,
+		// aah.CORSMiddleware,
 		aah.BindMiddleware,
-		aah.AntiCSRFMiddleware,
-		aah.AuthcAuthzMiddleware,
+		// aah.AntiCSRFMiddleware,
+		// aah.AuthcAuthzMiddleware,
 
 		//
 		// NOTE: Register your Custom middleware's right here
@@ -119,12 +118,12 @@ func init() {
 //__________________________________________________________________________
 
 func SubscribeHTTPEvents(_ *aah.Event) {
-	 he := aah.AppHTTPEngine()
+	he := aah.AppHTTPEngine()
 
 	// Event: OnRequest
 	// Doc: https://docs.aahframework.org/server-extension.html#event-onrequest
 	//
-	// he.OnRequest(myserverext.OnRequest)
+	// he.OnRequest(repo.Switch)
 
 	// Event: OnPreReply
 	// Doc: https://docs.aahframework.org/server-extension.html#event-onprereply
@@ -152,7 +151,6 @@ func SubscribeHTTPEvents(_ *aah.Event) {
 	he.OnPostAuth(security.PostAuthEvent)
 }
 
-
 //‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 // WebSocket Events
 // Doc: https://docs.aahframework.org/websocket.html#events
@@ -161,25 +159,25 @@ func SubscribeHTTPEvents(_ *aah.Event) {
 //__________________________________________________________________________
 
 func SubscribeWebSocketEvents(_ *aah.Event) {
-  // wse := aah.AppWSEngine()
+	// wse := aah.AppWSEngine()
 
 	// Custom ID Generator
 	//
-  // wse.SetIDGenerator(websockets.MyCustomIDGenerator)
+	// wse.SetIDGenerator(websockets.MyCustomIDGenerator)
 
-  // Event: OnPreConnect
+	// Event: OnPreConnect
 	//
-  // wse.OnPreConnect(mywebsockets.HandleEvents)
+	// wse.OnPreConnect(mywebsockets.HandleEvents)
 
-  // Event: OnPostConnect
-  //
-  // wse.OnPostConnect(mywebsockets.HandleEvents)
+	// Event: OnPostConnect
+	//
+	// wse.OnPostConnect(mywebsockets.HandleEvents)
 
-  // Event: OnPostDisconnect
-  //
-  // wse.OnPostDisconnect(mywebsockets.HandleEvents)
+	// Event: OnPostDisconnect
+	//
+	// wse.OnPostDisconnect(mywebsockets.HandleEvents)
 
-  // Event: OnError
-  //
-  // wse.OnError(mywebsockets.HandleEvents)
+	// Event: OnError
+	//
+	// wse.OnError(mywebsockets.HandleEvents)
 }
