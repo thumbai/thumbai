@@ -28,8 +28,8 @@ type VanityController struct {
 
 // Handle method handles Go vanity package request. If not found then it passes
 // control over to proxy pass.
-func (c *VanityController) Handle(vanityPath string) {
-	pkg := vanity.Lookup(c.Req.Host, "/"+vanityPath)
+func (c *VanityController) Handle() {
+	pkg := vanity.Lookup(c.Req.Host, c.Req.Path)
 	if pkg == nil {
 		proxypass.Do(c.Context)
 		return
