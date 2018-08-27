@@ -31,7 +31,7 @@ type VanityController struct {
 func (c *VanityController) Handle() {
 	pkg := vanity.Lookup("aahframe.work", c.Req.Path) // TODO Remove
 	if pkg == nil {
-		c.Context.Req.Host = "aahframework.org" // TODO Remove
+		c.Req.Host = "docs.aahframework.org" // TODO Remove
 		if redirect.Do(c.Context) {
 			return
 		}

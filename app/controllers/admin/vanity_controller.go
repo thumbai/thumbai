@@ -24,16 +24,16 @@ type VanityController struct {
 	BaseController
 }
 
-// Index method shows all vanity hosts configured in the vanities.
-func (c *VanityController) Index() {
+// List method shows all vanity hosts configured in the vanities.
+func (c *VanityController) List() {
 	c.Reply().HTML(aah.Data{
 		"IsVanity":    true,
 		"AllVanities": models.AllVanities(),
 	})
 }
 
-// ShowHost method shows all the vanity packages configured for the host.
-func (c *VanityController) ShowHost(hostName string) {
+// Index method shows all the vanity packages configured for the host.
+func (c *VanityController) Index(hostName string) {
 	pkgs := models.VanityByHost(hostName)
 	c.Reply().HTML(aah.Data{
 		"IsVanity": true,
