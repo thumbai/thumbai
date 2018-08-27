@@ -1,0 +1,81 @@
+{{ define "title" }}
+<title>Admin Dashboard - Gorepositree</title>
+{{ end }} 
+
+{{ define "body-content" -}} 
+<div class="admin-vanity">
+    <h1 class="w-75">Vanity
+        <!-- <span class="align-middle float-sm-right">
+            <button id="vanityHostAddBtn" data-url="#" data-toggle="tooltip" title="Add new vanity host" class="btn btn-sm btn-outline-success pl-4 pr-4">Add</button>
+        </span> -->
+    </h1>
+    <div class="mt-5 w-75">
+        <table class="table table-hover">
+            <thead class="bg-dark text-white">
+                <tr>
+                <th scope="col">Host</th>
+                <th scope="col">Packages</th>
+                <!-- <th scope="col">&nbsp;</th> -->
+                </tr>
+            </thead>
+            <tbody>
+                {{ if .AllVanities }}
+                {{- range $key, $value := .AllVanities }}
+                <tr class="vanity-row" data-url="{{ rurl $ "vanity_show" $key }}">
+                    <th scope="row"> {{ $key }} </th>
+                    <td>{{ len $value }}</td>
+                    <!-- <td class="text-center veritical-align-middle">
+                        <a href=""><i class="fas fa-edit fa-lg"></i></a>     
+                        <a href=""><i class="fas fa-trash-alt fa-lg"></i></a>
+                    </td> -->
+                </tr>
+                {{- end }}
+                {{ end }}
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- Add/Edit vanity host record -->
+<div class="modal fade" id="addEditModal" tabindex="-1" role="dialog" aria-labelledby="addEditModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addEditModalTitle">Add vanity host</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" style="height: 18vh">
+                <form id="addEditForm" class="mt-3">
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="vanityHostname" placeholder="Enter vanity hostname" required>
+                    </div>
+                    <div class="float-right mt-3">
+                        <button type="button" class="btn btn-sm btn-outline-secondary pl-4 pr-4" data-dismiss="modal">Close</button>
+                        <button id="modalAddBtn" type="submit" class="btn btn-sm btn-outline-success pl-4 pr-4">Add</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div> <!-- /addEditModal -->
+<script>
+window.jqReady = function() {
+    $('.vanity-row').click(function() {
+        window.location = $(this).data('url');
+    });
+    // $('#vanityHostAddBtn').click(function() {
+    //     $('#addEditModal').modal();
+    // });
+    // $('#addEditModal').on('show.bs.modal', function(e) {
+    //     $('#addEditForm').trigger('reset');
+    //     $('#vanityHostname').trigger('focus');
+    // });
+    // $('#addEditForm').submit(function(e){
+    //     console.log('came here');
+        
+    //     return false;
+    // });
+}
+</script>
+{{ end }}

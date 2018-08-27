@@ -15,10 +15,9 @@
 package controllers
 
 import (
+	"aahframe.work/aah"
 	"gorepositree.com/app/proxypass"
 	"gorepositree.com/app/vanity"
-
-	"aahframe.work/aah"
 )
 
 // VanityController handles the classic `go get` handling, gonna become legacy.
@@ -29,14 +28,13 @@ type VanityController struct {
 // Handle method handles Go vanity package request. If not found then it passes
 // control over to proxy pass.
 func (c *VanityController) Handle() {
-	pkg := vanity.Lookup(c.Req.Host, c.Req.Path)
+	pkg := vanity.Lookup("aahframe.work", c.Req.Path) // TODO Remove
 	if pkg == nil {
 		proxypass.Do(c.Context)
 		return
 	}
 
 	c.Reply().HTMLl("goget.html", aah.Data{
-		"Host": "aahframe.work", // TODO Remove
-		"Pkg":  pkg,
+		"Vanity": pkg,
 	})
 }

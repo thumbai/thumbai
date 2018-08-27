@@ -1,0 +1,26 @@
+{{ define "title" }}
+<title>Login - Gorepositree</title>
+{{ end }}
+
+{{ define "body" }}
+<div class="login">
+    <div class="card card-container">
+        <img id="profile-img" class="profile-img-card" src="/static/img/aah-framework-logo.png" />
+        <div class="mtop15 mbtm15">
+            {{ if eq (qparam . "error") "true" }}
+            <div class="alert alert-danger">
+            Invalid credentials.
+            </div>
+            {{ end }}
+        </div>
+        <form class="form-signin" method="post" action="{{ rurl . "login_submit" }}">
+            <input type="email" id="inputEmail" name="email" class="form-control" placeholder="Email address" required autofocus>
+            <input type="password" id="inputPassword" name="password" class="form-control" placeholder="Password" required>
+            <button class="btn btn-lg btn-primary btn-block btn-signin" type="submit">Sign in</button>
+
+            <!-- Include the requested URL in the form submission -->
+            <input type="hidden" name="_rt" value="{{ qparam . "_rt" }}">
+        </form><!-- /form -->
+    </div><!-- /card-container -->
+</div><!-- /login -->
+{{ end }}

@@ -12,25 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package models
+package admin
 
-// ProxyInfo holds single Reverse Proxy server info.
-type ProxyInfo struct {
-	URL       string      `json:"url,omitempty"`
-	Redirects []*Redirect `json:"redirects,omitempty"`
-	ReqHdr    *Hdr        `json:"request_header,omitempty"`
-	ResHdr    *Hdr        `json:"response_header,omitempty"`
+// UserController handles subject related actions like login, logout, etc.
+type UserController struct {
+	BaseController
 }
 
-// Redirect holds single redirect for proxy server.
-type Redirect struct {
-	Match  string
-	Target string
-	Code   int
-}
-
-// Hdr struct holds the request needs to be added or removed.
-type Hdr struct {
-	Add    map[string]string `json:"add,omitempty"`
-	Remove []string          `json:"remove,omitempty"`
+// Login method does the subject login.
+func (c UserController) Login() {
+	c.Reply().HTMLl("basic.html", nil)
 }

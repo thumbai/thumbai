@@ -12,25 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package models
+package admin
 
-// ProxyInfo holds single Reverse Proxy server info.
-type ProxyInfo struct {
-	URL       string      `json:"url,omitempty"`
-	Redirects []*Redirect `json:"redirects,omitempty"`
-	ReqHdr    *Hdr        `json:"request_header,omitempty"`
-	ResHdr    *Hdr        `json:"response_header,omitempty"`
+import (
+	"aahframe.work/aah"
+	"gorepositree.com/app/models"
+)
+
+// VanityController controller manages the Vanity host and its packages.
+type VanityController struct {
+	BaseController
 }
 
-// Redirect holds single redirect for proxy server.
-type Redirect struct {
-	Match  string
-	Target string
-	Code   int
+// Index method shows all vanity hosts configured in the vanities.
+func (c *VanityController) Index() {
+	c.Reply().HTML(aah.Data{
+		"IsVanity":    true,
+		"AllVanities": models.AllVanities(),
+	})
 }
 
-// Hdr struct holds the request needs to be added or removed.
-type Hdr struct {
-	Add    map[string]string `json:"add,omitempty"`
-	Remove []string          `json:"remove,omitempty"`
+// ShowHost method shows all the vanity packages configured for the host.
+func (c *VanityController) ShowHost(hostName string) {
+	pkgs := models.VanityByHost(hostName)
+	c.Reply().HTML(aah.Data{
+		"IsVanity": true,
+		"Packages": pkgs,
+	})
 }

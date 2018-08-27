@@ -12,25 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package models
+package admin
 
-// ProxyInfo holds single Reverse Proxy server info.
-type ProxyInfo struct {
-	URL       string      `json:"url,omitempty"`
-	Redirects []*Redirect `json:"redirects,omitempty"`
-	ReqHdr    *Hdr        `json:"request_header,omitempty"`
-	ResHdr    *Hdr        `json:"response_header,omitempty"`
+import (
+	"aahframe.work/aah"
+	"gorepositree.com/app/models"
+)
+
+// DashboardController defines admin dashboard actions.
+type DashboardController struct {
+	BaseController
 }
 
-// Redirect holds single redirect for proxy server.
-type Redirect struct {
-	Match  string
-	Target string
-	Code   int
+// Index ...
+func (c *DashboardController) Index() {
+	c.Reply().Ok().HTML(aah.Data{
+		"IsDashboard": true,
+		"VanityCount": len(models.AllVanities()),
+	})
 }
 
-// Hdr struct holds the request needs to be added or removed.
-type Hdr struct {
-	Add    map[string]string `json:"add,omitempty"`
-	Remove []string          `json:"remove,omitempty"`
+// ToAdminDashboard ...
+func (c *DashboardController) ToAdminDashboard() {
+	c.Reply().Redirect(c.RouteURL("dashboard"))
 }

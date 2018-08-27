@@ -19,8 +19,7 @@ package main
 
 import (
 	"aahframe.work/aah"
-	"gorepositree.com/app/data"
-	"gorepositree.com/app/proxypass"
+	"gorepositree.com/app/models"
 	"gorepositree.com/app/security"
 	"gorepositree.com/app/vanity"
 )
@@ -51,19 +50,16 @@ func init() {
 	//
 	aah.OnStart(SubscribeHTTPEvents)
 	aah.OnStart(SubscribeWebSocketEvents)
-	aah.OnStart(data.Load, 1)
+	aah.OnStart(models.LoadVanityStore, 1)
 	aah.OnStart(vanity.Load, 2)
-	aah.OnStart(proxypass.Load, 3)
 
 	// Event: OnPreShutdown
 	// Doc: https://docs.aahframework.org/server-extension.html#event-onpreshutdown
 	//
-	// aah.OnPreShutdown(notify.AnnounceImGonnaShutdown)
+	aah.OnPreShutdown(models.PersistVanityStore)
 
 	// Event: OnPostShutdown
 	// Doc: https://docs.aahframework.org/server-extension.html#event-onpostshutdown
-	//
-	aah.OnPostShutdown(data.Persist)
 
 	//‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 	// Middleware's
@@ -76,7 +72,7 @@ func init() {
 		aah.RouteMiddleware,
 		// aah.CORSMiddleware,
 		aah.BindMiddleware,
-		// aah.AntiCSRFMiddleware,
+		aah.AntiCSRFMiddleware,
 		// aah.AuthcAuthzMiddleware,
 
 		//

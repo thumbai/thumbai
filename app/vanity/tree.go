@@ -19,7 +19,6 @@ import (
 	"strings"
 
 	"aahframe.work/aah"
-	"gorepositree.com/app/data"
 	"gorepositree.com/app/models"
 )
 
@@ -31,21 +30,26 @@ var errNodeExists = errors.New("gorepositree/tree: node exists")
 
 // Lookup method searches the vanity mapping defined in the store for given host
 // and request path. If found returns the package info otherwise nil.
-func Lookup(host, p string) *models.PackageInfo {
-	host = "aahframe.work" // TODO remove
+func Lookup(host, p string) *models.VanityPackage {
 	return tree.lookup(host, p)
 }
 
 // Load method creates a vanity tree using data store.
 func Load(_ *aah.Event) {
-	s := data.Store()
-	for h, ps := range s.Data.Vanites {
+	vanities := models.AllVanities()
+	if vanities == nil || len(vanities) == 0 {
+		aah.AppLog().Info("Vanity is not yet configured on Gorepositree")
+		return
+	}
+
+	for h, ps := range vanities {
 		for _, p := range ps {
 			if err := tree.add(h, p.Path, p); err != nil {
 				aah.AppLog().Error(err)
 			}
 		}
 	}
+	aah.AppLog().Info("Successfully created vanity route tree")
 }
 
 //‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
@@ -66,7 +70,7 @@ func (t *Tree) lookupRoot(host string) *node {
 	return nil
 }
 
-func (t *Tree) lookup(h, p string) *models.PackageInfo {
+func (t *Tree) lookup(h, p string) *models.VanityPackage {
 	root := t.lookupRoot(h)
 	if root == nil {
 		return nil
@@ -108,7 +112,7 @@ nomore:
 	return sn.value
 }
 
-func (t *Tree) add(host, p string, v *models.PackageInfo) error {
+func (t *Tree) add(host, p string, v *models.VanityPackage) error {
 	root := t.lookupRoot(host)
 	if root == nil {
 		root = &node{edges: make([]*node, 0)}
@@ -167,7 +171,7 @@ func (t *Tree) add(host, p string, v *models.PackageInfo) error {
 type node struct {
 	idx   byte
 	label string
-	value *models.PackageInfo
+	value *models.VanityPackage
 	edges []*node
 }
 
@@ -191,7 +195,7 @@ func min(a, b int) int {
 	return b
 }
 
-func newNode(label string, value *models.PackageInfo, edges []*node) *node {
+func newNode(label string, value *models.VanityPackage, edges []*node) *node {
 	return &node{
 		idx:   label[0],
 		label: label,

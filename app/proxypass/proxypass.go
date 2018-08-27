@@ -24,7 +24,6 @@ import (
 
 	"aahframe.work/aah"
 	"aahframe.work/aah/ahttp"
-	"gorepositree.com/app/data"
 	"gorepositree.com/app/models"
 )
 
@@ -57,14 +56,14 @@ func Do(ctx *aah.Context) {
 // Load method creates the reverse proxy instances based
 // gorepositree store config.
 func Load(e *aah.Event) {
-	s := data.Store()
-	for h, pi := range s.Data.Proxies {
-		ProxyHosts.AddReverseProxy(h, pi)
+	// s := data.Store()
+	// for h, pi := range s.Data.Proxies {
+	// 	ProxyHosts.AddReverseProxy(h, pi)
 
-		for _, r := range pi.Redirects {
-			ProxyHosts.AddRedirectRule(h, r)
-		}
-	}
+	// 	for _, r := range pi.Redirects {
+	// 		ProxyHosts.AddRedirectRule(h, r)
+	// 	}
+	// }
 }
 
 //‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾

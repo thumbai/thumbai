@@ -1,0 +1,165 @@
+/* global */
+.form-control:focus {
+  border-color:dodgerblue;
+  outline: 0;
+  box-shadow:none !important;
+}
+
+/* header.html */
+.header .bg-dark {
+  background-color: #1a1b1d !important;
+}
+.header .navbar-brand {
+  padding-top: .75rem;
+  padding-bottom: .75rem;
+}
+.header .hdr-sign-out {
+  color: #28a74a;
+}
+.header .hdr-sign-out:hover {
+  color: orangered !important;
+}
+
+/* sidebar.html */
+.sidebar {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 100; /* Behind the navbar */
+  padding: 55px 0 0; /* Height of navbar */
+  box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+}
+.sidebar-sticky {
+  position: relative;
+  top: 0;
+  height: calc(100vh - 55px);
+  padding-top: .5rem;
+  overflow-x: hidden;
+  overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+}
+@supports ((position: -webkit-sticky) or (position: sticky)) {
+  .sidebar-sticky {
+    position: -webkit-sticky;
+    position: sticky;
+  }
+}
+.sidebar .nav-item {
+  text-align: center;
+  padding-top: .8rem;
+}
+.sidebar .nav-link {
+  font-weight: 500;
+  color: #c6c5c5;
+}
+.sidebar .nav-link.active {
+  color: #fff;
+  background-color: rgba(0, 0, 0, .25);
+  box-shadow: inset -1px 0 0 rgba(0, 0, 0, .25);
+}
+
+.sidebar .nav-link:hover {
+  color: #fff;
+}
+
+/* body-content */
+[role="main"] {
+  padding: 5%;
+}
+
+/* admin/user/login.html */
+.login {
+  margin-top: 9%;
+}
+.login .card-container.card {
+  max-width: 350px;
+  padding: 40px 40px;
+}
+.login .btn {
+  font-weight: 700;
+  height: 36px;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  cursor: pointer;
+}
+ .login .card {
+  background-color: #F7F7F7;
+  padding: 20px 25px 30px;
+  margin: 0 auto 25px;
+  margin-top: 50px;
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+  border-radius: 2px;
+}
+.login .profile-img-card {
+  width: 96px;
+  height: 96px;
+  margin: 0 auto 10px;
+  display: block;
+  -moz-border-radius: 50%;
+  -webkit-border-radius: 50%;
+  border-radius: 50%;
+}
+.login .form-signin #inputEmail,
+.login .form-signin #inputPassword {
+  direction: ltr;
+  height: 44px;
+  font-size: 16px;
+}
+
+.login .form-signin input[type=email],
+.login .form-signin input[type=password],
+.login .form-signin input[type=text],
+.login .form-signin button {
+  width: 100%;
+  display: block;
+  margin-bottom: 10px;
+  z-index: 1;
+  position: relative;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.login .btn.btn-signin {
+  background-color: rgb(104, 145, 162);
+  padding: 0px;
+  font-weight: 700;
+  font-size: 14px;
+  height: 36px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+  border: none;
+  -o-transition: all 0.218s;
+  -moz-transition: all 0.218s;
+  -webkit-transition: all 0.218s;
+  transition: all 0.218s;
+}
+.login .btn.btn-signin:hover,
+.login .btn.btn-signin:active,
+.login .btn.btn-signin:focus {
+  background-color: rgb(12, 97, 33);
+}
+
+/* admin/dashboard/index.html */
+.admin-dashboard .card hr {
+  border-top: 1px dotted;
+}
+
+/* admin/vanity/index.html */
+/* admin/vanity/showhost.html */
+.admin-vanity .vanity-row,
+.admin-vanity-show .vanity-pkg-row {
+  cursor: pointer;
+}
+.admin-vanity .table > thead > tr:first-child > th,
+.admin-vanity-show .table > thead > tr:first-child > th {
+  border-bottom: none;
+}
+.admin-vanity .vanity-row td > a,
+.admin-vanity-show .vanity-pkg-row td > a {
+  margin-left: 10px;
+  color: #626365;
+}
