@@ -15,8 +15,6 @@
 package admin
 
 import (
-	"fmt"
-
 	"aahframe.work/aah"
 )
 
@@ -27,5 +25,5 @@ type BaseController struct {
 
 // Before method is interceptor for admin scope.
 func (c *BaseController) Before() {
-	fmt.Println(c.Req.ClientIP())
+
 }

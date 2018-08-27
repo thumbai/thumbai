@@ -19,7 +19,7 @@
                             </div>
                             <div class="card mb-4 shadow-sm">
                                 <div class="card-body text-center">
-                                    <h3 class="card-title">{{ .VanityCount }}</h3>
+                                    <h3 class="card-title">{{ .VanityStats.Host }} <span class="stats-lbl">hosts</span>, {{ .VanityStats.Packages }} <span class="stats-lbl">packages</span></h3>
                                     <hr>
                                     <p class="h3">Vanities</p>
                                     <!-- <div class="mt-3"><a href="{{ rurl . "vanity_admin" }}" class="text-muted">configure</a></div> -->
@@ -27,7 +27,7 @@
                             </div>
                             <div class="card mb-4 shadow-sm">
                                 <div class="card-body">
-                                    <h3 class="card-title">0</h3>
+                                    <h3 class="card-title">{{ .RedirectStats.Host }} <span class="stats-lbl">hosts</span>, {{ .RedirectStats.Redirects }} <span class="stats-lbl">redirects</span></h3>
                                     <hr>
                                     <p class="text-center h3">Redirects</p>
                                 </div>

@@ -24,15 +24,20 @@ type DashboardController struct {
 	BaseController
 }
 
-// Index ...
+// Index method serves the admin dashboard.
 func (c *DashboardController) Index() {
 	c.Reply().Ok().HTML(aah.Data{
-		"IsDashboard": true,
-		"VanityCount": len(models.AllVanities()),
+		"IsDashboard":   true,
+		"VanityStats":   models.VanityStats(),
+		"RedirectStats": models.RedirectStats(),
 	})
 }
 
-// ToAdminDashboard ...
+// ToAdminDashboard method redirects path '/@admin' to '/@admin/dashboard'.
 func (c *DashboardController) ToAdminDashboard() {
 	c.Reply().Redirect(c.RouteURL("dashboard"))
+}
+
+func count(d map[string][]interface{}) {
+
 }

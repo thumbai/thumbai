@@ -66,6 +66,20 @@ func VanityByHost(hostName string) []*VanityPackage {
 	return vanityStore.byHost(hostName)
 }
 
+// VanityStats method returns stats about vanities.
+func VanityStats() map[string]int {
+	vanityStore.RLock()
+	defer vanityStore.RUnlock()
+	stats := make(map[string]int)
+	stats["Host"] = len(vanityStore.Data)
+	c := 0
+	for _, v := range vanityStore.Data {
+		c += len(v)
+	}
+	stats["Packages"] = c
+	return stats
+}
+
 //‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 // Vanity Store types and its methods
 //______________________________________________________________________________
@@ -79,7 +93,7 @@ type VanityPackage struct {
 	Src  string `json:"-"`
 }
 
-// VanityStore is data store for vanity domain and package configuration.
+// VanityStore is data store thats holds vanity domain and its package configuration.
 type VanityStore struct {
 	sync.RWMutex
 	Modified bool

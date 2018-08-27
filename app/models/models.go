@@ -16,17 +16,10 @@ package models
 
 // ProxyInfo holds single Reverse Proxy server info.
 type ProxyInfo struct {
-	URL       string      `json:"url,omitempty"`
-	Redirects []*Redirect `json:"redirects,omitempty"`
-	ReqHdr    *Hdr        `json:"request_header,omitempty"`
-	ResHdr    *Hdr        `json:"response_header,omitempty"`
-}
-
-// Redirect holds single redirect for proxy server.
-type Redirect struct {
-	Match  string
-	Target string
-	Code   int
+	URL string `json:"url,omitempty"`
+	// Redirects []*Redirect `json:"redirects,omitempty"`
+	ReqHdr *Hdr `json:"request_header,omitempty"`
+	ResHdr *Hdr `json:"response_header,omitempty"`
 }
 
 // Hdr struct holds the request needs to be added or removed.

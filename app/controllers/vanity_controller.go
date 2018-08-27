@@ -17,6 +17,7 @@ package controllers
 import (
 	"aahframe.work/aah"
 	"gorepositree.com/app/proxypass"
+	"gorepositree.com/app/redirect"
 	"gorepositree.com/app/vanity"
 )
 
@@ -30,11 +31,14 @@ type VanityController struct {
 func (c *VanityController) Handle() {
 	pkg := vanity.Lookup("aahframe.work", c.Req.Path) // TODO Remove
 	if pkg == nil {
+		c.Context.Req.Host = "aahframework.org" // TODO Remove
+		if redirect.Do(c.Context) {
+			return
+		}
+
 		proxypass.Do(c.Context)
 		return
 	}
 
-	c.Reply().HTMLl("goget.html", aah.Data{
-		"Vanity": pkg,
-	})
+	c.Reply().HTMLl("goget.html", aah.Data{"Vanity": pkg})
 }

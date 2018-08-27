@@ -147,6 +147,10 @@
 .admin-dashboard .card hr {
   border-top: 1px dotted;
 }
+.admin-dashboard .stats-lbl {
+  font-size: 0.7em;
+  color: #6c757d;
+}
 
 /* admin/vanity/index.html */
 /* admin/vanity/showhost.html */
