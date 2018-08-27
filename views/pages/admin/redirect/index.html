@@ -1,0 +1,110 @@
+<!-- Copyright 2018 Jeevanandam M. (https://github.com/jeevatkm, jeeva@myjeeva.com)
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License. -->
+
+{{ define "title" }}
+<title>Redirect - Gorepositree</title>
+{{ end }} 
+
+{{ define "body-content" -}} 
+<div class="admin-redirect-show">
+    <h1>Redirect Host: <span class="font-weight-bold">{{ pparam . "hostName" }}</span>
+        <span class="align-middle float-sm-right">
+        <!-- <button id="redirectPkgAddBtn" data-url="#" data-toggle="tooltip" title="Add new redirect rule" class="btn btn-sm btn-outline-success pl-4 pr-4">Add</button> -->
+        <button id="redirectBackBtn" data-url="{{ rurl . "redirect_admin" }}" data-toggle="tooltip" title="Go back to all redirects page" class="btn btn-sm btn-outline-success pl-4 pr-4">Back</button>
+        </span>
+    </h1> 
+    <div class="mt-5">
+        <table class="table table-hover">
+            <thead class="bg-dark text-white">
+                <tr>
+                <th scope="col" class="w-45">Match</th>
+                <th scope="col" class="w-45">Target</th>
+                <th scope="col" class="w-10">Code</th>
+                <!-- <th scope="col">&nbsp;</th> -->
+                </tr>
+            </thead>
+            <tbody>
+                {{ if .Redirects }}
+                {{- range .Redirects }}
+                <tr class="redirect-rule-row" data-url="">
+                    <th scope="row"> {{ .Match }} </th>
+                    <td>{{ .Target }}</td>
+                    <td>{{ .Code }}</td>
+                    <!-- <td class="text-center veritical-align-middle">
+                        <a href=""><i class="fas fa-edit fa-lg"></i></a>     
+                        <a href=""><i class="fas fa-trash-alt fa-lg"></i></a>
+                    </td> -->
+                </tr>
+                {{- end }}
+                {{ end }}
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- Add/Edit redirect host record -->
+<!-- <div class="modal fade" id="addEditModal" tabindex="-1" role="dialog" aria-labelledby="addEditModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addEditModalTitle">Add redirect rule</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addEditForm" class="mt-3">
+                    <div class="form-group">
+                        <label for="redirectRuleMatch">Match</label>
+                        <input type="text" class="form-control" id="redirectRuleMatch" aria-describedby="matchHelp" placeholder="{^/issues(.*)$}" required>
+                        <small id="matchHelp" class="form-text text-muted">Match can be extact text or regex rule.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="redirectRuleTarget">Target</label>
+                        <input type="text" class="form-control" id="redirectRuleTarget" aria-describedby="targetHelp" placeholder="https://github.com/go-aah/aah{request_uri}" required>
+                        <small id="targetHelp" class="form-text text-muted">Supported vars are {request_uri} and regex groups like {1}, {2} and so on.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="redirectRuleCode">Code</label>
+                        <input type="text" class="form-control" id="redirectRuleCode" aria-describedby="codeHelp" placeholder="git" value="307">
+                        <small id="codeHelp" class="form-text text-muted">Tip: 307-Temporary, 302-Found/Temporary, 301-Permanent</small>
+                    </div>
+                    <div class="float-right mt-3 pb-2">
+                        <button type="button" class="btn btn-sm btn-outline-secondary pl-4 pr-4" data-dismiss="modal">Close</button>
+                        <button id="modalAddBtn" type="submit" class="btn btn-sm btn-outline-success pl-4 pr-4">Add</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div> -->
+<!-- /addEditModal -->
+<script>
+window.jqReady = function() {
+    $("#redirectBackBtn").click(function() {
+        window.location = $(this).data('url');
+    });
+    // $('#redirectPkgAddBtn').click(function() {
+    //     $('#addEditModal').modal();
+    // });
+    // $('#addEditModal').on('show.bs.modal', function(e) {
+    //     $('#addEditForm').trigger('reset');
+    //     // $('#redirectHostname').trigger('focus');
+    // });
+    // $('#addEditForm').submit(function(e){
+    //     console.log('came here');
+    //     return false;
+    // });
+}
+</script>
+{{ end }}

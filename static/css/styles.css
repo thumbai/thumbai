@@ -1,3 +1,17 @@
+/* Copyright 2018 Jeevanandam M. (https://github.com/jeevatkm, jeeva@myjeeva.com)
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License. */
+
 /* global */
 .form-control:focus {
   border-color:dodgerblue;
@@ -152,8 +166,8 @@
   color: #6c757d;
 }
 
+/* admin/vanity/list.html */
 /* admin/vanity/index.html */
-/* admin/vanity/showhost.html */
 .admin-vanity .vanity-row,
 .admin-vanity-show .vanity-pkg-row {
   cursor: pointer;
@@ -164,6 +178,22 @@
 }
 .admin-vanity .vanity-row td > a,
 .admin-vanity-show .vanity-pkg-row td > a {
+  margin-left: 10px;
+  color: #626365;
+}
+
+/* admin/redirect/list.html */
+/* admin/vanredirectity/index.html */
+.admin-redirect .redirect-row,
+.admin-redirect-show .redirect-rule-row {
+  cursor: pointer;
+}
+.admin-redirect .table > thead > tr:first-child > th,
+.admin-redirect-show .table > thead > tr:first-child > th {
+  border-bottom: none;
+}
+.admin-redirect .redirect-row td > a,
+.admin-redirect-show .redirect-rule-row td > a {
   margin-left: 10px;
   color: #626365;
 }
