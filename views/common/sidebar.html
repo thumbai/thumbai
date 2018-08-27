@@ -17,28 +17,32 @@ limitations under the License. -->
     <ul class="nav flex-column">
       <li class="nav-item">
         <a class="nav-link {{ if .IsDashboard }}active{{ end }}" href="{{ rurl . "dashboard" }}">
-          <i class="fas fa-tachometer-alt fa-2x"></i>
-          Dashboard <span class="sr-only">(current)</span>
+          <i class="fas fa-tachometer-alt fa-2x"></i>Dashboard
+          {{ if .IsDashboard }}<span class="sr-only">(current)</span>{{ end }}
         </a>
       </li>
       <li class="nav-item">
         <a class="nav-link {{ if .IsModule }}active{{ end }}" href="#">
-          <i class="fas fa-cogs fa-2x"></i><br> Module
+          <i class="fas fa-cogs fa-2x"></i><br>Go Modules
+          {{ if .IsModule }}<span class="sr-only">(current)</span>{{ end }}
         </a>
       </li>
       <li class="nav-item">
         <a class="nav-link {{ if .IsVanity }}active{{ end }}" href="{{ rurl . "vanity_admin" }}">
-          <i class="fas fa-link fa-2x"></i><br> Vanity
+          <i class="fas fa-link fa-2x"></i><br>Go Vanities
+          {{ if .IsVanity }}<span class="sr-only">(current)</span>{{ end }}
         </a>
       </li>
       <li class="nav-item">
         <a class="nav-link {{ if .IsRedirect }}active{{ end }}" href="{{ rurl . "redirect_admin" }}">
-          <i class="fas fa-directions fa-2x"></i><br>Redirect
+          <i class="fas fa-directions fa-2x"></i><br>Redirects
+          {{ if .IsRedirect }}<span class="sr-only">(current)</span>{{ end }}
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="#">
-          <i class="fas fa-sitemap fa-2x"></i><br>Proxy
+        <a class="nav-link {{ if .IsProxy }}active{{ end }}" href="#">
+          <i class="fas fa-sitemap fa-2x"></i><br>Proxies
+          {{ if .IsProxy }}<span class="sr-only">(current)</span>{{ end }}
         </a>
       </li>
     </ul>

@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License. -->
 
 {{ define "title" }}
-<title>Redirect - Gorepositree</title>
+<title>Redirect Host: {{ pparam . "hostName" }} - Gorepositree</title>
 {{ end }} 
 
 {{ define "body-content" -}} 
@@ -21,7 +21,7 @@ limitations under the License. -->
     <h1>Redirect Host: <span class="font-weight-bold">{{ pparam . "hostName" }}</span>
         <span class="align-middle float-sm-right">
         <!-- <button id="redirectPkgAddBtn" data-url="#" data-toggle="tooltip" title="Add new redirect rule" class="btn btn-sm btn-outline-success pl-4 pr-4">Add</button> -->
-        <button id="redirectBackBtn" data-url="{{ rurl . "redirect_admin" }}" data-toggle="tooltip" title="Go back to all redirects page" class="btn btn-sm btn-outline-success pl-4 pr-4">Back</button>
+        <button id="redirectBackBtn" data-url="{{ rurl . "redirect_admin" }}" data-toggle="tooltip" title="Back to Redirects" class="btn btn-sm btn-outline-success pl-4 pr-4">Back</button>
         </span>
     </h1> 
     <div class="mt-5">

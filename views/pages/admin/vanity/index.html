@@ -1,13 +1,13 @@
 {{ define "title" }}
-<title>Vanity - Gorepositree</title>
+<title>Go Vanity Host: {{ pparam . "hostName" }} - Gorepositree</title>
 {{ end }} 
 
 {{ define "body-content" -}} 
 <div class="admin-vanity-show">
-    <h1>Vanity Host: <span class="font-weight-bold">{{ pparam . "hostName" }}</span>
+    <h1>Go Vanity Host: <span class="font-weight-bold">{{ pparam . "hostName" }}</span>
         <span class="align-middle float-sm-right">
         <!-- <button id="vanityPkgAddBtn" data-url="#" data-toggle="tooltip" title="Add new vanity package into host" class="btn btn-sm btn-outline-success pl-4 pr-4">Add</button> -->
-        <button id="vanityBackBtn" data-url="{{ rurl . "vanity_admin" }}" data-toggle="tooltip" title="Go back to all vanities page" class="btn btn-sm btn-outline-success pl-4 pr-4">Back</button>
+        <button id="vanityBackBtn" data-url="{{ rurl . "vanity_admin" }}" data-toggle="tooltip" title="Back to Go vanities" class="btn btn-sm btn-outline-success pl-4 pr-4">Back</button>
         </span>
     </h1> 
     <div class="mt-5">

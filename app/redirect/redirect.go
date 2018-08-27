@@ -36,7 +36,7 @@ var redirectHosts hosts
 func Load(_ *aah.Event) {
 	redirects := models.AllRedirects()
 	if redirects == nil || len(redirects) == 0 {
-		aah.AppLog().Info("Redirects is not yet configured on Gorepositree")
+		aah.AppLog().Info("Redirects are not yet configured on Gorepositree")
 		return
 	}
 

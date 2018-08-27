@@ -38,7 +38,7 @@ func Lookup(host, p string) *models.VanityPackage {
 func Load(_ *aah.Event) {
 	vanities := models.AllVanities()
 	if vanities == nil || len(vanities) == 0 {
-		aah.AppLog().Info("Vanity is not yet configured on Gorepositree")
+		aah.AppLog().Info("Vanities are not yet configured on Gorepositree")
 		return
 	}
 

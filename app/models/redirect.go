@@ -47,7 +47,7 @@ func PersistRedirectStore(_ *aah.Event) {
 	}
 }
 
-// AllRedirects methos redirects all the redirects configured in the system.
+// AllRedirects method returns all the redirects configuration from the store.
 func AllRedirects() map[string][]*Redirect {
 	redirectStore.RLock()
 	defer redirectStore.RUnlock()
@@ -79,9 +79,9 @@ func RedirectStats() map[string]int {
 
 // Redirect holds single redirect for proxy server.
 type Redirect struct {
-	Match  string
-	Target string
-	Code   int
+	Match  string `json:"match,omitempty"`
+	Target string `json:"target,omitempty"`
+	Code   int    `json:"code,omitempty"`
 }
 
 // RedirectStore is data store that holds redirects configuration by host.
