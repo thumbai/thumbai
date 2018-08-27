@@ -20,6 +20,7 @@ package main
 import (
 	"aahframe.work/aah"
 	"gorepositree.com/app/models"
+	"gorepositree.com/app/proxy"
 	"gorepositree.com/app/redirect"
 	"gorepositree.com/app/security"
 	"gorepositree.com/app/vanity"
@@ -53,14 +54,17 @@ func init() {
 	aah.OnStart(SubscribeWebSocketEvents)
 	aah.OnStart(models.LoadVanityStore, 1)
 	aah.OnStart(models.LoadRedirectStore, 1)
+	aah.OnStart(models.LoadProxyStore, 1)
 	aah.OnStart(vanity.Load, 2)
 	aah.OnStart(redirect.Load, 2)
+	aah.OnStart(proxy.Load, 2)
 
 	// Event: OnPreShutdown
 	// Doc: https://docs.aahframework.org/server-extension.html#event-onpreshutdown
 	//
 	aah.OnPreShutdown(models.PersistVanityStore)
 	aah.OnPreShutdown(models.PersistRedirectStore)
+	aah.OnPreShutdown(models.PersistProxyStore)
 
 	// Event: OnPostShutdown
 	// Doc: https://docs.aahframework.org/server-extension.html#event-onpostshutdown

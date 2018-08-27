@@ -30,14 +30,11 @@ func (c *DashboardController) Index() {
 		"IsDashboard":   true,
 		"VanityStats":   models.VanityStats(),
 		"RedirectStats": models.RedirectStats(),
+		"ProxyStats":    models.ProxyStats(),
 	})
 }
 
 // ToAdminDashboard method redirects path '/@admin' to '/@admin/dashboard'.
 func (c *DashboardController) ToAdminDashboard() {
 	c.Reply().Redirect(c.RouteURL("dashboard"))
-}
-
-func count(d map[string][]interface{}) {
-
 }
