@@ -20,7 +20,7 @@ limitations under the License. -->
 <div class="admin-redirect-show">
     <h1>Redirect Host: <span class="font-weight-bold">{{ pparam . "hostName" }}</span>
         <span class="align-middle float-sm-right">
-        <!-- <button id="redirectPkgAddBtn" data-url="#" data-toggle="tooltip" title="Add new redirect rule" class="btn btn-sm btn-outline-success pl-4 pr-4">Add</button> -->
+        <!-- <button id="redirectRuleAddBtn" data-url="#" data-toggle="tooltip" title="Add new redirect rule" class="btn btn-sm btn-outline-success pl-4 pr-4">Add</button> -->
         <button id="redirectBackBtn" data-url="{{ rurl . "redirect_admin" }}" data-toggle="tooltip" title="Back to Redirects" class="btn btn-sm btn-outline-success pl-4 pr-4">Back</button>
         </span>
     </h1> 
@@ -38,7 +38,7 @@ limitations under the License. -->
                 {{ if .Redirects }}
                 {{- range .Redirects }}
                 <tr class="redirect-rule-row" data-url="">
-                    <th scope="row"> {{ .Match }} </th>
+                    <td><span class="rule-value">{{ .Match }}</span></td>
                     <td>{{ .Target }}</td>
                     <td>{{ .Code }}</td>
                     <!-- <td class="text-center veritical-align-middle">
@@ -94,7 +94,7 @@ window.jqReady = function() {
     $("#redirectBackBtn").click(function() {
         window.location = $(this).data('url');
     });
-    // $('#redirectPkgAddBtn').click(function() {
+    // $('#redirectRuleAddBtn').click(function() {
     //     $('#addEditModal').modal();
     // });
     // $('#addEditModal').on('show.bs.modal', function(e) {

@@ -24,7 +24,7 @@
                 {{ if .Packages }}
                 {{- range .Packages }}
                 <tr class="vanity-pkg-row" data-url="">
-                    <th scope="row"> {{ .Path }} </th>
+                    <td>{{ .Path }}</td>
                     <td>{{ .Repo }}</td>
                     <td>{{ .VCS }}</td>
                     <!-- <td class="text-center veritical-align-middle">
