@@ -38,6 +38,10 @@ func LoadProxyStore(_ *aah.Event) {
 	if err := proxyStore.json.Load(&proxyStore.Data); err != nil {
 		aah.AppLog().Fatal(err)
 	}
+
+	if err := proxyStore.processData(); err != nil {
+		aah.AppLog().Fatal(err)
+	}
 }
 
 // PersistProxyStore persists the proxy configuration into filesystem.
@@ -92,6 +96,17 @@ func (ps *ProxyStore) byHost(hostName string) []*ProxyRule {
 	return nil
 }
 
+func (ps *ProxyStore) processData() error {
+	ps.Lock()
+	defer ps.Unlock()
+	for host, rules := range ps.Data {
+		for _, pr := range rules {
+			pr.Host = host
+		}
+	}
+	return nil
+}
+
 func (ps *ProxyStore) persist() {
 	ps.Lock()
 	if err := ps.json.Persist(&ps.Data); err != nil {
@@ -108,6 +123,7 @@ func (ps *ProxyStore) persist() {
 type ProxyRule struct {
 	Last           bool              `json:"last,omitempty"`
 	SkipTLSVerify  bool              `json:"skip_tls_verify,omitempty"`
+	Host           string            `json:"-"`
 	Path           string            `json:"path,omitempty"`
 	TargetURL      string            `json:"target_url,omitempty"`
 	QueryParams    map[string]string `json:"query_params,omitempty"`

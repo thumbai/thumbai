@@ -18,6 +18,10 @@ limitations under the License. */
   outline: 0;
   box-shadow:none !important;
 }
+.rule-value {
+  font-family: Menlo, Monaco, 'Courier New', monospace;
+  font-size: 80%;
+}
 
 /* header.html */
 .header .bg-dark {
@@ -79,6 +83,41 @@ limitations under the License. */
 /* body-content */
 [role="main"] {
   padding: 5%;
+}
+
+/* admin pages common */
+.admin-vanity .vanity-row,
+.admin-vanity-show .vanity-pkg-row,
+.admin-redirect .redirect-row,
+.admin-redirect-show .redirect-rule-row,
+.admin-proxy .proxy-row,
+.admin-proxy-show .proxy-rule-row {
+  cursor: pointer;
+}
+.admin-vanity .table > thead > tr:first-child > th,
+.admin-vanity-show .table > thead > tr:first-child > th,
+.admin-redirect .table > thead > tr:first-child > th,
+.admin-redirect-show .table > thead > tr:first-child > th,
+.admin-proxy .table > thead > tr:first-child > th,
+.admin-proxy-show .table > thead > tr:first-child > th {
+  border-bottom: none;
+}
+.admin-vanity .table > tbody > tr:last-child > td,
+.admin-vanity-show .table > tbody > tr:last-child > td,
+.admin-redirect .table > tbody > tr:last-child > td,
+.admin-redirect-show .table > tbody > tr:last-child > td,
+.admin-proxy .table > tbody > tr:last-child > td,
+.admin-proxy-show .table > tbody > tr:last-child > td {
+  border-bottom: 1px solid #dee2e6;
+}
+.admin-vanity .vanity-row td > a,
+.admin-vanity-show .vanity-pkg-row td > a,
+.admin-redirect .redirect-row td > a,
+.admin-redirect-show .redirect-rule-row td > a,
+.admin-proxy .proxy-row td > a,
+.admin-proxy-show .proxy-rule-row td > a {
+  margin-left: 10px;
+  color: #626365;
 }
 
 /* admin/user/login.html */
@@ -166,34 +205,7 @@ limitations under the License. */
   color: #6c757d;
 }
 
-/* admin/vanity/list.html */
-/* admin/vanity/index.html */
-.admin-vanity .vanity-row,
-.admin-vanity-show .vanity-pkg-row {
-  cursor: pointer;
-}
-.admin-vanity .table > thead > tr:first-child > th,
-.admin-vanity-show .table > thead > tr:first-child > th {
-  border-bottom: none;
-}
-.admin-vanity .vanity-row td > a,
-.admin-vanity-show .vanity-pkg-row td > a {
-  margin-left: 10px;
-  color: #626365;
-}
-
-/* admin/redirect/list.html */
-/* admin/vanredirectity/index.html */
-.admin-redirect .redirect-row,
-.admin-redirect-show .redirect-rule-row {
-  cursor: pointer;
-}
-.admin-redirect .table > thead > tr:first-child > th,
-.admin-redirect-show .table > thead > tr:first-child > th {
-  border-bottom: none;
-}
-.admin-redirect .redirect-row td > a,
-.admin-redirect-show .redirect-rule-row td > a {
-  margin-left: 10px;
-  color: #626365;
+/* admin/proxy/index.html */
+.admin-proxy-show .badge {
+  border-radius: 0;
 }

@@ -40,7 +40,7 @@ limitations under the License. -->
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link {{ if .IsProxy }}active{{ end }}" href="#">
+        <a class="nav-link {{ if .IsProxy }}active{{ end }}" href="{{ rurl . "proxy_admin" }}">
           <i class="fas fa-sitemap fa-2x"></i><br>Proxies
           {{ if .IsProxy }}<span class="sr-only">(current)</span>{{ end }}
         </a>

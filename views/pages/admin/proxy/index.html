@@ -1,0 +1,121 @@
+<!-- Copyright 2018 Jeevanandam M. (https://github.com/jeevatkm, jeeva@myjeeva.com)
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License. -->
+
+{{ define "title" }}
+<title>Proxy Host: {{ pparam . "hostName" }} - Gorepositree</title>
+{{ end }} 
+
+{{ define "body-content" -}} 
+<div class="admin-proxy-show">
+    <h1>Proxy Host: <span class="font-weight-bold">{{ pparam . "hostName" }}</span>
+        <span class="align-middle float-sm-right">
+        <button id="proxyRuleAddBtn" data-url="#" data-toggle="tooltip" title="Add new proxy rule" class="btn btn-sm btn-outline-success pl-4 pr-4">Add</button>
+        <button id="proxyBackBtn" data-url="{{ rurl . "proxy_admin" }}" data-toggle="tooltip" title="Back to Proxies" class="btn btn-sm btn-outline-success pl-4 pr-4">Back</button>
+        </span>
+    </h1> 
+    <div class="mt-5">
+        <table class="table table-hover">
+            <thead class="bg-dark text-white">
+                <tr>
+                <th scope="col" class="w-75">Proxy Rules</th>
+                <th class="w-25">Target URL</th>
+                <!-- <th scope="col">&nbsp;</th> -->
+                </tr>
+            </thead>
+            <tbody>
+                {{ if .ProxyRules }}
+                {{- range .ProxyRules }}
+                <tr class="proxy-rule-row" data-url="">
+                    <td>
+                        <div>
+                            <span class="badge badge-secondary">Host</span><span class="rule-value"> {{ .Host }}</span>{{ if .Last }}&nbsp;&nbsp;<span class="badge badge-success">Last Rule</span>{{ end }}
+                            {{ if .Path }}<br><span class="badge badge-secondary">Path</span><span class="rule-value"> {{ .Path }}</span>{{ end }}
+                            {{ if .SkipTLSVerify }}<br><span class="badge badge-secondary">SkipTLSVerify</span><span class="rule-value"> true</span>{{ end }}
+                            {{ if .QueryParams }}<br>
+                            <span class="badge badge-secondary">Query Params</span><span class="rule-value"> {{ mapstr2str .QueryParams }}</span>
+                            {{ end }}
+                            {{ if .Headers }}<br>
+                            <span class="badge badge-secondary">Headers</span><span class="rule-value"> {{ mapstr2str .Headers }}</span>
+                            {{ end }}
+                            {{ if .RequestHeader }}<br>
+                            <span class="badge badge-secondary">Request Header</span><br>
+                            {{ if .RequestHeader.Add }}
+                            <span class="badge badge-light">Add</span><span class="rule-value"> {{ mapstr2str .RequestHeader.Add }}</span><br>
+                            {{ end }}{{ if .RequestHeader.Remove }}
+                            <span class="badge badge-light">Remove</span><span class="rule-value"> {{ join .RequestHeader.Remove ", " }}</span>
+                            {{ end }}
+                            {{ end }}
+                            {{ if .ResponseHeader }}<br>
+                            <span class="badge badge-secondary">Response Header</span><br>
+                            {{ if .ResponseHeader.Add }}
+                            <span class="badge badge-light">Add</span><span class="rule-value"> {{ mapstr2str .ResponseHeader.Add }}</span><br>
+                            {{ end }}{{ if .ResponseHeader.Remove }}
+                            <span class="badge badge-light">Remove</span><span class="rule-value"> {{ join .ResponseHeader.Remove ", " }}</span>
+                            {{ end }}
+                            {{ end }}
+                        </div>                        
+                    </td>
+                    <td>{{ .TargetURL }}</td>
+                    <!-- <td class="text-center veritical-align-middle">
+                        <a href=""><i class="fas fa-edit fa-lg"></i></a>     
+                        <a href=""><i class="fas fa-trash-alt fa-lg"></i></a>
+                    </td> -->
+                </tr>
+                {{- end }}
+                {{ end }}
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- Add/Edit proxy host record -->
+<div class="modal fade" id="addEditModal" tabindex="-1" role="dialog" aria-labelledby="addEditModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addEditModalTitle">Add proxy rule</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addEditForm" class="mt-3">
+                    
+                    <div class="float-right mt-3 pb-2">
+                        <button type="button" class="btn btn-sm btn-outline-secondary pl-4 pr-4" data-dismiss="modal">Close</button>
+                        <button id="modalAddBtn" type="submit" class="btn btn-sm btn-outline-success pl-4 pr-4">Add</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /addEditModal -->
+<script>
+window.jqReady = function() {
+    $("#proxyBackBtn").click(function() {
+        window.location = $(this).data('url');
+    });
+    $('#proxyRuleAddBtn').click(function() {
+        $('#addEditModal').modal();
+    });
+    $('#addEditModal').on('show.bs.modal', function(e) {
+        $('#addEditForm').trigger('reset');
+    });
+    $('#addEditForm').submit(function(e){
+        console.log('came here');
+        return false;
+    });
+}
+</script>
+{{ end }}

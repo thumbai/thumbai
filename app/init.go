@@ -18,11 +18,15 @@
 package main
 
 import (
+	"html/template"
+	"strings"
+
 	"aahframe.work/aah"
 	"gorepositree.com/app/models"
 	"gorepositree.com/app/proxy"
 	"gorepositree.com/app/redirect"
 	"gorepositree.com/app/security"
+	"gorepositree.com/app/util"
 	"gorepositree.com/app/vanity"
 )
 
@@ -100,9 +104,10 @@ func init() {
 	// Add Custom Template Functions
 	// Doc: https://docs.aahframework.org/template-funcs.html
 	//__________________________________________________________________________
-	// aah.AddTemplateFunc(template.FuncMap{
-	// // ...
-	// })
+	aah.AddTemplateFunc(template.FuncMap{
+		"mapstr2str": util.MapStringToString,
+		"join":       strings.Join,
+	})
 
 	//‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 	// Add Custom Session Store
