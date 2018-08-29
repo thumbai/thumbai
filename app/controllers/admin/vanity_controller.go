@@ -15,8 +15,9 @@
 package admin
 
 import (
+	"thumbai/app/models"
+
 	"aahframe.work/aah"
-	"gorepositree.com/app/models"
 )
 
 // VanityController controller manages the Vanity host and its packages.

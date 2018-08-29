@@ -15,8 +15,9 @@
 package admin
 
 import (
+	"thumbai/app/models"
+
 	"aahframe.work/aah"
-	"gorepositree.com/app/models"
 )
 
 // RedirectController controller manages the host and its redirects.

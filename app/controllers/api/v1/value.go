@@ -3,9 +3,10 @@ package v1
 import (
 	"fmt"
 
+	"thumbai/app/models"
+
 	"aahframe.work/aah"
 	"aahframe.work/aah/ahttp"
-	"gorepositree.com/app/models"
 )
 
 var values = make(map[string]*models.Value)

@@ -3,9 +3,10 @@ package websockets
 import (
 	"strings"
 
+	"thumbai/app/models"
+
 	"aahframe.work/aah"
 	"aahframe.work/aah/ws"
-	"gorepositree.com/app/models"
 )
 
 // SampleWebSocket is aah's sample WebSocket implementation.

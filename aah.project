@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------------
-# gorepositree.com - aah framework project
+# thumbai - aah framework project
 #
 # Doc: https://docs.aahframework.org/aah-project-file.html
 # Note: Add it to version control
@@ -13,7 +13,7 @@
 build {
   # Application binary name
   # Default value is `name` attribute value from `aah.conf`
-  binary_name = "gorepositree"
+  #binary_name = "thumbai"
 
   # Used as fallback if
   #   - `git commit sha` or

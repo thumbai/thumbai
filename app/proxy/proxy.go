@@ -23,8 +23,9 @@ import (
 	"regexp"
 	"strings"
 
+	"thumbai/app/models"
+
 	"aahframe.work/aah"
-	"gorepositree.com/app/models"
 )
 
 var proxyHosts hosts

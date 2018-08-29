@@ -21,13 +21,14 @@ import (
 	"html/template"
 	"strings"
 
+	"thumbai/app/models"
+	"thumbai/app/proxy"
+	"thumbai/app/redirect"
+	"thumbai/app/security"
+	"thumbai/app/util"
+	"thumbai/app/vanity"
+
 	"aahframe.work/aah"
-	"gorepositree.com/app/models"
-	"gorepositree.com/app/proxy"
-	"gorepositree.com/app/redirect"
-	"gorepositree.com/app/security"
-	"gorepositree.com/app/util"
-	"gorepositree.com/app/vanity"
 )
 
 func init() {

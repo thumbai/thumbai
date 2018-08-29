@@ -22,7 +22,7 @@ import (
 
 	"aahframe.work/aah"
 	"aahframe.work/aah/ahttp"
-	"gorepositree.com/app/models"
+	"thumbai/app/models"
 )
 
 var redirectHosts hosts

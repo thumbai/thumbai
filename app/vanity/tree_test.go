@@ -20,8 +20,9 @@ import (
 	"strings"
 	"testing"
 
+	"thumbai/app/models"
+
 	"github.com/stretchr/testify/assert"
-	"gorepositree.com/app/models"
 )
 
 func TestTreeAddAndLookup(t *testing.T) {

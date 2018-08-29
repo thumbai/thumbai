@@ -18,11 +18,12 @@ import (
 	"errors"
 	"strings"
 
+	"thumbai/app/models"
+
 	"aahframe.work/aah"
-	"gorepositree.com/app/models"
 )
 
-var errNodeExists = errors.New("gorepositree/tree: node exists")
+var errNodeExists = errors.New("tree: node exists")
 
 //‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 // Package methods

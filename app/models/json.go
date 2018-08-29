@@ -26,7 +26,7 @@ import (
 )
 
 func newJSONFile(store, filename string) *jsonFile {
-	storePath := aah.AppConfig().StringDefault("gorepositree.data_store.location",
+	storePath := aah.AppConfig().StringDefault("thumbai.data_store.location",
 		filepath.Join(aah.AppBaseDir(), "data"))
 	storePath = filepath.Join(storePath, filename)
 
