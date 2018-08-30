@@ -39,7 +39,7 @@ var proxyHosts hosts
 func Load(_ *aah.Event) {
 	proxies := models.AllProxies()
 	if proxies == nil || len(proxies) == 0 {
-		aah.AppLog().Info("Proxies are not yet configured on Gorepositree")
+		aah.AppLog().Info("Proxies are not yet configured on THUMBAI")
 		return
 	}
 

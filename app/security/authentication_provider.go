@@ -41,13 +41,13 @@ func (a *AuthenticationProvider) GetAuthenticationInfo(authcToken *authc.Authent
 
 	// User found, now create authentication info and return to the framework
 	authcInfo := authc.NewAuthenticationInfo()
-	// authcInfo.Principals = append(authcInfo.Principals,
-	// 	&authc.Principal{
-	// 		Value:     user.Email,
-	// 		IsPrimary: true,
-	// 		Realm:     "inmemory",
-	// 	})
-	// authcInfo.Credential = []byte(user.Password)
+	authcInfo.Principals = append(authcInfo.Principals,
+		&authc.Principal{
+			Value:     "admin@admin.com",
+			IsPrimary: true,
+			Realm:     "inmemory",
+		})
+	authcInfo.Credential = []byte("$2y$10$2A4GsJ6SmLAMvDe8XmTam.MSkKojdobBVJfIU7GiyoM.lWt.XV3H6") // welcome123
 	// authcInfo.IsLocked = user.IsLocked
 	// authcInfo.IsExpired = user.IsExpried
 

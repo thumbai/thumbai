@@ -33,7 +33,7 @@ func TestTreeAddAndLookup(t *testing.T) {
 		"/cli",
 		"/cache/provider/redis",
 	} {
-		err := tt.add("aahframe.work", importPath, &models.PackageInfo{Path: importPath})
+		err := tt.add("aahframe.work", importPath, &models.VanityPackage{Path: importPath})
 		assert.Nil(t, err)
 		// assert.Equal(t, errNodeExists, err)
 	}

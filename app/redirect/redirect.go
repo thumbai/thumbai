@@ -20,9 +20,10 @@ import (
 	"strconv"
 	"strings"
 
+	"thumbai/app/models"
+
 	"aahframe.work/aah"
 	"aahframe.work/aah/ahttp"
-	"thumbai/app/models"
 )
 
 var redirectHosts hosts
@@ -36,7 +37,7 @@ var redirectHosts hosts
 func Load(_ *aah.Event) {
 	redirects := models.AllRedirects()
 	if redirects == nil || len(redirects) == 0 {
-		aah.AppLog().Info("Redirects are not yet configured on Gorepositree")
+		aah.AppLog().Info("Redirects are not yet configured on THUMBAI")
 		return
 	}
 

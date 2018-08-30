@@ -1,8 +1,11 @@
 {{ define "title" }}
-<title>Admin Dashboard - Gorepositree</title>
+<title>Admin Dashboard - THUMBAI</title>
 {{ end }} 
 
-{{ define "body-content" -}} 
+{{ define "body-content" -}}
+{{ $vanityAdminURL := rurl . "vanity_admin" }}
+{{ $redirectAdminURL := rurl . "redirect_admin" }}
+{{ $proxyAdminURL := rurl . "proxy_admin" }}
 <div class="admin-dashboard">
     <div style="height: 75vh">
         <div class="d-flex justify-content-center align-items-center h-100">
@@ -17,26 +20,28 @@
                                     <p class="text-center h3">Go Modules</p>
                                 </div>
                             </div>
-                            <div class="card mb-4 shadow-sm">
+                            <div id="cardGoVanities" class="card mb-4 shadow-sm">
                                 <div class="card-body text-center">
                                     <h3 class="card-title">{{ .VanityStats.Host }} <span class="stats-lbl">hosts</span>, {{ .VanityStats.Packages }} <span class="stats-lbl">packages</span></h3>
                                     <hr>
                                     <p class="h3">Go Vanities</p>
-                                    <!-- <div class="mt-3"><a href="{{ rurl . "vanity_admin" }}" class="text-muted">configure</a></div> -->
+                                    <div class="mt-3"><a href="{{ $vanityAdminURL }}" class="text-muted">configure</a></div>
                                 </div>
                             </div>
-                            <div class="card mb-4 shadow-sm">
+                            <div id="cardRedirects" class="card mb-4 shadow-sm">
                                 <div class="card-body">
                                     <h3 class="card-title">{{ .RedirectStats.Host }} <span class="stats-lbl">hosts</span>, {{ .RedirectStats.Redirects }} <span class="stats-lbl">redirects</span></h3>
                                     <hr>
                                     <p class="text-center h3">Redirects</p>
+                                    <div class="mt-3"><a href="{{ $redirectAdminURL }}" class="text-muted">configure</a></div>
                                 </div>
                             </div>
-                            <div class="card mb-4 shadow-sm">
+                            <div id="cardProxies" class="card mb-4 shadow-sm">
                                 <div class="card-body">
                                     <h3 class="card-title">{{ .ProxyStats.Host }} <span class="stats-lbl">hosts</span>, {{ .ProxyStats.ProxyRules }} <span class="stats-lbl">rules</span></h3>
                                     <hr>
                                     <p class="text-center h3">Proxies</p>
+                                    <div class="mt-3"><a href="{{ $proxyAdminURL }}" class="text-muted">configure</a></div>
                                 </div>
                             </div>
                         </div>
@@ -46,4 +51,17 @@
         </div>
     </div>
 </div> <!-- /admin-dashboard -->
+<script>
+window.jqReady = function() {
+    $('#cardGoVanities').click(function(){
+        window.location = '{{ $vanityAdminURL }}';
+    });
+    $('#cardRedirects').click(function(){
+        window.location = '{{ $redirectAdminURL }}';
+    });
+    $('#cardProxies').click(function(){
+        window.location = '{{ $proxyAdminURL }}';
+    });
+}
+</script>
 {{ end -}}

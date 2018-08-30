@@ -86,7 +86,7 @@ func init() {
 		// aah.CORSMiddleware,
 		aah.BindMiddleware,
 		aah.AntiCSRFMiddleware,
-		// aah.AuthcAuthzMiddleware,
+		aah.AuthcAuthzMiddleware,
 
 		//
 		// NOTE: Register your Custom middleware's right here

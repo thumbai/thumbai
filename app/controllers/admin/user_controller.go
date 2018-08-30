@@ -19,7 +19,25 @@ type UserController struct {
 	BaseController
 }
 
+// BeforeLogin method is an interceptor for action Login.
+// func (c *UserController) BeforeLogin() {
+// 	if c.Subject().IsAuthenticated() {
+// 		c.Reply().Redirect(c.RouteURL("dashboard"))
+// 		c.Abort()
+// 	}
+// }
+
 // Login method does the subject login.
-func (c UserController) Login() {
+func (c *UserController) Login() {
+	if c.Subject().IsAuthenticated() {
+		c.Reply().Redirect(c.RouteURL("dashboard"))
+		return
+	}
 	c.Reply().HTMLl("basic.html", nil)
+}
+
+// Logout method does the subject logout.
+func (c *UserController) Logout() {
+	c.Subject().Logout()
+	c.Reply().Redirect(c.RouteURL("login"))
 }

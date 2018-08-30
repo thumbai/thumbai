@@ -13,6 +13,10 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 /* global */
+html {
+  position: relative;
+  min-height: 100%;
+}
 .form-control:focus {
   border-color:dodgerblue;
   outline: 0;
@@ -21,6 +25,10 @@ limitations under the License. */
 .rule-value {
   font-family: Menlo, Monaco, 'Courier New', monospace;
   font-size: 80%;
+}
+.thumbai-logo-dark-256 {
+  width: 256px;
+  height: 39px;
 }
 
 /* header.html */
@@ -36,6 +44,21 @@ limitations under the License. */
 }
 .header .hdr-sign-out:hover {
   color: orangered !important;
+}
+
+/* footer.html */
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 50px;
+}
+.footer .credit-info {
+  font-size: 70%;
+  color: #6c757dcc;
+}
+.footer .credit-info a {
+  color: inherit;
 }
 
 /* sidebar.html */
@@ -124,8 +147,8 @@ limitations under the License. */
 .login {
   margin-top: 9%;
 }
-.login .card-container.card {
-  max-width: 350px;
+.login .card-container-inner {
+  max-width: 450px;
   padding: 40px 40px;
 }
 .login .btn {
@@ -139,21 +162,20 @@ limitations under the License. */
 }
  .login .card {
   background-color: #F7F7F7;
-  padding: 20px 25px 30px;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  padding: 25px 30px 35px;
   margin: 0 auto 25px;
   margin-top: 50px;
   -moz-border-radius: 2px;
   -webkit-border-radius: 2px;
   border-radius: 2px;
 }
-.login .profile-img-card {
-  width: 96px;
-  height: 96px;
-  margin: 0 auto 10px;
-  display: block;
-  -moz-border-radius: 50%;
-  -webkit-border-radius: 50%;
-  border-radius: 50%;
+.login .login-logo-sec {
+  text-align: center;
+  margin-bottom: 10%;
+}
+.login .form-signin {
+  width: 350px;
 }
 .login .form-signin #inputEmail,
 .login .form-signin #inputPassword {
@@ -161,7 +183,6 @@ limitations under the License. */
   height: 44px;
   font-size: 16px;
 }
-
 .login .form-signin input[type=email],
 .login .form-signin input[type=password],
 .login .form-signin input[type=text],
@@ -189,6 +210,7 @@ limitations under the License. */
   -moz-transition: all 0.218s;
   -webkit-transition: all 0.218s;
   transition: all 0.218s;
+  margin-top: 20px;
 }
 .login .btn.btn-signin:hover,
 .login .btn.btn-signin:active,
@@ -203,6 +225,9 @@ limitations under the License. */
 .admin-dashboard .stats-lbl {
   font-size: 0.7em;
   color: #6c757d;
+}
+#cardGoVanities, #cardRedirects, #cardProxies {
+  cursor: pointer;
 }
 
 /* admin/proxy/index.html */
