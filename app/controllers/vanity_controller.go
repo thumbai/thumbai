@@ -31,14 +31,11 @@ type VanityController struct {
 // control over to proxy pass.
 func (c *VanityController) Handle() {
 	pkg := vanity.Lookup(c.Req.Host, c.Req.Path)
-	// pkg := vanity.Lookup("aahframe.work", c.Req.Path) // TODO Remove
 	if pkg == nil {
 		if redirect.Do(c.Context) {
 			return
 		}
 
-		// c.Req.Host = "localhost:8080"          // TODO Remove
-		// c.Req.Unwrap().Host = "localhost:8080" // TODO Remove
 		proxy.Do(c.Context)
 		return
 	}

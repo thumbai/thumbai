@@ -48,7 +48,7 @@ build {
   #
   # For valid pattern syntax, refer to https://golang.org/pkg/path/filepath/#Match
   excludes = ["*.go", ".*", "*.bak", "*.tmp", "*.pid",
-    "vendor", "app", "build", "tests", "logs", "data"]
+    "vendor", "app", "build", "tests", "logs", "data", "certs"]
 }
 
 # ---------------------------------------------------------------------------

@@ -23,3 +23,13 @@ import (
 type BaseController struct {
 	*aah.Context
 }
+
+// Before method is an interceptor for admin path.
+func (c *BaseController) Before() {
+	host := aah.AppConfig().StringDefault("thumbai.admin.host", "")
+	if c.Req.Host != host {
+		c.Reply().Forbidden().Text("403 Forbidden")
+		c.Abort()
+		return
+	}
+}
