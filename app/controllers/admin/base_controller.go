@@ -19,11 +19,7 @@ import (
 )
 
 // BaseController for admin controllers.
+// Created for any common abstraction of admin controllers.
 type BaseController struct {
 	*aah.Context
-}
-
-// Before method is interceptor for admin scope.
-func (c *BaseController) Before() {
-
 }

@@ -64,6 +64,10 @@ limitations under the License. -->
                             <span class="badge badge-light">Remove</span><span class="rule-value"> {{ join .ResponseHeader.Remove ", " }}</span>
                             {{ end }}
                             {{ end }}
+                            {{ if .Statics }}<br>
+                            <span class="badge badge-secondary">Static Files</span>
+                            {{ range .Statics }}<br><span class="rule-value">{{ .TargetPath }}</span>{{ end }}
+                            {{ end }}
                         </div>                        
                     </td>
                     <td>{{ .TargetURL }}</td>
@@ -104,7 +108,7 @@ limitations under the License. -->
 <script>
 window.jqReady = function() {
     $("#proxyBackBtn").click(function() {
-        window.location = $(this).data('url');
+        location = $(this).data('url');
     });
     $('#proxyRuleAddBtn').click(function() {
         $('#addEditModal').modal();

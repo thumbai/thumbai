@@ -32,18 +32,14 @@ html {
 }
 
 /* header.html */
-.header .bg-dark {
-  background-color: #1a1b1d !important;
-}
 .header .navbar-brand {
-  padding-top: .75rem;
   padding-bottom: .75rem;
 }
 .header .hdr-sign-out {
-  color: #28a74a;
+  color: #56e67c;
 }
 .header .hdr-sign-out:hover {
-  color: orangered !important;
+  color: rgb(255, 68, 0) !important;
 }
 
 /* footer.html */
@@ -68,14 +64,15 @@ html {
   bottom: 0;
   left: 0;
   z-index: 100; /* Behind the navbar */
-  padding: 55px 0 0; /* Height of navbar */
+  padding: 50px 0 0; /* Height of navbar */
   box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
 }
 .sidebar-sticky {
   position: relative;
   top: 0;
-  height: calc(100vh - 55px);
+  height: calc(100vh - 50px);
   padding-top: .5rem;
+  background-color: #F7F7F7;
   overflow-x: hidden;
   overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
 }
@@ -91,15 +88,17 @@ html {
 }
 .sidebar .nav-link {
   font-weight: 500;
-  color: #c6c5c5;
+  color: #6c757d;
 }
 .sidebar .nav-link.active {
   color: #fff;
-  background-color: rgba(0, 0, 0, .25);
+  background-color: #4f5458;
   box-shadow: inset -1px 0 0 rgba(0, 0, 0, .25);
 }
-
 .sidebar .nav-link:hover {
+  color: #343a40;
+}
+.sidebar .nav-link:hover.active {
   color: #fff;
 }
 
@@ -219,8 +218,11 @@ html {
 }
 
 /* admin/dashboard/index.html */
+.admin-dashboard .card {
+  border-color: rgb(241, 241, 241);
+}
 .admin-dashboard .card hr {
-  border-top: 1px dotted;
+  border-top: 1px dotted #c5c5c6;
 }
 .admin-dashboard .stats-lbl {
   font-size: 0.7em;

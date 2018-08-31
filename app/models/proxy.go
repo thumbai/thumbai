@@ -128,12 +128,21 @@ type ProxyRule struct {
 	TargetURL      string            `json:"target_url,omitempty"`
 	QueryParams    map[string]string `json:"query_params,omitempty"`
 	Headers        map[string]string `json:"headers,omitempty"`
-	RequestHeader  *Header           `json:"request_header,omitempty"`
-	ResponseHeader *Header           `json:"response_header,omitempty"`
+	RequestHeader  *ProxyHeader      `json:"request_header,omitempty"`
+	ResponseHeader *ProxyHeader      `json:"response_header,omitempty"`
+	Statics        []*ProxyStatic    `json:"statics,omitempty"`
 }
 
-// Header struct holds the headers request and response that needs to be added or removed.
-type Header struct {
+// ProxyHeader struct holds the headers request and
+// response that needs to be added or removed.
+type ProxyHeader struct {
 	Add    map[string]string `json:"add,omitempty"`
 	Remove []string          `json:"remove,omitempty"`
+}
+
+// ProxyStatic struct holds the static files directory mappings.
+// It used to check before proxying request to upstream targets.
+type ProxyStatic struct {
+	StripPrefix string `json:"strip_prefix,omitempty"`
+	TargetPath  string `json:"target_path,omitempty"`
 }

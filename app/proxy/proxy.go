@@ -20,12 +20,14 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"path/filepath"
 	"regexp"
 	"strings"
 
 	"thumbai/app/models"
 
 	"aahframe.work/aah"
+	"aahframe.work/aah/essentials"
 )
 
 var proxyHosts hosts
@@ -72,7 +74,7 @@ func Do(ctx *aah.Context) {
 		return
 	}
 
-	var proxy *httputil.ReverseProxy
+	var tr *rule
 	for _, r := range host.ProxyRules {
 		if len(r.Path) > 0 || r.PathRegex != nil {
 			path := false
@@ -112,21 +114,33 @@ func Do(ctx *aah.Context) {
 			}
 		}
 
-		proxy = r.Proxy
+		tr = r
 		break
 	}
 
-	if proxy != nil {
-		ctx.Reply().Done()
-		proxy.ServeHTTP(ctx.Res, ctx.Req.Unwrap())
-		return
-	} else if host.LastRule != nil {
-		ctx.Reply().Done()
-		host.LastRule.Proxy.ServeHTTP(ctx.Res, ctx.Req.Unwrap())
+	if tr == nil {
+		tr = host.LastRule
+	}
+	if tr == nil {
+		ctx.Reply().Status(http.StatusBadGateway).Text("502 Bad Gateway")
 		return
 	}
 
-	ctx.Reply().Status(http.StatusBadGateway).Text("502 Bad Gateway")
+	for _, sf := range tr.Statics {
+		tp := ctx.Req.Path
+		if len(sf.StripPrefix) > 0 {
+			tp = strings.TrimPrefix(tp, sf.StripPrefix)
+		}
+
+		tp = filepath.Join(sf.TargetPath, tp)
+		if ess.IsFileExists(tp) {
+			ctx.Reply().File(tp)
+			return
+		}
+	}
+
+	ctx.Reply().Done()
+	tr.Proxy.ServeHTTP(ctx.Res, ctx.Req.Unwrap())
 }
 
 //‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
@@ -145,8 +159,9 @@ type rule struct {
 	PathRegex   *regexp.Regexp
 	QueryParams map[string]string
 	Headers     map[string]string
-	ReqHdr      *models.Header
-	ResHdr      *models.Header
+	ReqHdr      *models.ProxyHeader
+	ResHdr      *models.ProxyHeader
+	Statics     []*models.ProxyStatic
 	Proxy       *httputil.ReverseProxy
 	host        *host
 }
@@ -177,6 +192,13 @@ func (h *host) AddProxyRule(pr *models.ProxyRule) error {
 	if pr.ResponseHeader != nil {
 		resHdr := *pr.ResponseHeader
 		r.ResHdr = &resHdr
+	}
+
+	if len(pr.Statics) > 0 {
+		for _, v := range pr.Statics {
+			t := *v
+			r.Statics = append(r.Statics, &t)
+		}
 	}
 
 	if err := r.createReverseProxy(pr.TargetURL, pr.SkipTLSVerify); err != nil {
