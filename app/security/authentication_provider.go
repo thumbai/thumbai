@@ -1,6 +1,8 @@
 package security
 
 import (
+	"strings"
+
 	"aahframe.work/aah"
 	"aahframe.work/aah/config"
 	"aahframe.work/aah/security/authc"
@@ -21,6 +23,9 @@ func (a *AuthenticationProvider) Init(appCfg *config.Config) error {
 
 // GetAuthenticationInfo method is `authc.Authenticator` interface
 func (a *AuthenticationProvider) GetAuthenticationInfo(authcToken *authc.AuthenticationToken) (*authc.AuthenticationInfo, error) {
+	if strings.ToLower(authcToken.Identity) != "admin" {
+		return nil, authc.ErrSubjectNotExists
+	}
 
 	//‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 	// This code snippet provided as a reference

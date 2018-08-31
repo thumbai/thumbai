@@ -176,13 +176,12 @@ html {
 .login .form-signin {
   width: 350px;
 }
-.login .form-signin #inputEmail,
+.login .form-signin #inputUsername,
 .login .form-signin #inputPassword {
   direction: ltr;
   height: 44px;
   font-size: 16px;
 }
-.login .form-signin input[type=email],
 .login .form-signin input[type=password],
 .login .form-signin input[type=text],
 .login .form-signin button {

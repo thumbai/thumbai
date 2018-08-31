@@ -12,11 +12,11 @@
   <link rel="preload" href="/@admin/assets/css/source-sans-pro-v11.css" as="style">
   <link rel="preload" href="/@admin/assets/css/font-awesome-5.3.1-all.css" as="style">
   <link rel="preload" href="/@admin/assets/css/bootstrap-4.1.3.min.css" as="style">
-  <link rel="preload" href="/@admin/assets/css/styles.css" as="style">
+  <link rel="preload" href="/@admin/assets/css/styles-{{ .AppBuildInfo.Version }}.css" as="style">
   <link rel="preload" href="/@admin/assets/js/jquery-3.3.1.slim.min.js" as="script">
   <link rel="preload" href="/@admin/assets/js/popper-1.14.3.min.js" as="script">
   <link rel="preload" href="/@admin/assets/js/bootstrap-4.1.3.min.js" as="script">
-  <link rel="preload" href="/@admin/assets/js/aah.js" as="script">
+  <link rel="preload" href="/@admin/assets/js/aah-{{ .AppBuildInfo.Version }}.js" as="script">
   {{ include "head_tags.html" . }}
 </head>
 
