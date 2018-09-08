@@ -20,7 +20,7 @@ limitations under the License. -->
 <div class="admin-proxy-show">
     <h1>Proxy Host: <span class="font-weight-bold">{{ pparam . "hostName" }}</span>
         <span class="align-middle float-sm-right">
-        <button id="proxyRuleAddBtn" data-url="#" data-toggle="tooltip" title="Add new proxy rule" class="btn btn-sm btn-outline-success pl-4 pr-4">Add</button>
+        <!-- <button id="proxyRuleAddBtn" data-url="#" data-toggle="tooltip" title="Add new proxy rule" class="btn btn-sm btn-outline-success pl-4 pr-4">Add</button> -->
         <button id="proxyBackBtn" data-url="{{ rurl . "proxy_admin" }}" data-toggle="tooltip" title="Back to Proxies" class="btn btn-sm btn-outline-success pl-4 pr-4">Back</button>
         </span>
     </h1> 
@@ -64,6 +64,15 @@ limitations under the License. -->
                             <span class="badge badge-light">Remove</span><span class="rule-value"> {{ join .ResponseHeader.Remove ", " }}</span>
                             {{ end }}
                             {{ end }}
+                            {{ if .RestrictFile }}<br>
+                            <span class="badge badge-secondary">Restrict File</span>
+                            {{ if .RestrictFile.Extension }}<br>
+                            <span class="badge badge-light">By Extension</span><span class="rule-value"> {{ join .RestrictFile.Extension ", " }}</span>
+                            {{ end }}
+                            {{ if .RestrictFile.Match }}<br>
+                            <span class="badge badge-light">By Match</span><span class="rule-value"> {{ join .RestrictFile.Match ", " }}</span>
+                            {{ end }}
+                            {{ end }}
                             {{ if .Statics }}<br>
                             <span class="badge badge-secondary">Static Files</span>
                             {{ range .Statics }}<br><span class="rule-value">{{ .TargetPath }}</span>{{ end }}
@@ -83,7 +92,7 @@ limitations under the License. -->
     </div>
 </div>
 <!-- Add/Edit proxy host record -->
-<div class="modal fade" id="addEditModal" tabindex="-1" role="dialog" aria-labelledby="addEditModalTitle" aria-hidden="true">
+<!-- <div class="modal fade" id="addEditModal" tabindex="-1" role="dialog" aria-labelledby="addEditModalTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -103,23 +112,23 @@ limitations under the License. -->
             </div>
         </div>
     </div>
-</div>
+</div> -->
 <!-- /addEditModal -->
 <script>
 window.jqReady = function() {
     $("#proxyBackBtn").click(function() {
         location = $(this).data('url');
     });
-    $('#proxyRuleAddBtn').click(function() {
-        $('#addEditModal').modal();
-    });
-    $('#addEditModal').on('show.bs.modal', function(e) {
-        $('#addEditForm').trigger('reset');
-    });
-    $('#addEditForm').submit(function(e){
-        console.log('came here');
-        return false;
-    });
+    // $('#proxyRuleAddBtn').click(function() {
+    //     $('#addEditModal').modal();
+    // });
+    // $('#addEditModal').on('show.bs.modal', function(e) {
+    //     $('#addEditForm').trigger('reset');
+    // });
+    // $('#addEditForm').submit(function(e){
+    //     console.log('came here');
+    //     return false;
+    // });
 }
 </script>
 {{ end }}

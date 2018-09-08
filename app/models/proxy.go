@@ -121,16 +121,17 @@ func (ps *ProxyStore) persist() {
 
 // ProxyRule represents one proxy pass rule.
 type ProxyRule struct {
-	Last           bool              `json:"last,omitempty"`
-	SkipTLSVerify  bool              `json:"skip_tls_verify,omitempty"`
-	Host           string            `json:"-"`
-	Path           string            `json:"path,omitempty"`
-	TargetURL      string            `json:"target_url,omitempty"`
-	QueryParams    map[string]string `json:"query_params,omitempty"`
-	Headers        map[string]string `json:"headers,omitempty"`
-	RequestHeader  *ProxyHeader      `json:"request_header,omitempty"`
-	ResponseHeader *ProxyHeader      `json:"response_header,omitempty"`
-	Statics        []*ProxyStatic    `json:"statics,omitempty"`
+	Last           bool               `json:"last,omitempty"`
+	SkipTLSVerify  bool               `json:"skip_tls_verify,omitempty"`
+	Host           string             `json:"-"`
+	Path           string             `json:"path,omitempty"`
+	TargetURL      string             `json:"target_url,omitempty"`
+	QueryParams    map[string]string  `json:"query_params,omitempty"`
+	Headers        map[string]string  `json:"headers,omitempty"`
+	RequestHeader  *ProxyHeader       `json:"request_header,omitempty"`
+	ResponseHeader *ProxyHeader       `json:"response_header,omitempty"`
+	RestrictFile   *ProxyRestrictFile `json:"restrict_file,omitempty"`
+	Statics        []*ProxyStatic     `json:"statics,omitempty"`
 }
 
 // ProxyHeader struct holds the headers request and
@@ -145,4 +146,11 @@ type ProxyHeader struct {
 type ProxyStatic struct {
 	StripPrefix string `json:"strip_prefix,omitempty"`
 	TargetPath  string `json:"target_path,omitempty"`
+}
+
+// ProxyRestrictFile structs holds the restricts configurations of by file
+// extension and regex match.
+type ProxyRestrictFile struct {
+	Extension []string `json:"extension,omitempty"`
+	Match     []string `json:"match,omitempty"`
 }

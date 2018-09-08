@@ -20,6 +20,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"path"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -126,6 +127,25 @@ func Do(ctx *aah.Context) {
 		return
 	}
 
+	// Restrict by file extensions and regex
+	if tr.RestrictFile != nil {
+		file := path.Base(ctx.Req.Path)
+		ext := strings.ToLower(path.Ext(file))
+		for _, e := range tr.RestrictFile.Extension {
+			if ext == e {
+				ctx.Reply().Forbidden().Text("403 Forbidden")
+				return
+			}
+		}
+		for _, re := range tr.RestrictFile.Match {
+			if re.MatchString(file) {
+				ctx.Reply().Forbidden().Text("403 Forbidden")
+				return
+			}
+		}
+	}
+
+	// Static file try from filesystem
 	for _, sf := range tr.Statics {
 		tp := ctx.Req.Path
 		if len(sf.StripPrefix) > 0 {
@@ -154,16 +174,22 @@ type host struct {
 	ProxyRules []*rule
 }
 
+type restrictFile struct {
+	Extension []string
+	Match     []*regexp.Regexp
+}
+
 type rule struct {
-	Path        string
-	PathRegex   *regexp.Regexp
-	QueryParams map[string]string
-	Headers     map[string]string
-	ReqHdr      *models.ProxyHeader
-	ResHdr      *models.ProxyHeader
-	Statics     []*models.ProxyStatic
-	Proxy       *httputil.ReverseProxy
-	host        *host
+	Path         string
+	PathRegex    *regexp.Regexp
+	QueryParams  map[string]string
+	Headers      map[string]string
+	ReqHdr       *models.ProxyHeader
+	ResHdr       *models.ProxyHeader
+	RestrictFile *restrictFile
+	Statics      []*models.ProxyStatic
+	Proxy        *httputil.ReverseProxy
+	host         *host
 }
 
 func (h *host) AddProxyRule(pr *models.ProxyRule) error {
@@ -192,6 +218,22 @@ func (h *host) AddProxyRule(pr *models.ProxyRule) error {
 	if pr.ResponseHeader != nil {
 		resHdr := *pr.ResponseHeader
 		r.ResHdr = &resHdr
+	}
+
+	if pr.RestrictFile != nil {
+		r.RestrictFile = &restrictFile{}
+		if len(pr.RestrictFile.Extension) > 0 {
+			r.RestrictFile.Extension = pr.RestrictFile.Extension
+		}
+		if len(pr.RestrictFile.Match) > 0 {
+			for _, rr := range pr.RestrictFile.Match {
+				regex, err := regexp.Compile(rr[1 : len(rr)-1])
+				if err != nil {
+					return fmt.Errorf("proxy restrict by match config error on host->'%s' match->'%s': %v", h.Name, rr, err)
+				}
+				r.RestrictFile.Match = append(r.RestrictFile.Match, regex)
+			}
+		}
 	}
 
 	if len(pr.Statics) > 0 {
