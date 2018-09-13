@@ -78,13 +78,13 @@ func Do(ctx *aah.Context) {
 	var tr *rule
 	for _, r := range host.ProxyRules {
 		if len(r.Path) > 0 || r.PathRegex != nil {
-			path := false
+			var rpath bool
 			if r.PathRegex == nil {
-				path = ctx.Req.Path == r.Path
+				rpath = ctx.Req.Path == r.Path
 			} else {
-				path = r.PathRegex.MatchString(ctx.Req.Path)
+				rpath = r.PathRegex.MatchString(ctx.Req.Path)
 			}
-			if !path {
+			if !rpath {
 				continue
 			}
 		}
@@ -301,6 +301,7 @@ func (r *rule) createReverseProxy(targetURL string, skipTLSVerify bool) error {
 	}
 
 	if skipTLSVerify {
+		// #nosec
 		r.Proxy = &httputil.ReverseProxy{Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}},
 			Director: director, ModifyResponse: modifyResponse}
 	} else {

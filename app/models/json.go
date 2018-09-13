@@ -53,8 +53,8 @@ func (j *jsonFile) Load(v interface{}) error {
 		return fmt.Errorf("Unable to read %s store from %s", j.Store, j.Location)
 	}
 
-	fi, _ := f.Stat()
-	if fi.Size() > 0 {
+	fi, err := f.Stat()
+	if err == nil && fi.Size() > 0 {
 		if err = json.NewDecoder(f).Decode(v); err != nil {
 			return fmt.Errorf("Unable to load %s store info: %v", j.Store, err)
 		}

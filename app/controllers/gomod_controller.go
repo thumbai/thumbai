@@ -1,4 +1,4 @@
-// Copyright 2018 Jeevanandam M. (https://github.com/jeevatkm, jeeva@myjeeva.com)
+// Copyright Jeevanandam M. (https://github.com/jeevatkm, jeeva@myjeeva.com)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,15 @@
 package controllers
 
 import (
+	"net/http"
+	"strings"
+
+	"thumbai/app/gomod"
+	"thumbai/app/models"
+
 	"aahframe.work/aah"
+	"aahframe.work/aah/ahttp"
+	"aahframe.work/aah/essentials"
 )
 
 // GoModController handles `go mod` requests, this is gonna be future package management way.
@@ -23,9 +31,81 @@ type GoModController struct {
 	*aah.Context
 }
 
-// Handle ..
+// Handle method handles the go mode requests {list, info, mod, zip}
 func (c *GoModController) Handle(modPath string) {
-	// fmt.Println("modPath", modPath)
-	// fmt.Println(strings.Index(modPath, "/@v"))
-	c.Reply().Text("go mod handling coming soon...")
+	modReq, err := gomod.InferRequest(modPath)
+	if err != nil {
+		c.Log().Warn(err)
+		c.Reply().BadRequest().Text("%v", err)
+		return
+	}
+
+	if !ess.IsFileExists(modReq.ModuleFilePath) || !ess.IsFileExists(modReq.FilePath) {
+		c.Log().Infof("Requested module or version is not exists on server, let's download it '%s@%s'",
+			modReq.Module, modReq.Version)
+		if err := gomod.Download(modReq); err != nil {
+			c.Log().Error(err)
+			c.Reply().InternalServerError().Text("%v %s",
+				http.StatusInternalServerError,
+				http.StatusText(http.StatusInternalServerError))
+			return
+		}
+	}
+
+	switch modReq.Action {
+	case "list":
+		c.Reply().ContentType(ahttp.ContentTypePlainText.String()).File(modReq.FilePath)
+	case "info":
+		c.Reply().ContentType(ahttp.ContentTypeJSON.String()).File(modReq.FilePath)
+	case "mod":
+		c.Reply().ContentType(ahttp.ContentTypePlainText.String()).File(modReq.FilePath)
+	case "zip":
+		c.Reply().ContentType(ahttp.ContentTypeOctetStream.String()).File(modReq.FilePath)
+	default:
+		c.Reply().BadRequest().Text("invaild go mod request")
+	}
+}
+
+// Publish method go modules into repository.
+//
+// Supported formats:
+//
+// aahframe.work/aah@latest    # same (@latest is default for 'go get')
+//
+// aahframe.work/aah@v0.12.0   # records v0.12.0
+//
+// aahframe.work/aah@7e312af   # records v0.0.0-20180908054125-7e312af9202b
+//
+// aahframe.work/aah@edge      # records current meaning of branch edge
+func (c *GoModController) Publish(pubReq *models.PublishRequest) {
+	if len(pubReq.Modules) == 0 {
+		c.Reply().BadRequest().JSON(aah.Data{
+			"message": "module path required",
+		})
+		return
+	}
+
+	go func() {
+		for _, m := range pubReq.Modules {
+			if ess.IsStrEmpty(m) {
+				continue
+			}
+			if strings.Contains(m, gomod.FSPathDelimiter) {
+				aah.AppLog().Errorf("Publish: invalid module path '%s'", m)
+				continue
+			}
+			parts := strings.Split(m, "@")
+			if len(parts) != 2 {
+				aah.AppLog().Errorf("Publish: invalid module path '%s'", m)
+				continue
+			}
+			if err := gomod.Download(&gomod.Request{Module: parts[0], Version: parts[1]}); err != nil {
+				aah.AppLog().Error(err)
+			}
+		}
+	}()
+
+	c.Reply().Accepted().JSON(aah.Data{
+		"message": "module(s) publish request accepted",
+	})
 }

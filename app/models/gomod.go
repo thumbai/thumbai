@@ -12,31 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package admin
+package models
 
 import (
-	"thumbai/app/models"
+	"thumbai/app/store"
 
 	"aahframe.work/aah"
 )
 
-// DashboardController defines admin dashboard actions.
-type DashboardController struct {
-	BaseController
+// ModuleStats represents the go modules statics on the server.
+type ModuleStats struct {
+	TotalCount int64
 }
 
-// Index method serves the admin dashboard.
-func (c *DashboardController) Index() {
-	c.Reply().Ok().HTML(aah.Data{
-		"IsDashboard":    true,
-		"GoModulesStats": models.GoModulesStats(),
-		"VanityStats":    models.VanityStats(),
-		"RedirectStats":  models.RedirectStats(),
-		"ProxyStats":     models.ProxyStats(),
+// GoModulesStats returns go modules statistics.
+func GoModulesStats() *ModuleStats {
+	_ = store.Put(store.BucketGoModules, "stats", &ModuleStats{
+		TotalCount: 23,
 	})
-}
 
-// ToAdminDashboard method redirects path '/@admin' to '/@admin/dashboard'.
-func (c *DashboardController) ToAdminDashboard() {
-	c.Reply().Redirect(c.RouteURL("dashboard"))
+	stats := &ModuleStats{}
+	if err := store.Get(store.BucketGoModules, "stats", stats); err != nil {
+		if err == store.ErrRecordNotFound {
+			aah.AppLog().Info("Go Modules stats data currently unavailable")
+		} else {
+			aah.AppLog().Error(err)
+		}
+	}
+	return stats
 }
