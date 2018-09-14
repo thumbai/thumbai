@@ -12,12 +12,13 @@
                     <div class="col-md-12">
                         <!-- Grid column -->
                         <div class="card-deck mb-3 text-center">
-                            <div class="card mb-4 shadow-sm">
+                            <div id="cardGoModules" class="card mb-4 shadow-sm">
                                 <div class="card-body">
                                     <h3 class="card-title">{{ .GoModulesStats.TotalCount }} <span class="stats-lbl">modules</span></h3>
                                     <hr>
                                     <p class="text-center h3">Go Modules</p>
                                 </div>
+                                {{ if not .GoModulesEnabled }}<span class="text-info proxy-server-unavailable">proxy server unavailable</span>{{ end }}
                             </div>
                             <div id="cardGoVanities" class="card mb-4 shadow-sm">
                                 <div class="card-body text-center">
@@ -52,6 +53,9 @@
 </div> <!-- /admin-dashboard -->
 <script>
     window.jqReady = function () {
+        $('#cardGoModules').click(function () {
+            location = '{{ rurl . "gomod_admin" }}';
+        });
         $('#cardGoVanities').click(function () {
             location = '{{ rurl . "vanity_admin" }}';
         });

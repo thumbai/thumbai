@@ -15,6 +15,7 @@
 package admin
 
 import (
+	"thumbai/app/gomod"
 	"thumbai/app/models"
 
 	"aahframe.work/aah"
@@ -28,11 +29,12 @@ type DashboardController struct {
 // Index method serves the admin dashboard.
 func (c *DashboardController) Index() {
 	c.Reply().Ok().HTML(aah.Data{
-		"IsDashboard":    true,
-		"GoModulesStats": models.GoModulesStats(),
-		"VanityStats":    models.VanityStats(),
-		"RedirectStats":  models.RedirectStats(),
-		"ProxyStats":     models.ProxyStats(),
+		"IsDashboard":      true,
+		"GoModulesEnabled": gomod.Settings.Enabled,
+		"GoModulesStats":   gomod.Stats,
+		"VanityStats":      models.VanityStats(),
+		"RedirectStats":    models.RedirectStats(),
+		"ProxyStats":       models.ProxyStats(),
 	})
 }
 

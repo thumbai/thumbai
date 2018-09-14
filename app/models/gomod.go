@@ -20,6 +20,12 @@ import (
 	"aahframe.work/aah"
 )
 
+// ModuleSettings represents the go modules settings.
+type ModuleSettings struct {
+	GoPath   string `bind:"goPath"`
+	GoBinary string `bind:"goBinary"`
+}
+
 // ModuleStats represents the go modules statics on the server.
 type ModuleStats struct {
 	TotalCount int64
@@ -27,10 +33,6 @@ type ModuleStats struct {
 
 // GoModulesStats returns go modules statistics.
 func GoModulesStats() *ModuleStats {
-	_ = store.Put(store.BucketGoModules, "stats", &ModuleStats{
-		TotalCount: 23,
-	})
-
 	stats := &ModuleStats{}
 	if err := store.Get(store.BucketGoModules, "stats", stats); err != nil {
 		if err == store.ErrRecordNotFound {
@@ -40,4 +42,25 @@ func GoModulesStats() *ModuleStats {
 		}
 	}
 	return stats
+}
+
+// SaveModuleStats method saves the given stats into data store.
+func SaveModuleStats(stats *ModuleStats) error {
+	return store.Put(store.BucketGoModules, "stats", stats)
+}
+
+// GoModuleSettings method gets the modules settings from data store.
+func GoModuleSettings() *ModuleSettings {
+	settings := &ModuleSettings{}
+	if err := store.Get(store.BucketGoModules, "settings", settings); err != nil {
+		if err != store.ErrRecordNotFound {
+			aah.AppLog().Error(err)
+		}
+	}
+	return settings
+}
+
+// SaveModulesSettings method saves the given modules into data store.
+func SaveModulesSettings(settings *ModuleSettings) error {
+	return store.Put(store.BucketGoModules, "settings", settings)
 }

@@ -22,6 +22,10 @@ html {
   outline: 0;
   box-shadow:none !important;
 }
+.btn:focus {
+  outline: 0;
+  box-shadow:none !important;
+} 
 .rule-value {
   font-family: Menlo, Monaco, 'Courier New', monospace;
   font-size: 80%;
@@ -227,11 +231,24 @@ html {
   font-size: 0.7em;
   color: #6c757d;
 }
-#cardGoVanities, #cardRedirects, #cardProxies {
+.admin-dashboard #cardGoModules, .admin-dashboard #cardGoVanities, 
+.admin-dashboard #cardRedirects, .admin-dashboard #cardProxies {
   cursor: pointer;
+}
+.admin-dashboard .proxy-server-unavailable {
+  font-size: 85%;
+  position: absolute;
+  margin-left: 3.75rem !important;
+  margin-top: 10rem !important;
 }
 
 /* admin/proxy/index.html */
 .admin-proxy-show .badge {
   border-radius: 0;
+}
+
+/* admin/gomod/index.html */
+.admin-gomodules .total-mod-count {
+  font-size: 1.5em;
+  color: #4f5458;
 }

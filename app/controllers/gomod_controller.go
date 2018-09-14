@@ -33,6 +33,11 @@ type GoModController struct {
 
 // Handle method handles the go mode requests {list, info, mod, zip}
 func (c *GoModController) Handle(modPath string) {
+	if !gomod.Settings.Enabled {
+		c.Reply().ServiceUnavailable().Text("Go Proxy Server unavailable due to prerequisites not met on server, please check thumbai logs")
+		return
+	}
+
 	modReq, err := gomod.InferRequest(modPath)
 	if err != nil {
 		c.Log().Warn(err)
@@ -78,6 +83,13 @@ func (c *GoModController) Handle(modPath string) {
 //
 // aahframe.work/aah@edge      # records current meaning of branch edge
 func (c *GoModController) Publish(pubReq *models.PublishRequest) {
+	if !gomod.Settings.Enabled {
+		c.Reply().ServiceUnavailable().JSON(aah.Data{
+			"message": "Go Proxy Server unavailable due to prerequisites not met on server, please check thumbai logs",
+		})
+		return
+	}
+
 	if len(pubReq.Modules) == 0 {
 		c.Reply().BadRequest().JSON(aah.Data{
 			"message": "module path required",

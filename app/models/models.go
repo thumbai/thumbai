@@ -18,3 +18,9 @@ package models
 type PublishRequest struct {
 	Modules []string `json:"modules"`
 }
+
+// FieldError to represent HTML field error info on JSON response.
+type FieldError struct {
+	Name    string
+	Message string
+}

@@ -20,16 +20,19 @@ import (
 	"errors"
 	"fmt"
 	"go/build"
+	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"syscall"
 
+	"thumbai/app/models"
+
 	"aahframe.work/aah"
 	"aahframe.work/aah/essentials"
-	"aahframe.work/aah/log"
 )
 
 // errors
@@ -38,24 +41,20 @@ var (
 	ErrExecFailure      = errors.New("gomod: exec failure")
 )
 
-// Request struct holds parsed values of module request info.
-type Request struct {
-	Module         string
-	Version        string
-	FilePath       string
-	ModuleFilePath string
-	Action         string
-}
-
-func (r *Request) gogetRequired() bool {
-	return r.Version == "latest" || r.Version == "master"
-}
-
+// go mod
 var (
-	gopath   string
-	modCache string
-	gocmd    string
+	Settings = &settings{GoVersion: "NA"}
+	Stats    *models.ModuleStats
 )
+
+type settings struct {
+	Enabled       bool
+	GoBinary      string
+	GoVersion     string
+	GoPath        string
+	ModCachePath  string
+	storeSettings *models.ModuleSettings
+}
 
 //‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 // Package methods
@@ -63,15 +62,38 @@ var (
 
 // Infer method runtime infer values for gocmd, gopath, and mod cache.
 func Infer(_ *aah.Event) {
+	Settings.storeSettings = models.GoModuleSettings()
 	var err error
-	if gocmd, err = exec.LookPath("go"); err != nil {
-		log.Fatal(err)
+	if ess.IsStrEmpty(Settings.storeSettings.GoBinary) {
+		if Settings.GoBinary, err = exec.LookPath("go"); err != nil {
+			aah.AppLog().Errorf("Go modules proxy server would unavailable: %v", err)
+			return
+		}
+	} else {
+		Settings.GoBinary = Settings.storeSettings.GoBinary
 	}
-	paths := filepath.SplitList(build.Default.GOPATH)
-	if len(paths) > 0 {
-		gopath = paths[0]
+
+	Settings.GoVersion = GoVersion(Settings.GoBinary)
+	if !InferGo111AndAbove(Settings.GoVersion) {
+		aah.AppLog().Errorf("Go version found: %s. Minimum go.11 & above is required to use go modules proxy server")
+		return
 	}
-	modCache = filepath.Join(gopath, "pkg", "mod", "cache", "download")
+
+	if ess.IsStrEmpty(Settings.storeSettings.GoPath) {
+		paths := filepath.SplitList(build.Default.GOPATH)
+		if len(paths) > 0 {
+			Settings.GoPath = paths[0]
+		}
+	} else {
+		Settings.GoPath = Settings.storeSettings.GoPath
+	}
+	Settings.ModCachePath = filepath.Join(Settings.GoPath, "pkg", "mod", "cache", "download")
+	Settings.Enabled = true
+	Stats = models.GoModulesStats()
+	if Stats.TotalCount == 0 {
+		Stats.TotalCount = Count(Settings.ModCachePath)
+		models.SaveModuleStats(Stats)
+	}
 }
 
 // FSPathDelimiter is used for mod cache operations.
@@ -93,8 +115,8 @@ func InferRequest(modReqPath string) (*Request, error) {
 	}
 
 	req := &Request{Module: parts[0],
-		ModuleFilePath: filepath.Join(modCache, parts[0]),
-		FilePath:       filepath.Join(modCache, modReqPath)}
+		ModuleFilePath: filepath.Join(Settings.ModCachePath, parts[0]),
+		FilePath:       filepath.Join(Settings.ModCachePath, modReqPath)}
 	if parts[1] == "list" {
 		req.Action = parts[1]
 	} else {
@@ -134,7 +156,7 @@ var modMutex = map[string]bool{}
 func Download(modReq *Request) error {
 	mutexModPath := modReq.Module + "@" + modReq.Version
 	aah.AppLog().Info("Download request recevied for ", mutexModPath)
-	srcZipPath := filepath.Join(modCache, modReq.Module, "@v", modReq.Version+".zip")
+	srcZipPath := filepath.Join(Settings.ModCachePath, modReq.Module, "@v", modReq.Version+".zip")
 	if ess.IsFileExists(srcZipPath) {
 		aah.AppLog().Info("Module ", mutexModPath, " already exists on server")
 		return nil
@@ -168,12 +190,12 @@ func Download(modReq *Request) error {
 
 	args := []string{"mod", "download"}
 	if modReq.gogetRequired() {
-		args = []string{"get", "-v", decodedPath + "@" + modReq.Version}
+		args = []string{"get", decodedPath + "@" + modReq.Version}
 	}
-	aah.AppLog().Info("Executing ", gocmd, " ", strings.Join(args, " "))
-	cmd := exec.Command(gocmd, args...)
+	aah.AppLog().Info("Executing ", Settings.GoBinary, " ", strings.Join(args, " "))
+	cmd := exec.Command(Settings.GoBinary, args...)
 	env := os.Environ()
-	env = append(env, fmt.Sprintf("GOPATH=%s", gopath))
+	env = append(env, fmt.Sprintf("GOPATH=%s", Settings.GoPath))
 	cmd.Env = env
 	cmd.Dir = dirPath
 
@@ -191,12 +213,11 @@ func Download(modReq *Request) error {
 
 	status, errInfo := inferExitStatus(cmd, cmd.Run())
 	if status != 0 {
-		aah.AppLog().Info(buf.String())
+		aah.AppLog().Error(strings.TrimSpace(buf.String()))
 		aah.AppLog().Error(errInfo)
 		return ErrExecFailure
 	}
-	fmt.Println(buf.String())
-
+	processModAndUpdateCount(buf)
 	aah.AppLog().Infof("Module %s@%s downloaded successfully", decodedPath, modReq.Version)
 	return nil
 }
@@ -206,7 +227,7 @@ const modExt = ".mod"
 // Count method counts the no of modules in the server filesystem.
 func Count(dir string) int64 {
 	if ess.IsStrEmpty(dir) {
-		dir = modCache
+		dir = Settings.ModCachePath
 	}
 	var count int64
 	_ = filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
@@ -219,6 +240,23 @@ func Count(dir string) int64 {
 		return nil
 	})
 	return count
+}
+
+//‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+// Request type and its methods
+//______________________________________________________________________________
+
+// Request struct holds parsed values of module request info.
+type Request struct {
+	Module         string
+	Version        string
+	FilePath       string
+	ModuleFilePath string
+	Action         string
+}
+
+func (r *Request) gogetRequired() bool {
+	return r.Version == "latest" || r.Version == "master"
 }
 
 //‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
@@ -235,4 +273,43 @@ func inferExitStatus(cmd *exec.Cmd, err error) (int, string) {
 		return ws.ExitStatus(), ee.String()
 	}
 	return 1, err.Error()
+}
+
+// GoVersion method returns go version
+func GoVersion(gocmd string) string {
+	cmd := exec.Command(gocmd, "version")
+	verBytes, err := cmd.CombinedOutput()
+	if err != nil {
+		aah.AppLog().Errorf("Unable to infer go version: %v", err)
+		return "0.0.0"
+	}
+	return strings.TrimPrefix(strings.Fields(string(verBytes))[2], "go")
+}
+
+// InferGo111AndAbove method infers the go version is go1.11 and above
+func InferGo111AndAbove(ver string) bool {
+	ver = strings.Join(strings.Split(ver, ".")[:2], ".")
+	verNum, err := strconv.ParseFloat(ver, 64)
+	if err != nil {
+		return false
+	}
+	return verNum >= float64(1.11)
+}
+
+func processModAndUpdateCount(r io.Reader) {
+	mods := map[string]bool{}
+	scanner := bufio.NewScanner(r)
+	for scanner.Scan() {
+		ln := strings.TrimSpace(scanner.Text())
+		if len(ln) > 0 {
+			if strings.HasPrefix(ln, "go: finding") || strings.HasPrefix(ln, "go: downloading") {
+				parts := strings.Fields(ln)[2:]
+				if len(parts) >= 2 {
+					mods[parts[0]+"@"+parts[1]] = true
+				}
+			}
+		}
+	}
+	Stats.TotalCount += int64(len(mods))
+	_ = models.SaveModuleStats(Stats)
 }
