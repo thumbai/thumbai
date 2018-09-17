@@ -3,10 +3,9 @@
 
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> 
-  {{ block "title" . }}
-  <title>Default page title from master layout</title>
-  {{ end }}
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  {{- template "meta_extra" . -}}
+  {{- block "title" . }}<title>Default page title from master layout</title>{{ end -}}
   <link rel="preload" href="/@admin/assets/webfonts/fa-solid-900.woff2" as="font" crossorigin>
   <link rel="preload" href="/@admin/assets/webfonts/source-sans-pro-v11.woff2" as="font" crossorigin>
   <link rel="preload" href="/@admin/assets/css/source-sans-pro-v11.css" as="style">
@@ -21,11 +20,15 @@
 </head>
 
 <body>
+  <script>window.jqReadyFuncs=[];window.jqReady = function(fn){window.jqReadyFuncs.push(fn);}</script>
   {{ include "header.html" . }}
   <div class="container-fluid h-100">
     <div class="row h-100">
       {{ include "sidebar.html" . }}
       <main role="main" class="col-md-9 ml-sm-auto col-lg-11 px-4">
+        <div class="justify-content-center align-items-center position-absolute" style="margin-left:40%;margin-top:-1.8%">
+          <span id="genericFeedback" class="text-success"></span>
+        </div>
         {{ block "body-content" . -}}
         <p>Default body content from master layout</p>
         {{ end }}
@@ -33,10 +36,10 @@
     </div>
   </div>
   {{ include "footer_scripts.html" . }}
-  <script>
-    if (window.hasOwnProperty('jqReady')) $(function() {window.jqReady();});
-  </script>
   {{ include "footer.html" . }}
+  <script>$(window.jqReadyFuncs).each(function(k, fn){fn();});</script>
 </body>
 
 </html>
+
+{{ define "meta_extra"}}{{ end }}

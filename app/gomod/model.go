@@ -12,28 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package models
+package gomod
 
 import (
+	"thumbai/app/models"
 	"thumbai/app/store"
 
 	"aahframe.work/aah"
 )
 
-// ModuleSettings represents the go modules settings.
-type ModuleSettings struct {
-	GoPath   string `bind:"goPath"`
-	GoBinary string `bind:"goBinary"`
-}
-
-// ModuleStats represents the go modules statics on the server.
-type ModuleStats struct {
-	TotalCount int64
-}
-
-// GoModulesStats returns go modules statistics.
-func GoModulesStats() *ModuleStats {
-	stats := &ModuleStats{}
+// Stats returns go modules statistics.
+func Stats() *models.ModuleStats {
+	stats := &models.ModuleStats{}
 	if err := store.Get(store.BucketGoModules, "stats", stats); err != nil {
 		if err == store.ErrRecordNotFound {
 			aah.AppLog().Info("Go Modules stats data currently unavailable")
@@ -44,14 +34,14 @@ func GoModulesStats() *ModuleStats {
 	return stats
 }
 
-// SaveModuleStats method saves the given stats into data store.
-func SaveModuleStats(stats *ModuleStats) error {
+// SaveStats method saves the given stats into data store.
+func SaveStats(stats *models.ModuleStats) error {
 	return store.Put(store.BucketGoModules, "stats", stats)
 }
 
-// GoModuleSettings method gets the modules settings from data store.
-func GoModuleSettings() *ModuleSettings {
-	settings := &ModuleSettings{}
+// GetSettings method gets the modules settings from data store.
+func GetSettings() *models.ModuleSettings {
+	settings := &models.ModuleSettings{}
 	if err := store.Get(store.BucketGoModules, "settings", settings); err != nil {
 		if err != store.ErrRecordNotFound {
 			aah.AppLog().Error(err)
@@ -60,7 +50,7 @@ func GoModuleSettings() *ModuleSettings {
 	return settings
 }
 
-// SaveModulesSettings method saves the given modules into data store.
-func SaveModulesSettings(settings *ModuleSettings) error {
+// SaveSettings method saves the given modules into data store.
+func SaveSettings(settings *models.ModuleSettings) error {
 	return store.Put(store.BucketGoModules, "settings", settings)
 }

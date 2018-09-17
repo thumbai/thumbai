@@ -15,7 +15,6 @@
 package admin
 
 import (
-	"fmt"
 	"os"
 
 	"thumbai/app/gomod"
@@ -34,14 +33,13 @@ type GoModController struct {
 func (c *GoModController) Index() {
 	c.Reply().HTML(aah.Data{
 		"IsGoModules": true,
-		"Stats":       gomod.Stats,
+		"Stats":       gomod.Settings.Stats,
 		"Settings":    gomod.Settings,
 	})
 }
 
 // SaveSettings method saves user settings into data store.
 func (c *GoModController) SaveSettings(settings *models.ModuleSettings) {
-	fmt.Printf("From Body: %#v\n", settings)
 	var fieldErrors []*models.FieldError
 
 	// Existence check
@@ -89,25 +87,18 @@ func (c *GoModController) SaveSettings(settings *models.ModuleSettings) {
 		return
 	}
 
-	es := models.GoModuleSettings()
-	var changed bool
-	if gomod.Settings.GoBinary != settings.GoBinary {
-		changed = true
-		es.GoBinary = settings.GoBinary
+	es := gomod.GetSettings()
+	es.GoBinary = settings.GoBinary
+	es.GoPath = settings.GoPath
+	es.GoProxy = settings.GoProxy
+	if err := gomod.SaveSettings(es); err != nil {
+		c.Log().Error(err)
+		c.Reply().InternalServerError().JSON(aah.Data{
+			"message": "error occurred while saving settings",
+		})
+		return
 	}
-	if gomod.Settings.GoPath != settings.GoPath {
-		changed = true
-		es.GoPath = settings.GoPath
-	}
-	if changed {
-		if err := models.SaveModulesSettings(es); err != nil {
-			c.Log().Error(err)
-			c.Reply().InternalServerError().JSON(aah.Data{
-				"message": "error occurred while saving settings",
-			})
-			return
-		}
-	}
+
 	c.Reply().JSON(aah.Data{
 		"message": "success",
 	})

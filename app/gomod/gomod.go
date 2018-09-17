@@ -27,8 +27,8 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"syscall"
-
 	"thumbai/app/models"
 
 	"aahframe.work/aah"
@@ -43,16 +43,18 @@ var (
 
 // go mod
 var (
-	Settings = &settings{GoVersion: "NA"}
-	Stats    *models.ModuleStats
+	Settings = &settings{RWMutex: sync.RWMutex{}, GoVersion: "NA"}
 )
 
 type settings struct {
+	sync.RWMutex
 	Enabled       bool
 	GoBinary      string
 	GoVersion     string
 	GoPath        string
+	GoProxy       string
 	ModCachePath  string
+	Stats         *models.ModuleStats
 	storeSettings *models.ModuleSettings
 }
 
@@ -62,7 +64,9 @@ type settings struct {
 
 // Infer method runtime infer values for gocmd, gopath, and mod cache.
 func Infer(_ *aah.Event) {
-	Settings.storeSettings = models.GoModuleSettings()
+	Settings.Lock()
+	defer Settings.Unlock()
+	Settings.storeSettings = GetSettings()
 	var err error
 	if ess.IsStrEmpty(Settings.storeSettings.GoBinary) {
 		if Settings.GoBinary, err = exec.LookPath("go"); err != nil {
@@ -88,11 +92,18 @@ func Infer(_ *aah.Event) {
 		Settings.GoPath = Settings.storeSettings.GoPath
 	}
 	Settings.ModCachePath = filepath.Join(Settings.GoPath, "pkg", "mod", "cache", "download")
+
+	if ess.IsStrEmpty(Settings.storeSettings.GoProxy) {
+		Settings.GoProxy = os.Getenv("GOPROXY")
+	} else {
+		Settings.GoProxy = Settings.storeSettings.GoProxy
+	}
+
 	Settings.Enabled = true
-	Stats = models.GoModulesStats()
-	if Stats.TotalCount == 0 {
-		Stats.TotalCount = Count(Settings.ModCachePath)
-		models.SaveModuleStats(Stats)
+	Settings.Stats = Stats()
+	if Settings.Stats.TotalCount == 0 {
+		Settings.Stats.TotalCount = Count(Settings.ModCachePath)
+		_ = SaveStats(Settings.Stats)
 	}
 }
 
@@ -297,6 +308,8 @@ func InferGo111AndAbove(ver string) bool {
 }
 
 func processModAndUpdateCount(r io.Reader) {
+	Settings.Lock()
+	defer Settings.Unlock()
 	mods := map[string]bool{}
 	scanner := bufio.NewScanner(r)
 	for scanner.Scan() {
@@ -310,6 +323,6 @@ func processModAndUpdateCount(r io.Reader) {
 			}
 		}
 	}
-	Stats.TotalCount += int64(len(mods))
-	_ = models.SaveModuleStats(Stats)
+	Settings.Stats.TotalCount += int64(len(mods))
+	_ = SaveStats(Settings.Stats)
 }

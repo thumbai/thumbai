@@ -28,20 +28,20 @@
                                     <p class="h3">Go Vanities</p>
                                 </div>
                             </div>
-                            <div id="cardRedirects" class="card mb-4 shadow-sm">
-                                <div class="card-body">
-                                    <h3 class="card-title">{{ .RedirectStats.Host }} <span class="stats-lbl">hosts</span>,
-                                        {{ .RedirectStats.Redirects }} <span class="stats-lbl">redirects</span></h3>
-                                    <hr>
-                                    <p class="text-center h3">Redirects</p>
-                                </div>
-                            </div>
                             <div id="cardProxies" class="card mb-4 shadow-sm">
                                 <div class="card-body">
                                     <h3 class="card-title">{{ .ProxyStats.Host }} <span class="stats-lbl">hosts</span>,
                                         {{ .ProxyStats.ProxyRules }} <span class="stats-lbl">rules</span></h3>
                                     <hr>
                                     <p class="text-center h3">Proxies</p>
+                                </div>
+                            </div>
+                            <div id="cardRedirects" class="card mb-4 shadow-sm">
+                                <div class="card-body">
+                                    <h3 class="card-title">{{ .RedirectStats.Host }} <span class="stats-lbl">hosts</span>,
+                                        {{ .RedirectStats.Redirects }} <span class="stats-lbl">redirects</span></h3>
+                                    <hr>
+                                    <p class="text-center h3">Redirects</p>
                                 </div>
                             </div>
                         </div>
@@ -52,19 +52,19 @@
     </div>
 </div> <!-- /admin-dashboard -->
 <script>
-    window.jqReady = function () {
-        $('#cardGoModules').click(function () {
-            location = '{{ rurl . "gomod_admin" }}';
-        });
-        $('#cardGoVanities').click(function () {
-            location = '{{ rurl . "vanity_admin" }}';
-        });
-        $('#cardRedirects').click(function () {
-            location = '{{ rurl . "redirect_admin" }}';
-        });
-        $('#cardProxies').click(function () {
-            location = '{{ rurl . "proxy_admin" }}';
-        });
-    }
+window.jqReady(function () {
+    $('#cardGoModules').click(function () {
+        location = '{{ rurl . "gomod_admin" }}';
+    });
+    $('#cardGoVanities').click(function () {
+        location = '{{ rurl . "vanity_list" }}';
+    });
+    $('#cardProxies').click(function () {
+        location = '{{ rurl . "proxy_list" }}';
+    });
+    $('#cardRedirects').click(function () {
+        location = '{{ rurl . "redirect_admin" }}';
+    });    
+});
 </script>
 {{ end -}}

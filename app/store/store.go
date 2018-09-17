@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"encoding/gob"
 	"errors"
+	"fmt"
 	"path/filepath"
 	"time"
 
@@ -29,13 +30,16 @@ var thumbaiDB *bolt.DB
 
 // DB Errors
 var (
-	ErrRecordNotFound = errors.New("db: record not found")
-	ErrInvalidValue   = errors.New("db: invalid value")
+	ErrRecordNotFound      = errors.New("db: record not found")
+	ErrInvalidValue        = errors.New("db: invalid value")
+	ErrRecordAlreadyExists = errors.New("db: record alredy exists")
 )
 
 // Bucket Names
 var (
-	BucketGoModules = "gomodules"
+	BucketGoModules  = "gomodules"
+	BucketGoVanities = "govanities"
+	BucketProxies    = "proxies"
 )
 
 //‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
@@ -44,12 +48,9 @@ var (
 
 // Connect method connects to DB on app start up.
 func Connect(_ *aah.Event) {
-	opts := &bolt.Options{
-		Timeout: 100 * time.Millisecond,
-	}
 	var err error
 	storePath := filepath.Join(aah.AppBaseDir(), "data", "thumbai.db")
-	thumbaiDB, err = bolt.Open(storePath, 0644, opts)
+	thumbaiDB, err = bolt.Open(storePath, 0644, &bolt.Options{Timeout: 100 * time.Millisecond})
 	if err != nil {
 		aah.AppLog().Fatal(err)
 	}
@@ -58,12 +59,15 @@ func Connect(_ *aah.Event) {
 		if _, err = tx.CreateBucketIfNotExists([]byte(BucketGoModules)); err != nil {
 			return err
 		}
-		// futher buckets
+		if _, err = tx.CreateBucketIfNotExists([]byte(BucketGoVanities)); err != nil {
+			return err
+		}
+		_, err = tx.CreateBucketIfNotExists([]byte(BucketProxies))
 		return err
 	}); err != nil {
 		aah.AppLog().Fatal(err)
 	}
-	aah.AppLog().Info("Connected to data store successfully at ", storePath)
+	aah.AppLog().Info("Connected to thumbai data store successfully at ", storePath)
 }
 
 // Disconnect method disconects from DB.
@@ -77,18 +81,18 @@ func Disconnect(_ *aah.Event) {
 
 // Get method gets the record from data store from the given bucket
 // for the give key.
-func Get(bucketName, key string, value interface{}) error {
+func Get(bucketName, key string, dst interface{}) error {
 	return thumbaiDB.View(func(tx *bolt.Tx) error {
 		c := tx.Bucket([]byte(bucketName)).Cursor()
 		k, v := c.Seek([]byte(key))
 		if k == nil || string(k) != key {
 			return ErrRecordNotFound
 		}
-		if value == nil {
+		if dst == nil {
 			return nil
 		}
 		d := gob.NewDecoder(bytes.NewReader(v))
-		return d.Decode(value)
+		return d.Decode(dst)
 	})
 }
 
@@ -117,3 +121,53 @@ func Del(bucketName, key string) error {
 		return c.Delete()
 	})
 }
+
+// BucketKeys method returns all the bucket keys for given name.
+func BucketKeys(name string) []string {
+	var keys []string
+	thumbaiDB.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(name))
+		if err := b.ForEach(func(k, _ []byte) error {
+			keys = append(keys, string(k))
+			return nil
+		}); err != nil {
+			aah.AppLog().Error("store.BucketKeys ", err)
+		}
+		return nil
+	})
+	return keys
+}
+
+// IsKeyExists method returns true if given key exists on given bucket.
+func IsKeyExists(bucketName, key string) bool {
+	return thumbaiDB.View(func(tx *bolt.Tx) error {
+		c := tx.Bucket([]byte(bucketName)).Cursor()
+		k, _ := c.Seek([]byte(key))
+		fmt.Println("k", string(k))
+		if k != nil && string(k) == key {
+			return ErrRecordNotFound
+		}
+		return nil
+	}) == ErrRecordNotFound
+}
+
+// Encode method encodes the Go object into bytes.
+// func Encode(value interface{}) ([]byte, error) {
+// 	if value == nil {
+// 		return nil, nil
+// 	}
+// 	var buf bytes.Buffer
+// 	if err := gob.NewEncoder(&buf).Encode(value); err != nil {
+// 		return nil, err
+// 	}
+// 	return buf.Bytes(), nil
+// }
+
+// Decode method decodes the bytes into Go object.
+// func Decode(dst interface{}, data []byte) error {
+// 	if dst == nil || len(data) == 0 {
+// 		return nil
+// 	}
+// 	d := gob.NewDecoder(bytes.NewReader(data))
+// 	return d.Decode(dst)
+// }

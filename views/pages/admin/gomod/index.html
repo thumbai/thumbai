@@ -12,7 +12,7 @@
         <p class="alert alert-danger w-50">Go Proxy Server unavailable due to prerequisites does not met on the server.</p>
     </div>{{ end }}
     <div class="w-50 mt-4 pl-1">
-        <form id="goModulesForm" method="post" action="{{ rurl . "gomod_admin_save" }}">
+        <form id="goModulesForm" method="post" action="{{ rurl . "gomod_save_settings" }}">
             <div class="form-group">
                 <label for="goBinary">Go Binary</label><span class="ml-2 badge badge-success">go{{ .Settings.GoVersion }}</span>
                 <input type="text" class="form-control" id="goBinary" name="goBinary" value="{{ .Settings.GoBinary }}" placeholder="Enter the path to Go binary on the server" aria-describedby="goBinaryHelp" required>
@@ -29,39 +29,35 @@
                 </small>
                 <div id="goPathError" class="invalid-feedback">Required</div>
             </div>
-            <span id="formResponse"></span>
             <button id="goModulesSubmit" type="submit" class="btn btn-success float-right pl-4 pr-4">Save</button>
         </form>
     </div>
 </div>
 <script>
-    window.jqReady = function () {
-        var goModForm = $('#goModulesForm');
-        goModForm.submit(function (e) {
-            e.preventDefault();
-            disableWithSpinner('goModulesSubmit');
-            $.ajax({
-                url: e.currentTarget.action,
-                method: 'post',
-                data: goModForm.serialize()
-            }).done(function (res) {
-                $('#formResponse').html('<strong>Settings saved!</strong>').addClass('text-success').fadeIn();
-                enableWithoutSpinner('goModulesSubmit');
-            }).fail(function (res) {
-                var data = res.responseJSON;
-                if (data.errors) {
-                    markFieldErrors(data.errors);
-                }
-                $('#formResponse').html('<strong>Unable to save settings!</strong>').addClass('text-danger').fadeIn();
-                enableWithoutSpinner('goModulesSubmit');
-            });
-            setTimeout(function () { 
-                $('#formResponse').fadeOut('slow', function(){
-                    $(this).removeClass('text-danger text-success');
-                }); 
-            }, 3000);
+window.jqReady(function () {
+    var goModForm = $('#goModulesForm');
+    goModForm.submit(function (e) {
+        e.preventDefault();
+        disableWithSpinner('goModulesSubmit');
+        $.ajax({
+            url: e.currentTarget.action,
+            method: 'post',
+            data: goModForm.serialize(),
+        }).done(function (res) {
+            showFeedback('success', 'Go modules settings saved!');
+            enableWithoutSpinner('goModulesSubmit');
+        }).fail(function (res) {
+            var data = res.responseJSON;
+            if (data.errors) {
+                markFieldErrors(data.errors);
+            }
+            showFeedback('failure', 'Unable to save Go modules settings!');
+            enableWithoutSpinner('goModulesSubmit');
         });
-        applyOnKeydownRemoveError('goModulesForm');
-    }
+        fadeOutFeedback(3000);
+        return false;
+    });
+    applyOnKeydownRemoveError('goModulesForm');
+});
 </script>
 {{ end }}

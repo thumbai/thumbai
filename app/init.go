@@ -60,9 +60,7 @@ func init() {
 	aah.OnStart(SubscribeHTTPEvents)
 	aah.OnStart(SubscribeWebSocketEvents)
 	aah.OnStart(store.Connect)
-	aah.OnStart(models.LoadVanityStore, 1)
 	aah.OnStart(models.LoadRedirectStore, 1)
-	aah.OnStart(models.LoadProxyStore, 1)
 	aah.OnStart(vanity.Load, 2)
 	aah.OnStart(redirect.Load, 2)
 	aah.OnStart(proxy.Load, 2)
@@ -72,9 +70,7 @@ func init() {
 	// Doc: https://docs.aahframework.org/server-extension.html#event-onpreshutdown
 	//
 	aah.OnPreShutdown(store.Disconnect)
-	aah.OnPreShutdown(models.PersistVanityStore)
 	aah.OnPreShutdown(models.PersistRedirectStore)
-	aah.OnPreShutdown(models.PersistProxyStore)
 
 	// Event: OnPostShutdown
 	// Doc: https://docs.aahframework.org/server-extension.html#event-onpostshutdown

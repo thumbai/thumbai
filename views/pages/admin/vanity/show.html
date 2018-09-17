@@ -1,0 +1,170 @@
+{{ define "title" }}
+<title>Go Vanity Host: {{ .VanityHostName }} - THUMBAI</title>
+{{ end }} 
+
+{{ define "meta_extra" }}
+<meta name="anti_csrf_token" content="{{ anticsrftoken . }}">
+{{ end }}
+
+{{ define "body-content" -}} 
+<div class="admin-vanity-show">
+    <h1>Go Vanity Host: <span class="font-weight-bold">{{ .VanityHostName }}</span>
+        <span class="align-middle float-sm-right">
+        <button id="vanityPkgAddBtn" data-url="#" data-toggle="tooltip" title="Add new vanity package into host" class="btn btn-sm btn-outline-success pl-4 pr-4">Add</button>
+        <button id="vanityBackBtn" data-url="{{ rurl . "vanity_list" }}" data-toggle="tooltip" title="Back to Go vanities" class="btn btn-sm btn-outline-success pl-4 pr-4">Back</button>
+        </span>
+    </h1> 
+    <div class="mt-5">
+        <table id="vanityPackages" class="table table-hover">
+            <thead class="bg-dark text-white">
+                <tr>
+                <th scope="col" class="w-40">Path</th>
+                <th scope="col" class="w-50">Repo</th>
+                <th scope="col" class="w-20">VCS</th>
+                <th scope="col">&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+<!-- Add/Edit vanity host record -->
+<div class="modal fade" id="addEditModal" tabindex="-1" role="dialog" aria-labelledby="addEditModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addEditModalTitle">Add vanity package</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body pr-5 pl-5 mb-2">
+                <form id="addEditForm" class="mt-2" method="post" data-add-url="{{ rurl . "vanity_add_package" .VanityHostName }}">
+                    <div class="form-group">
+                        <label for="vanityPkgPath">Package Path</label>
+                        <input type="text" class="form-control" id="vanityPkgPath" name="vanityPkgPath" placeholder="/cache/provider/inmemory" required>
+                        <span id="vanityPkgPathError" class="invalid-feedback">Required</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="vanityPkgRepo">Repository URL</label>
+                        <input type="text" class="form-control" id="vanityPkgRepo" name="vanityPkgRepo" placeholder="https://github.com/go-aah/aah.git" required>
+                    </div>
+                    <div class="form-group disabled">
+                        <label for="vanityPkgVcs">VCS</label>
+                        <input type="text" class="form-control" id="vanityPkgVcs" name="vanityPkgVcs" placeholder="git" value="git" readonly>
+                    </div>
+                    <div class="float-right mt-3">
+                        <button type="button" class="btn btn-sm btn-outline-secondary pl-4 pr-4 mr-1" data-dismiss="modal">Close</button>
+                        <button id="modalAddBtn" type="submit" class="btn btn-sm btn-outline-success pl-4 pr-4">Add</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div> 
+<!-- /addEditModal -->
+<script>
+var vanityPackages = [];
+window.jqReady(function() {
+    fetchVanityHost();
+    $("#vanityBackBtn").click(function() {
+        location = $(this).data('url');
+    });
+    $('#vanityPkgAddBtn').click(function() {
+        $('#modalAddBtn').data('mode', 'add');
+        $('#addEditModal').modal();
+    });
+    $('#addEditModal').on('shown.bs.modal', function(e) {
+        $('#addEditForm').trigger('reset');
+        $('#vanityHostname').trigger('focus');
+    });
+    $('#addEditForm').submit(function(e){
+        e.preventDefault();
+        disableWithSpinner('modalAddBtn');
+        var mode = $('#modalAddBtn').data('mode');
+        $.ajax({
+            url: mode === 'add' ? $(this).data('add-url') : '',
+            method: 'post',
+            data: $(this).serialize()
+        }).done(function (res) {
+            enableWithoutSpinner('modalAddBtn');
+            $('#addEditModal').modal('hide');
+            showFeedback('success', 'Vanity package added successfully!')
+            fadeOutFeedback(3000);
+            vanityPackages.push({"path": $('#vanityPkgPath').val(), "repo": $('#vanityPkgRepo').val(), "vcs": $('#vanityPkgVcs').val()});
+            populateTable(vanityPackages);
+        }).fail(function (res) {
+            var data = res.responseJSON;
+            if (data.errors) {
+                markFieldErrors(data.errors);
+            }
+            showFormFeedback('failure', 'Unable to add vanity package!');
+            fadeOutFormFeedback(3000);
+            enableWithoutSpinner('modalAddBtn');
+        });
+        return false;
+    });
+});
+function fetchVanityHost() {
+    $.getJSON('{{ rurl . "vanity_get_host" .VanityHostName }}', function(data){
+        if (data.packages) {
+            $.each(data.packages,function(k, v){
+                vanityPackages.push({"path": v.path, "repo": v.repo, "vcs": v.vcs});
+            });
+            populateTable(vanityPackages);
+        }
+    });
+}
+function populateTable(packages) {
+    if (packages.length === 0) {
+        $('#vanityPackages > tbody').html('<tr class="vanity-pkg-row"><td colspan="4" class="text-center">' +
+            'No vanity packages configured yet.</td></tr>');
+        return;
+    }
+    packages.sort(function(a, b){
+        return a.path > b.path;
+    });
+    var apiBaseUrl = '{{ rurl . "vanity_del_package" .VanityHostName "" }}';
+    var rows = '';
+    $(packages).each(function(i, v){
+        rows += '<tr class="vanity-pkg-row" data-url="' + apiBaseUrl + '/' + encodeURIComponent(v.path) + '">' +
+            '<td>' + v.path + '</td>' +
+            '<td>' + v.repo + '</td>' +
+            '<td>' + v.vcs + '</td>' +
+            '<td class="text-center veritical-align-middle">' +
+            '<a class="vanity-row-pkg-del" data-pkg="'+ v.path + '" href="#"><i class="fas fa-trash-alt fa-lg"></i></a>' +
+            '</td>' +
+            '</tr>';
+    });
+    $('#vanityPackages > tbody').html(rows);
+    $('.vanity-row-pkg-del').click(function() {
+        var pkg = $(this).data('pkg');
+        $.confirmDialog('Are you sure to delete vanity package <strong>'+ pkg +'</strong>?', $(this), function(t){
+            $.ajax({
+                url: t.parent().parent().data('url'),
+                method: 'delete',
+                headers: antiCsrfHeader()
+            }).done(function (data) {
+                showFeedback('success', 'Vanity package deleted successfully!');
+                if (data.message === 'success') {
+                    t.parents('tr').remove();
+                    var f = -1;
+                    $(vanityPackages).each(function(i, v){
+                        if (v.path == pkg) {
+                            f = i;
+                            return false;
+                        }
+                    });
+                    if (f > -1) {
+                        vanityPackages.splice(f, 1);
+                    }
+                }
+            }).fail(function (res) {
+                showFeedback('failure', 'Unable to delete vanity package!');
+            });
+            fadeOutFeedback(3000);
+        });
+    });    
+}
+</script>
+{{ end }}

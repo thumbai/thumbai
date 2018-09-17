@@ -1,4 +1,4 @@
-<!-- Copyright 2018 Jeevanandam M. (https://github.com/jeevatkm, jeeva@myjeeva.com)
+<!-- Copyright Jeevanandam M. (https://github.com/jeevatkm, jeeva@myjeeva.com)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -75,7 +75,7 @@ limitations under the License. -->
 </div>  -->
 <!-- /addEditModal -->
 <script>
-window.jqReady = function() {
+window.jqReady(function() {
     $('.redirect-row').click(function() {
         location = $(this).data('url');
     });
@@ -90,6 +90,6 @@ window.jqReady = function() {
     //     console.log('came here');
     //     return false;
     // });
-}
+});
 </script>
 {{ end }}

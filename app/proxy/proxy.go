@@ -40,7 +40,7 @@ var proxyHosts hosts
 // Load method reads proxy configurations from store and builds proxy
 // engine.
 func Load(_ *aah.Event) {
-	proxies := models.AllProxies()
+	proxies := All()
 	if proxies == nil || len(proxies) == 0 {
 		aah.AppLog().Info("Proxies are not yet configured on THUMBAI")
 		return

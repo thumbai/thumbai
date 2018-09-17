@@ -17,6 +17,8 @@ package admin
 import (
 	"thumbai/app/gomod"
 	"thumbai/app/models"
+	"thumbai/app/proxy"
+	"thumbai/app/vanity"
 
 	"aahframe.work/aah"
 )
@@ -31,14 +33,14 @@ func (c *DashboardController) Index() {
 	c.Reply().Ok().HTML(aah.Data{
 		"IsDashboard":      true,
 		"GoModulesEnabled": gomod.Settings.Enabled,
-		"GoModulesStats":   gomod.Stats,
-		"VanityStats":      models.VanityStats(),
+		"GoModulesStats":   gomod.Settings.Stats,
+		"VanityStats":      vanity.Stats(),
+		"ProxyStats":       proxy.Stats(),
 		"RedirectStats":    models.RedirectStats(),
-		"ProxyStats":       models.ProxyStats(),
 	})
 }
 
-// ToAdminDashboard method redirects path '/@admin' to '/@admin/dashboard'.
+// ToAdminDashboard method redirects path '/thumbai' to '/thumbai/dashboard.html'.
 func (c *DashboardController) ToAdminDashboard() {
 	c.Reply().Redirect(c.RouteURL("dashboard"))
 }

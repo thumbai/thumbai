@@ -37,20 +37,36 @@ func Lookup(host, p string) *models.VanityPackage {
 
 // Load method creates a vanity tree using data store.
 func Load(_ *aah.Event) {
-	vanities := models.AllVanities()
+	vanities := All()
 	if vanities == nil || len(vanities) == 0 {
 		aah.AppLog().Info("Vanities are not yet configured on THUMBAI")
 		return
 	}
 
-	for h, ps := range vanities {
+	for _, ps := range vanities {
 		for _, p := range ps {
-			if err := tree.add(h, p.Path, p); err != nil {
+			if err := Add2Tree(p); err != nil {
 				aah.AppLog().Error(err)
 			}
+
+			// if err := processVanityPackage(p); err != nil {
+			// 	aah.AppLog().Error(err)
+			// 	continue
+			// }
+			// if err := tree.add(h, p.Path, p); err != nil {
+			// 	aah.AppLog().Error(err)
+			// }
 		}
 	}
 	aah.AppLog().Info("Successfully created vanity route tree")
+}
+
+// Add2Tree method adds vanity package into vanity tree.
+func Add2Tree(p *models.VanityPackage) error {
+	if err := processVanityPackage(p); err != nil {
+		return err
+	}
+	return tree.add(p.Host, p.Path, p)
 }
 
 //‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾

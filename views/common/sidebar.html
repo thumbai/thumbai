@@ -1,4 +1,4 @@
-<!-- Copyright 2018 Jeevanandam M. (https://github.com/jeevatkm, jeeva@myjeeva.com)
+<!-- Copyright Jeevanandam M. (https://github.com/jeevatkm, jeeva@myjeeva.com)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -28,23 +28,23 @@ limitations under the License. -->
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link {{ if .IsVanity }}active{{ end }}" href="{{ rurl . "vanity_admin" }}">
+        <a class="nav-link {{ if .IsVanity }}active{{ end }}" href="{{ rurl . "vanity_list" }}">
           <i class="fas fa-link fa-2x"></i><br>Go Vanities
           {{ if .IsVanity }}<span class="sr-only">(current)</span>{{ end }}
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link {{ if .IsRedirect }}active{{ end }}" href="{{ rurl . "redirect_admin" }}">
-          <i class="fas fa-directions fa-2x"></i><br>Redirects
-          {{ if .IsRedirect }}<span class="sr-only">(current)</span>{{ end }}
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link {{ if .IsProxy }}active{{ end }}" href="{{ rurl . "proxy_admin" }}">
+        <a class="nav-link {{ if .IsProxy }}active{{ end }}" href="{{ rurl . "proxy_list" }}">
           <i class="fas fa-sitemap fa-2x"></i><br>Proxies
           {{ if .IsProxy }}<span class="sr-only">(current)</span>{{ end }}
         </a>
       </li>
+      <li class="nav-item">
+          <a class="nav-link {{ if .IsRedirect }}active{{ end }}" href="{{ rurl . "redirect_admin" }}">
+            <i class="fas fa-directions fa-2x"></i><br>Redirects
+            {{ if .IsRedirect }}<span class="sr-only">(current)</span>{{ end }}
+          </a>
+        </li>
     </ul>
   </div>
 </nav>
