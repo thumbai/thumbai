@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"encoding/gob"
 	"errors"
-	"fmt"
 	"path/filepath"
 	"time"
 
@@ -143,7 +142,6 @@ func IsKeyExists(bucketName, key string) bool {
 	return thumbaiDB.View(func(tx *bolt.Tx) error {
 		c := tx.Bucket([]byte(bucketName)).Cursor()
 		k, _ := c.Seek([]byte(key))
-		fmt.Println("k", string(k))
 		if k != nil && string(k) == key {
 			return ErrRecordNotFound
 		}

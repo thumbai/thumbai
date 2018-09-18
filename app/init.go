@@ -107,8 +107,9 @@ func init() {
 	// Doc: https://docs.aahframework.org/template-funcs.html
 	//__________________________________________________________________________
 	aah.AddTemplateFunc(template.FuncMap{
-		"mapstr2str": util.MapStringToString,
-		"join":       strings.Join,
+		"mapstr2str":    util.MapStringToString,
+		"redirect2line": util.ProxyRedirects2Lines,
+		"join":          strings.Join,
 	})
 
 	//‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾

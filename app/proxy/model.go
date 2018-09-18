@@ -46,12 +46,15 @@ func Stats() map[string]int {
 }
 
 // AddHost method adds the given host into proxies data store.
-func AddHost(hostName string) error {
-	hostName = strings.ToLower(hostName)
-	if store.IsKeyExists(store.BucketProxies, hostName) {
+func AddHost(proxyRule *models.ProxyRule) error {
+	proxyRule.Host = strings.ToLower(proxyRule.Host)
+	if store.IsKeyExists(store.BucketProxies, proxyRule.Host) {
 		return store.ErrRecordAlreadyExists
 	}
-	return store.Put(store.BucketProxies, hostName, make([]*models.ProxyRule, 0))
+	proxyRule.RequestHeader = nil
+	proxyRule.ResponseHeader = nil
+	proxyRule.RestrictFile = nil
+	return store.Put(store.BucketProxies, proxyRule.Host, append([]*models.ProxyRule{}, proxyRule))
 }
 
 // DelHost method deletes the given host from proxies store.

@@ -64,13 +64,21 @@ type ProxyRule struct {
 	SkipTLSVerify  bool               `json:"skip_tls_verify,omitempty"`
 	Host           string             `bind:"hostName" json:"host,omitempty"`
 	Path           string             `json:"path,omitempty"`
-	TargetURL      string             `json:"target_url,omitempty"`
+	TargetURL      string             `bind:"targetURL" json:"target_url,omitempty"`
 	QueryParams    map[string]string  `json:"query_params,omitempty"`
 	Headers        map[string]string  `json:"headers,omitempty"`
 	RequestHeader  *ProxyHeader       `json:"request_header,omitempty"`
 	ResponseHeader *ProxyHeader       `json:"response_header,omitempty"`
 	RestrictFile   *ProxyRestrictFile `json:"restrict_file,omitempty"`
+	Redirects      []*ProxyRedirect   `json:"redirects,omitempty"`
 	Statics        []*ProxyStatic     `json:"statics,omitempty"`
+}
+
+// ProxyRedirect holds single redirect for proxy server.
+type ProxyRedirect struct {
+	Match  string `json:"match,omitempty"`
+	Target string `json:"target,omitempty"`
+	Code   int    `json:"code,omitempty"`
 }
 
 // ProxyHeader struct holds the headers request and

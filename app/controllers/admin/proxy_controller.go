@@ -15,6 +15,7 @@
 package admin
 
 import (
+	"fmt"
 	"thumbai/app/models"
 	"thumbai/app/proxy"
 	"thumbai/app/store"
@@ -49,11 +50,48 @@ func (c *ProxyController) Show(hostName string) {
 	})
 }
 
-// AddRule method serves the add proxy rules page.
+// AddRule method serves the add proxy rule page.
 func (c *ProxyController) AddRule(hostName string) {
-	c.Reply().HTML(aah.Data{
+	c.Reply().HTMLf("edit.html", aah.Data{
 		"IsProxy":       true,
 		"ProxyHostName": hostName,
+	})
+}
+
+// EditRule method serves the edit proxy rule page.
+func (c *ProxyController) EditRule(hostName, targetURL string) {
+	proxyRules := proxy.Get(hostName)
+	var rule *models.ProxyRule
+	for _, e := range proxyRules {
+		if e.Host == hostName && e.TargetURL == targetURL {
+			rule = e
+			break
+		}
+	}
+	rule.Redirects = make([]*models.ProxyRedirect, 0)
+	rule.Redirects = append(rule.Redirects,
+		&models.ProxyRedirect{
+			Match:  "{^/v0.5/(.*)$}",
+			Target: "https://docs.aahframework.org/{1}",
+		},
+		&models.ProxyRedirect{
+			Match:  "{^/v0.6/(.*)$}",
+			Target: "https://docs.aahframework.org/{1}",
+		},
+		&models.ProxyRedirect{
+			Match:  "/v0.7/centralized-error-handler.html",
+			Target: "https://docs.aahframework.org/error-handling.html",
+		},
+		&models.ProxyRedirect{
+			Match:  "/v0.7/external-json-library.html",
+			Target: "https://docs.aahframework.org",
+			Code:   307,
+		})
+	c.Reply().HTMLf("edit.html", aah.Data{
+		"IsProxy":        true,
+		"ProxyHostName":  hostName,
+		"ProxyTargetURL": targetURL,
+		"ProxyRule":      rule,
 	})
 }
 
@@ -77,9 +115,10 @@ func (c *ProxyController) Host(hostName string) {
 }
 
 // AddHost method adds the new proxy host into proxy store.
-func (c *ProxyController) AddHost(hostName string) {
+func (c *ProxyController) AddHost(proxyRule *models.ProxyRule) {
+	fmt.Println("AddHost proxyRule", proxyRule)
 	var fieldErrors []*models.FieldError
-	if err := proxy.AddHost(hostName); err != nil {
+	if err := proxy.AddHost(proxyRule); err != nil {
 		switch {
 		case err == store.ErrRecordAlreadyExists:
 			fieldErrors = append(fieldErrors, &models.FieldError{

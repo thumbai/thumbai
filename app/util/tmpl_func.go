@@ -16,7 +16,10 @@ package util
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
+
+	"thumbai/app/models"
 )
 
 // MapStringToString method converts map type to comma separated string.
@@ -26,4 +29,22 @@ func MapStringToString(input map[string]string) string {
 		str += ", " + fmt.Sprintf("%v: %v", k, v)
 	}
 	return strings.TrimPrefix(str, ", ")
+}
+
+// ProxyRedirects2Lines method transforms the proxy redirects into display line text.
+func ProxyRedirects2Lines(redirectRules []*models.ProxyRedirect) string {
+	if len(redirectRules) == 0 {
+		return ""
+	}
+	var redirects []string
+	for _, r := range redirectRules {
+		str := r.Match + ", " + r.Target + ", "
+		if r.Code == 0 {
+			str += "301"
+		} else {
+			str += strconv.Itoa(r.Code)
+		}
+		redirects = append(redirects, str)
+	}
+	return strings.Join(redirects, "\n")
 }

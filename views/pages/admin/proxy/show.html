@@ -26,7 +26,7 @@ limitations under the License. -->
         <div>
             <h1>Proxy Host: <span class="font-weight-bold">{{ .ProxyHostName }}</span>
                 <div class="align-middle float-sm-right float-right">
-                    <a href="{{ rurl . "proxy_edit" .ProxyHostName }}" data-toggle="tooltip" title="Add new proxy rule" class="btn btn-sm btn-outline-success pl-4 pr-4">Add Rule</a>
+                    <a href="{{ rurl . "proxy_add" .ProxyHostName }}" data-toggle="tooltip" title="Add new proxy rule" class="btn btn-sm btn-outline-success pl-4 pr-4">Add Rule</a>
                     <!-- <button id="proxyRuleAddBtn" data-url="#" data-toggle="tooltip" title="Add new proxy rule" class="btn btn-sm btn-outline-success pl-4 pr-4">Add Rule</button> -->
                     <button id="proxyBackBtn" data-url="{{ rurl . "proxy_list" }}" data-toggle="tooltip" title="Back to Proxies" class="btn btn-sm btn-outline-success pl-4 pr-4">Back</button>
                 </div>
@@ -44,8 +44,8 @@ limitations under the License. -->
                 <tbody>
                     {{ if .ProxyRules }}
                     {{- range .ProxyRules }}
-                    <tr class="proxy-rule-row" data-url="">
-                        <td>
+                    <tr class="proxy-rule-row" data-url="{{ rurl $ "proxy_edit" .Host .TargetURL }}">
+                        <td class="proxy-rule-col">
                             <div>
                                 <span class="badge badge-secondary">Host</span><span class="rule-value"> {{ .Host }}</span>{{ if .Last }}&nbsp;&nbsp;<span class="badge badge-success">Last Rule</span>{{ end }}
                                 {{ if .Path }}<br><span class="badge badge-secondary">Path</span><span class="rule-value"> {{ .Path }}</span>{{ end }}
@@ -87,9 +87,9 @@ limitations under the License. -->
                                 {{ end }}
                             </div>                        
                         </td>
-                        <td>{{ .TargetURL }}</td>
+                        <td class="proxy-rule-col">{{ .TargetURL }}</td>
                         <td class="text-center veritical-align-middle">
-                            <a href="#"><i class="fas fa-edit fa-lg"></i></a>     
+                            <!-- <a href="#"><i class="fas fa-edit fa-lg"></i></a>      -->
                             <a href="#"><i class="fas fa-trash-alt fa-lg"></i></a>
                         </td>
                     </tr>
@@ -101,7 +101,7 @@ limitations under the License. -->
     <!-- </div> -->
 </div>
 <!-- Add/Edit proxy host record -->
-<div class="modal fade admin-proxy-show-modal" id="addEditModal" tabindex="-1" role="dialog" aria-labelledby="addEditModalTitle" aria-hidden="true">
+<!-- <div class="modal fade admin-proxy-show-modal" id="addEditModal" tabindex="-1" role="dialog" aria-labelledby="addEditModalTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -164,19 +164,22 @@ limitations under the License. -->
             </div>
         </div>
     </div>
-</div>
+</div> -->
 <!-- /addEditModal -->
 <script>
 window.jqReady(function() {
     $("#proxyBackBtn").click(function() {
         location = $(this).data('url');
     });
-    $('#proxyRuleAddBtn').click(function() {
-        $('#addEditModal').modal();
+    $('.proxy-rule-row').click(function(){
+        location = $(this).data('url');
     });
-    $('#addEditModal').on('show.bs.modal', function(e) {
-        $('#addEditForm').trigger('reset');
-    });
+    // $('#proxyRuleAddBtn').click(function() {
+    //     $('#addEditModal').modal();
+    // });
+    // $('#addEditModal').on('show.bs.modal', function(e) {
+    //     $('#addEditForm').trigger('reset');
+    // });
     // $('#addEditForm').submit(function(e){
     //     console.log('came here');
     //     return false;
