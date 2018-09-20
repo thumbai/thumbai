@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License. -->
 
 {{ define "title" }}
-<title>Edit Proxy Rules: {{ pparam . "hostName" }} - THUMBAI</title>
+<title>Edit Proxy Rules: {{ .Rule.Host }} - THUMBAI</title>
 {{ end }} 
 
 {{ define "meta_extra" }}
@@ -25,27 +25,32 @@ limitations under the License. -->
     <div class="container-fluid no-gutters mb-4">
         <div class="row align-items-center no-gutters">
             <div class="col">
-                <span class="h1">Proxy Host:</span><span class="h1 font-weight-bold ml-2">{{ .ProxyHostName }}</span>
+                <span class="h1">Proxy Host:</span><span class="h1 ml-2" style="border-bottom: 1px dotted #a2a2a2">{{ .Rule.Host }}</span>
             </div>
             <div class="col text-right">
-                <a href="{{ rurl . "proxy_show" .ProxyHostName }}" data-toggle="tooltip" title="Back to Proxy Host" class="btn btn-sm btn-outline-success pl-4 pr-4">Back</a>
+                <a href="{{ rurl . "proxy_show" .Rule.Host }}" data-toggle="tooltip" title="Back to Proxy Host" class="btn btn-sm btn-outline-success pl-4 pr-4">Back</a>
             </div>
         </div>
         <div class="row no-gutters">
-            <div class="admin-proxy-rule-sec w-100 mt-4">
-                <form id="formTargetURL" action="">
+            <div class="admin-proxy-rule-sec w-50 mt-4">
+                <form id="formTargetURL" action="{{ rurl . "proxy_edit_target_url" .Rule.Host }}">
                     <div class="form-group">
-                        <label for="proxyTargetURL" class="d-flex font-weight-bold align-items-center">Target URL
+                        <label for="targetURL" class="d-flex font-weight-bold align-items-center">Target URL
                             <div class="form-check form-check-inline ml-3 font-weight-normal">
-                                <input class="form-check-input" type="checkbox" id="proxyLastRule" name="proxyLastRule" value="lastrule">
-                                <label class="form-check-label" for="proxyLastRule">Last Rule</label>
+                                <input class="form-check-input" type="checkbox" id="lastRule" name="lastRule" {{ if .Rule.Last }}checked{{ end }}>
+                                <label class="form-check-label" for="lastRule">Last Rule</label>
+                            </div>
+                            <div class="form-check form-check-inline ml-1 font-weight-normal">
+                                <input class="form-check-input" type="checkbox" id="skipTLSVerify" name="skipTLSVerify" {{ if .Rule.SkipTLSVerify }}checked{{ end }}>
+                                <label class="form-check-label" for="skipTLSVerify">Skip TLS Verify</label>
                             </div>
                         </label>
-                        <input type="text" class="form-control" id="proxyTargetURL" name="proxyTargetURL" placeholder="Enter Proxy Target URL" aria-describedby="proxyTargetURLHelp" value="{{ if .ProxyRule }}{{ .ProxyRule.TargetURL }}{{ end }}" required>
-                        <div id="proxyTargetURLError" class="invalid-feedback">Required</div>
+                        <input type="text" class="form-control rule-value" id="targetURL" name="targetURL" placeholder="Enter Proxy Target URL" aria-describedby="targetURLHelp" value="{{ .Rule.TargetURL }}" required>
+                        <div id="targetURLError" class="invalid-feedback">Required</div>
+                        <input type="hidden" name="oldTargetURL" value="{{ .Rule.TargetURL }}">
                     </div>
                     <div class="float-right mt-3 pb-2">
-                        <button type="submit" class="btn btn-sm btn-success pl-4 pr-4">Save</button>
+                        <button type="submit" id="formTargetURLSubmit" class="btn btn-sm btn-success pl-4 pr-4">Save</button>
                     </div>
                 </form>                
             </div>
@@ -57,40 +62,41 @@ limitations under the License. -->
                 </div>
                 <div class="collapse" id="conditionSection">
                     <div class="card card-body mt-2">
-                        <form id="formRules" action="">
+                        <p class="text-info">Conditions operates in AND mode. E.g.: Path AND Query Params AND Headers => selects proxy.</p>
+                        <form id="formConditions" action="{{ rurl . "proxy_edit_conditions" .Rule.Host .Rule.TargetURL }}"> 
                             <div class="form-group row">
-                                <label for="proxyPath" class="col-sm-2 col-form-label text-right">Path</label>
+                                <label for="path" class="col-sm-2 col-form-label text-right">Path</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" id="proxyPath" name="proxyPath" placeholder="Enter relative request path">
-                                    <small id="proxyPathHelp" class="form-text text-muted">
+                                    <input type="text" class="form-control rule-value" id="path" name="path" placeholder="Enter relative request path" value="{{ .Rule.Path }}">
+                                    <small id="pathHelp" class="form-text text-muted">
                                     Relative path to match, regex supported too, syntax: <code>{regex-here}</code>.<br>
                                     E.g.: <code>{^/(.*)\\.v0(.*)$}</code>
                                     </small>
-                                    <div id="proxyPathError" class="invalid-feedback"></div>
+                                    <div id="pathError" class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="proxyQueryParams" class="col-sm-2 col-form-label text-right">Query Params</label>
+                                <label for="queryParams" class="col-sm-2 col-form-label text-right">Query Params</label>
                                 <div class="col-sm-10">
-                                    <textarea class="form-control" id="proxyQueryParams" name="proxyQueryParams" rows="3" placeholder="Enter query params to match"></textarea>
-                                    <small id="proxyQueryParamsHelp" class="form-text text-muted">
-                                    Each query param and value pair per line, e.g: <code>Query_Params = Query_Params value</code>.
+                                    <textarea class="form-control rule-value" id="queryParams" name="queryParams" rows="3" placeholder="Enter query params to match">{{ mapstr2str .Rule.QueryParams "=" "\n" }}</textarea>
+                                    <small id="queryParamsHelp" class="form-text text-muted">
+                                    Each query param and value pair per line, syntax: <code>Query_Params=Query_Params value</code>.
                                     </small>
-                                    <div id="proxyQueryParamsError" class="invalid-feedback"></div>
+                                    <div id="queryParamsError" class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="proxyHeaders" class="col-sm-2 col-form-label text-right">Headers</label>
+                                <label for="headers" class="col-sm-2 col-form-label text-right">Headers</label>
                                 <div class="col-sm-10">
-                                    <textarea class="form-control" id="proxyHeaders" name="proxyHeaders" rows="3" placeholder="Enter headers to match"></textarea>
-                                    <small id="proxyHeadersHelp" class="form-text text-muted">
-                                    Each header key and value pair per line, e.g: <code>Header-Key = Header value</code>.
+                                    <textarea class="form-control rule-value" id="headers" name="headers" rows="3" placeholder="Enter headers to match">{{ mapstr2str .Rule.Headers "=" "\n" }}</textarea>
+                                    <small id="headersHelp" class="form-text text-muted">
+                                    Each header key and value pair per line, syntax: <code>Header-Key=Header value</code>.
                                     </small>
-                                    <div id="proxyHeadersError" class="invalid-feedback"></div>
+                                    <div id="headersError" class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="float-right mt-2 pb-2">
-                                <button type="submit" class="btn btn-sm btn-success pl-4 pr-4">Save</button>
+                                <button type="submit" id="formConditionsSubmit" class="btn btn-sm btn-success pl-4 pr-4">Save</button>
                             </div>
                         </form>
                     </div>
@@ -104,20 +110,20 @@ limitations under the License. -->
                 </div>
                 <div class="collapse" id="redirectsSection">
                     <div class="card card-body mt-2">
-                        <form id="formRedirects" action="">
+                        <form id="formRedirects" action="{{ rurl . "proxy_edit_redirects" .Rule.Host .Rule.TargetURL }}">
                             <div class="form-group row">
-                                <label for="proxyRedirects" class="col-sm-2 col-form-label text-right">Redirect Mapping</label>
+                                <label for="redirects" class="col-sm-2 col-form-label text-right">Redirect Mapping</label>
                                 <div class="col-sm-10">
-                                    <textarea class="form-control rule-value" id="proxyRedirects" name="proxyRedirects" rows="7" placeholder="Enter redirect  URLs">{{ if .ProxyRule }}{{ redirect2line .ProxyRule.Redirects }}{{ end}}</textarea>
-                                    <small id="proxyRedirectsHelp" class="form-text text-muted">
-                                    Each redirect mapping per line, syntax: <code>from-path, to-path-or-url, code (optional)</code>.<br>
+                                    <textarea class="form-control rule-value" id="redirects" name="redirects" rows="7" placeholder="Enter redirect  URLs">{{ redirect2line .Rule.Redirects }}</textarea>
+                                    <small id="redirectsHelp" class="form-text text-muted">
+                                    Each redirect mapping per line, syntax: <code>from-path, to-path-or-url, code (optional, default is 301)</code>.<br>
                                     E.g.: <code>{^/v0.5/(.*)$}, https://docs.aahframework.org/{1}, 301</code>
                                     </small>
-                                    <div id="proxyRedirectsError" class="invalid-feedback"></div>
+                                    <div id="redirectsError" class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="float-right mt-2 pb-2">
-                                <button type="submit" class="btn btn-sm btn-success pl-4 pr-4">Save</button>
+                                <button type="submit" id="formRedirectsSubmit" class="btn btn-sm btn-success pl-4 pr-4">Save</button>
                             </div>
                         </form>
                     </div>
@@ -126,58 +132,58 @@ limitations under the License. -->
         </div>
         <div class="row no-gutters mt-4">
             <div class="admin-proxy-rule-sec w-50 pr-2">
-                <div class="admin-proxy-rule-sec-hdr" data-toggle="collapse" href="#restrictStaticFilesSection" role="button" aria-expanded="false" aria-controls="restrictStaticFilesSection">
+                <div class="admin-proxy-rule-sec-hdr" data-toggle="collapse" href="#restrictStaticDirsSection" role="button" aria-expanded="false" aria-controls="restrictStaticDirsSection">
                     Restrict Files <span class="text-muted">(Optional)</span>
                 </div>
-                <div class="collapse" id="restrictStaticFilesSection">
+                <div class="collapse" id="restrictStaticDirsSection">
                     <div class="card card-body mt-2">
-                        <form action="">
+                        <form id="formRestricts" action="{{ rurl . "proxy_edit_restricts" .Rule.Host .Rule.TargetURL }}">
                             <div class="form-group row">
-                                <label for="proxyRestrictByExt" class="col-sm-2 col-form-label text-right">By Extension</label>
+                                <label for="restrictsByExt" class="col-sm-2 col-form-label text-right">By Extension</label>
                                 <div class="col-sm-10">
-                                    <textarea class="form-control" id="proxyRestrictByExt" name="proxyRestrictByExt" rows="3" placeholder="Enter file extension to restrict"></textarea>
-                                    <small id="proxyRestrictByExtHelp" class="form-text text-muted">
+                                    <textarea class="form-control rule-value" id="restrictsByExt" name="restrictsByExt" rows="3" placeholder="Enter file extension to restrict">{{ if .Rule.RestrictFile }}{{ join .Rule.RestrictFile.Extension "\n" }}{{ end }}</textarea>
+                                    <small id="restrictsByExtHelp" class="form-text text-muted">
                                     Each file extension per line.
                                     </small>
-                                    <div id="proxyRestrictByExtError" class="invalid-feedback"></div>
+                                    <div id="restrictsByExtError" class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="proxyRestrictByRegex" class="col-sm-2 col-form-label text-right">By Regex</label>
+                                <label for="restrictsByRegex" class="col-sm-2 col-form-label text-right">By Regex</label>
                                 <div class="col-sm-10">
-                                    <textarea class="form-control" id="proxyRestrictByRegex" name="proxyRestrictByRegex" rows="3" placeholder="Enter headers to match"></textarea>
-                                    <small id="proxyRestrictByRegexHelp" class="form-text text-muted">
-                                    Each regex per line e.g. <code>{regex-here}</code>.
+                                    <textarea class="form-control rule-value" id="restrictsByRegex" name="restrictsByRegex" rows="3" placeholder="Enter regex to restrict files">{{ if .Rule.RestrictFile }}{{ join .Rule.RestrictFile.Match "\n" }}{{ end }}</textarea>
+                                    <small id="restrictsByRegexHelp" class="form-text text-muted">
+                                    Each regex per line, syntax: <code>{regex-here}</code>.
                                     </small>
-                                    <div id="pproxyRestrictByRegexError" class="invalid-feedback"></div>
+                                    <div id="restrictsByRegexError" class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="float-right mt-2 pb-2">
-                                <button type="submit" class="btn btn-sm btn-success pl-4 pr-4">Save</button>
+                                <button type="submit" id="formRestrictsSubmit" class="btn btn-sm btn-success pl-4 pr-4">Save</button>
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
             <div class="admin-proxy-rule-sec w-50 pl-2">
-                <div class="admin-proxy-rule-sec-hdr" data-toggle="collapse" href="#restrictStaticFilesSection" role="button" aria-expanded="false" aria-controls="restrictStaticFilesSection">
-                    Static Files <span class="text-muted">(Optional)</span>
+                <div class="admin-proxy-rule-sec-hdr" data-toggle="collapse" href="#restrictStaticDirsSection" role="button" aria-expanded="false" aria-controls="restrictStaticDirsSection">
+                    Static File Directories <span class="text-muted">(Optional)</span>
                 </div>
-                <div class="collapse" id="restrictStaticFilesSection">
+                <div class="collapse" id="restrictStaticDirsSection">
                     <div class="card card-body mt-2">
-                        <form action="">
+                        <form id="formStatics" action="{{ rurl . "proxy_edit_statics" .Rule.Host .Rule.TargetURL }}">
                             <div class="form-group row">
-                                <label for="proxyStaticFiles" class="col-sm-2 col-form-label text-right">Mapping</label>
+                                <label for="staticDirs" class="col-sm-2 col-form-label text-right">Mapping</label>
                                 <div class="col-sm-10">
-                                    <textarea class="form-control" id="proxyStaticFiles" name="proxyStaticFiles" rows="3" placeholder="Enter directory mapping to deliver statis files"></textarea>
-                                    <small id="proxyStaticFilesHelp" class="form-text text-muted">
-                                    Each directory mapping per line e.g.: <code>root-directory, strip-prefix (optional)</code>.
+                                    <textarea class="form-control rule-value" id="staticDirs" name="staticDirs" rows="3" placeholder="Enter directory mapping to deliver static files">{{ static2line .Rule.Statics }}</textarea>
+                                    <small id="staticDirsHelp" class="form-text text-muted">
+                                    Each directory mapping per line, syntax: <code>root-directory, strip-prefix (optional)</code>.
                                     </small>
-                                    <div id="proxyStaticFilesError" class="invalid-feedback"></div>
+                                    <div id="staticDirsError" class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="float-right mt-2 pb-2">
-                                <button type="submit" class="btn btn-sm btn-success pl-4 pr-4">Save</button>
+                                <button type="submit" id="formStaticsSubmit" class="btn btn-sm btn-success pl-4 pr-4">Save</button>
                             </div>
                         </form>
                     </div>
@@ -191,19 +197,29 @@ limitations under the License. -->
                 </div>
                 <div class="collapse" id="requestResponseHdrSection">
                     <div class="card card-body mt-2">
-                        <form action="">
+                        <form id="formRequestHeaders" action="">
                             <div class="form-group row">
-                                <label for="proxyRequestHeaders" class="col-sm-2 col-form-label text-right">Headers</label>
+                                <label for="requestHeadersAdd" class="col-sm-2 col-form-label text-right">Add</label>
                                 <div class="col-sm-10">
-                                    <textarea class="form-control" id="proxyRequestHeaders" name="proxyRequestHeaders" rows="3" placeholder="Enter request headers to be added before proxying a request"></textarea>
-                                    <small id="proxyRequestHeadersHelp" class="form-text text-muted">
-                                    Each header key and value pair per line, e.g: <code>Header-Key = Header value</code>.
+                                    <textarea class="form-control rule-value" id="requestHeadersAdd" name="requestHeadersAdd" rows="3" placeholder="Enter request headers to be added before proxying a request"></textarea>
+                                    <small id="requestHeadersAddHelp" class="form-text text-muted">
+                                    Each header key and value pair per line, syntax: <code>Header-Key=Header value</code>.
                                     </small>
-                                    <div id="proxyRequestHeadersError" class="invalid-feedback"></div>
+                                    <div id="requestHeadersAddError" class="invalid-feedback"></div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="requestHeadersRemove" class="col-sm-2 col-form-label text-right">Remove</label>
+                                <div class="col-sm-10">
+                                    <textarea class="form-control rule-value" id="requestHeadersRemove" name="requestHeadersRemove" rows="3" placeholder="Enter request headers to be removed before proxying a request"></textarea>
+                                    <small id="requestHeadersRemoveHelp" class="form-text text-muted">
+                                    Each header key per line, syntax: <code>Header-Key</code>.
+                                    </small>
+                                    <div id="requestHeadersRemoveError" class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="float-right mt-2 pb-2">
-                                <button type="submit" class="btn btn-sm btn-success pl-4 pr-4">Save</button>
+                                <button type="submit" id="formRequestHeadersSubmit" class="btn btn-sm btn-success pl-4 pr-4">Save</button>
                             </div>
                         </form>
                     </div>
@@ -215,19 +231,29 @@ limitations under the License. -->
                 </div>
                 <div class="collapse" id="requestResponseHdrSection">
                     <div class="card card-body mt-2">
-                        <form action="">
+                        <form id="formResponseHeaders" action="">
                             <div class="form-group row">
-                                <label for="proxyResponseHeaders" class="col-sm-2 col-form-label text-right">Headers</label>
+                                <label for="responseHeadersAdd" class="col-sm-2 col-form-label text-right">Add</label>
                                 <div class="col-sm-10">
-                                    <textarea class="form-control" id="proxyResponseHeaders" name="proxyResponseHeaders" rows="3" placeholder="Enter response headers to be added for the proxy response"></textarea>
-                                    <small id="proxyResponseHeadersHelp" class="form-text text-muted">
-                                    Each header key and value pair per line, e.g: <code>Header-Key = Header value</code>.
+                                    <textarea class="form-control rule-value" id="responseHeadersAdd" name="responseHeadersAdd" rows="3" placeholder="Enter response headers to be added for the proxy response"></textarea>
+                                    <small id="responseHeadersAddHelp" class="form-text text-muted">
+                                    Each header key and value pair per line, syntax: <code>Header-Key=Header value</code>.
                                     </small>
-                                    <div id="proxyResponseHeadersError" class="invalid-feedback"></div>
+                                    <div id="responseHeadersAddError" class="invalid-feedback"></div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="responseHeadersRemove" class="col-sm-2 col-form-label text-right">Remove</label>
+                                <div class="col-sm-10">
+                                    <textarea class="form-control rule-value" id="responseHeadersRemove" name="responseHeadersRemove" rows="3" placeholder="Enter response headers to be removed for the proxy response"></textarea>
+                                    <small id="responseHeadersRemoveHelp" class="form-text text-muted">
+                                    Each header key per line, syntax: <code>Header-Key</code>.
+                                    </small>
+                                    <div id="responseHeadersRemoveError" class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="float-right mt-2 pb-2">
-                                <button type="submit" class="btn btn-sm btn-success pl-4 pr-4">Save</button>
+                                <button type="submit" id="formResponseHeadersSubmit" class="btn btn-sm btn-success pl-4 pr-4">Save</button>
                             </div>
                         </form>
                     </div>
@@ -236,4 +262,59 @@ limitations under the License. -->
         </div>
     </div>
 </div>
+<script>
+window.jqReady(function(){
+    $.each(['formTargetURL', 'formConditions', 'formRedirects',
+            'formRestricts', 'formStatics'], function(i, formName){
+        $('#'+formName).submit(function(e){
+            e.preventDefault();
+            var submitBtnName = formName+'Submit';
+            disableWithSpinner(submitBtnName);
+            $.ajax({
+                url: e.currentTarget.action,
+                method: 'put',
+                data: $(this).serialize()
+            }).done(function (res) {
+                enableWithoutSpinner(submitBtnName);
+                showFeedback('success', 'Proxy rule updated successfully!');
+            }).fail(function (res) {
+                var data = res.responseJSON;
+                if (data && data.errors) {
+                    markFieldErrors(data.errors);
+                } else if (data && data.message) {
+                    showFeedback('failure', data.message);
+                } else {
+                    showFeedback('failure', 'Unable to update proxy rule!');
+                }            
+                enableWithoutSpinner(submitBtnName);
+            });
+            return false;
+        });
+    });
+
+    // $('#formTargetURL').submit(function(e){
+    //     e.preventDefault();
+    //     disableWithSpinner('formTargetURLSubmit');
+    //     $.ajax({
+    //         url: e.currentTarget.action,
+    //         method: 'put',
+    //         data: $(this).serialize()
+    //     }).done(function (res) {
+    //         enableWithoutSpinner('formTargetURLSubmit');
+    //         showFeedback('success', 'Proxy rule updated successfully!');
+    //     }).fail(function (res) {
+    //         var data = res.responseJSON;
+    //         if (data.errors) {
+    //             markFieldErrors(data.errors);
+    //         } else if (data.message) {
+    //             showFeedback('failure', data.message);
+    //         } else {
+    //             showFeedback('failure', 'Unable to update proxy rule!');
+    //         }            
+    //         enableWithoutSpinner('formTargetURLSubmit');
+    //     });
+    //     return false;
+    // });
+});
+</script>
 {{ end }}

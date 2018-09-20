@@ -21,8 +21,8 @@ type PublishRequest struct {
 
 // FieldError to represent HTML field error info on JSON response.
 type FieldError struct {
-	Name    string
-	Message string
+	Name    string `json:"name"`
+	Message string `json:"message"`
 }
 
 //‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
@@ -31,9 +31,9 @@ type FieldError struct {
 
 // ModuleSettings represents the go modules settings.
 type ModuleSettings struct {
-	GoPath   string `bind:"goPath"`
-	GoBinary string `bind:"goBinary"`
-	GoProxy  string `bind:"goProxy"`
+	GoPath   string `bind:"goPath" json:"go_path,omitempty"`
+	GoBinary string `bind:"goBinary" json:"go_binary,omitempty"`
+	GoProxy  string `bind:"goProxy" json:"go_proxy,omitempty"`
 }
 
 // ModuleStats represents the go modules statics on the server.
@@ -62,9 +62,9 @@ type VanityPackage struct {
 type ProxyRule struct {
 	Last           bool               `json:"last,omitempty"`
 	SkipTLSVerify  bool               `json:"skip_tls_verify,omitempty"`
-	Host           string             `bind:"hostName" json:"host,omitempty"`
+	Host           string             `json:"host,omitempty"`
 	Path           string             `json:"path,omitempty"`
-	TargetURL      string             `bind:"targetURL" json:"target_url,omitempty"`
+	TargetURL      string             `json:"target_url,omitempty"`
 	QueryParams    map[string]string  `json:"query_params,omitempty"`
 	Headers        map[string]string  `json:"headers,omitempty"`
 	RequestHeader  *ProxyHeader       `json:"request_header,omitempty"`
@@ -79,6 +79,7 @@ type ProxyRedirect struct {
 	Match  string `json:"match,omitempty"`
 	Target string `json:"target,omitempty"`
 	Code   int    `json:"code,omitempty"`
+	IsAbs  bool   `json:"is_abs,omitempty"`
 }
 
 // ProxyHeader struct holds the headers request and
@@ -98,6 +99,6 @@ type ProxyStatic struct {
 // ProxyRestrictFile structs holds the restricts configurations of by file
 // extension and regex match.
 type ProxyRestrictFile struct {
-	Extension []string `json:"extension,omitempty"`
-	Match     []string `json:"match,omitempty"`
+	Extension []string `json:"extensions,omitempty"`
+	Match     []string `json:"regexs,omitempty"`
 }

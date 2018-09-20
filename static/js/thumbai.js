@@ -1,6 +1,6 @@
 function markFieldError(err) {
-    $('#'+err.Name).addClass('is-invalid');
-    $('#'+err.Name+'Error').html(err.Message);
+    $('#'+err.name).addClass('is-invalid');
+    $('#'+err.name+'Error').html(err.message.replace(/\n/g, '<br>'));
 }
 
 function markFieldErrors(errs) {
@@ -9,19 +9,21 @@ function markFieldErrors(errs) {
     }
 }
 
-function applyOnKeydownRemoveError(formId) {
-    $('#'+formId).find('.form-control').each(function(){
-        $(this).keydown(function(){
-            $(this).removeClass('is-invalid');
+function applyOnKeydownRemoveError() {
+    $('form').each(function() {
+        $(this).find('.form-control').each(function(){
+            $(this).keydown(function(){
+                $(this).removeClass('is-invalid');
+            });
         });
-    })
+    });
 }
 
 function disableWithSpinner(id) {
     var obj = $('#'+id);
     var text = obj.html();
     obj.data('previous-text', text);
-    obj.prop('disabled', true).html('<i class="fas fa-spinner fa-pulse pr-1"></i> ' + text);
+    obj.prop('disabled', true).html('<i class="fas fa-spinner fa-pulse"></i>&nbsp;&nbsp;' + text);
 }
 
 function enableWithoutSpinner(id) {
@@ -73,22 +75,26 @@ function antiCsrfHeader() {
     return {}
 }
 
-function showFeedback(mode, text) {
+function showFeedback(mode, text, delay) {
+    var feedback = $('#genericFeedback');
     var cssClass = mode === 'success' ? 'text-success' : 'text-danger';
-    $('#genericFeedback').html('<strong class="'+ cssClass +'">'+text+'</strong>').fadeIn();
+    feedback.html('<strong class="'+ cssClass +'">'+text+'</strong>')
+        .fadeIn().removeClass('invisible').addClass('visible');
+    fadeOutFeedback(delay || 3000);
 }
 
 function fadeOutFeedback(delay) {
     setTimeout(function () { 
         $('#genericFeedback').fadeOut('slow', function(){
-            $(this).removeClass('text-danger text-success');
+            $(this).removeClass('text-danger text-success visible').addClass('invisible');
         });
     }, delay);
 }
 
-function showFormFeedback(mode, text) {
+function showFormFeedback(mode, text, delay) {
     var cssClass = mode === 'success' ? 'text-success' : 'text-danger';
     $('#formFeedback').html('<strong class="'+ cssClass +'">'+text+'</strong>').fadeIn();
+    fadeOutFormFeedback(delay || 3000);
 }
 
 function fadeOutFormFeedback(delay) {

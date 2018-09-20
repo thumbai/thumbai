@@ -8,7 +8,7 @@
 
 {{ define "body-content" -}} 
 <div class="admin-vanity-show">
-    <h1>Go Vanity Host: <span class="font-weight-bold">{{ .VanityHostName }}</span>
+    <h1>Go Vanity Host: <span class="ml-2" style="border-bottom: 1px dotted #a2a2a2">{{ .VanityHostName }}</span>
         <span class="align-middle float-sm-right">
         <button id="vanityPkgAddBtn" data-url="#" data-toggle="tooltip" title="Add new vanity package into host" class="btn btn-sm btn-outline-success pl-4 pr-4">Add Package</button>
         <button id="vanityBackBtn" data-url="{{ rurl . "vanity_list" }}" data-toggle="tooltip" title="Back to Go vanities" class="btn btn-sm btn-outline-success pl-4 pr-4">Back</button>
@@ -90,7 +90,6 @@ window.jqReady(function() {
             enableWithoutSpinner('modalAddBtn');
             $('#addEditModal').modal('hide');
             showFeedback('success', 'Vanity package added successfully!')
-            fadeOutFeedback(3000);
             vanityPackages.push({"path": $('#vanityPkgPath').val(), "repo": $('#vanityPkgRepo').val(), "vcs": $('#vanityPkgVcs').val()});
             populateTable(vanityPackages);
         }).fail(function (res) {
@@ -99,7 +98,6 @@ window.jqReady(function() {
                 markFieldErrors(data.errors);
             }
             showFormFeedback('failure', 'Unable to add vanity package!');
-            fadeOutFormFeedback(3000);
             enableWithoutSpinner('modalAddBtn');
         });
         return false;
@@ -162,7 +160,6 @@ function populateTable(packages) {
             }).fail(function (res) {
                 showFeedback('failure', 'Unable to delete vanity package!');
             });
-            fadeOutFeedback(3000);
         });
     });    
 }

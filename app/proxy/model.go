@@ -46,14 +46,12 @@ func Stats() map[string]int {
 }
 
 // AddHost method adds the given host into proxies data store.
-func AddHost(proxyRule *models.ProxyRule) error {
-	proxyRule.Host = strings.ToLower(proxyRule.Host)
-	if store.IsKeyExists(store.BucketProxies, proxyRule.Host) {
+func AddHost(proxyInfo *models.FormTargetURL) error {
+	proxyInfo.Host = strings.ToLower(proxyInfo.Host)
+	if store.IsKeyExists(store.BucketProxies, proxyInfo.Host) {
 		return store.ErrRecordAlreadyExists
 	}
-	proxyRule.RequestHeader = nil
-	proxyRule.ResponseHeader = nil
-	proxyRule.RestrictFile = nil
+	proxyRule := &models.ProxyRule{Host: proxyInfo.Host, TargetURL: proxyInfo.TargetURL}
 	return store.Put(store.BucketProxies, proxyRule.Host, append([]*models.ProxyRule{}, proxyRule))
 }
 
@@ -68,4 +66,38 @@ func Get(host string) []*models.ProxyRule {
 	rules := make([]*models.ProxyRule, 0)
 	_ = store.Get(store.BucketProxies, host, &rules)
 	return rules
+}
+
+// GetRule method returns configured proxy rules for the given host.
+func GetRule(host, targetURL string) *models.ProxyRule {
+	rules := Get(host)
+	for _, rule := range rules {
+		if rule.TargetURL == targetURL {
+			return rule
+		}
+	}
+	return nil
+}
+
+// AddRule methods adds new proxy rule for the host.
+func AddRule(rule *models.ProxyRule) error {
+	rules := Get(rule.Host)
+	return store.Put(store.BucketProxies, rule.Host, append(rules, rule))
+}
+
+// UpdateRule method updates the given rule on the exiting rules for the host.
+func UpdateRule(oldTargetURL string, rule *models.ProxyRule) error {
+	rules := Get(rule.Host)
+	if rule.Last { // inactived current last rule
+		for _, e := range rules {
+			e.Last = false
+		}
+	}
+	for i := range rules {
+		if rules[i].TargetURL == oldTargetURL {
+			rules[i] = rule
+			return store.Put(store.BucketProxies, rule.Host, rules)
+		}
+	}
+	return nil
 }

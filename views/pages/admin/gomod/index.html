@@ -35,14 +35,13 @@
 </div>
 <script>
 window.jqReady(function () {
-    var goModForm = $('#goModulesForm');
-    goModForm.submit(function (e) {
+    $('#goModulesForm').submit(function (e) {
         e.preventDefault();
         disableWithSpinner('goModulesSubmit');
         $.ajax({
             url: e.currentTarget.action,
             method: 'post',
-            data: goModForm.serialize(),
+            data: $(this).serialize(),
         }).done(function (res) {
             showFeedback('success', 'Go modules settings saved!');
             enableWithoutSpinner('goModulesSubmit');
@@ -54,10 +53,8 @@ window.jqReady(function () {
             showFeedback('failure', 'Unable to save Go modules settings!');
             enableWithoutSpinner('goModulesSubmit');
         });
-        fadeOutFeedback(3000);
         return false;
     });
-    applyOnKeydownRemoveError('goModulesForm');
 });
 </script>
 {{ end }}

@@ -47,19 +47,18 @@ limitations under the License. -->
                     <tr class="proxy-rule-row" data-url="{{ rurl $ "proxy_edit" .Host .TargetURL }}">
                         <td class="proxy-rule-col">
                             <div>
-                                <span class="badge badge-secondary">Host</span><span class="rule-value"> {{ .Host }}</span>{{ if .Last }}&nbsp;&nbsp;<span class="badge badge-success">Last Rule</span>{{ end }}
+                                <span class="badge badge-secondary">Host</span><span class="rule-value"> {{ .Host }}</span>{{ if .Last }}<span class="badge badge-success ml-2">Last Rule</span>{{ end }}{{ if .SkipTLSVerify }}<span class="badge badge-warning ml-2">Skip TLS Verify</span>{{ end }}
                                 {{ if .Path }}<br><span class="badge badge-secondary">Path</span><span class="rule-value"> {{ .Path }}</span>{{ end }}
-                                {{ if .SkipTLSVerify }}<br><span class="badge badge-secondary">SkipTLSVerify</span><span class="rule-value"> true</span>{{ end }}
                                 {{ if .QueryParams }}<br>
-                                <span class="badge badge-secondary">Query Params</span><span class="rule-value"> {{ mapstr2str .QueryParams }}</span>
+                                <span class="badge badge-secondary">Query Params</span><span class="rule-value"> {{ mapstr2str .QueryParams "=" ", " }}</span>
                                 {{ end }}
                                 {{ if .Headers }}<br>
-                                <span class="badge badge-secondary">Headers</span><span class="rule-value"> {{ mapstr2str .Headers }}</span>
+                                <span class="badge badge-secondary">Headers</span><span class="rule-value"> {{ mapstr2str .Headers "=" ", " }}</span>
                                 {{ end }}
                                 {{ if .RequestHeader }}<br>
                                 <span class="badge badge-secondary">Request Header</span><br>
                                 {{ if .RequestHeader.Add }}
-                                <span class="badge badge-light">Add</span><span class="rule-value"> {{ mapstr2str .RequestHeader.Add }}</span><br>
+                                <span class="badge badge-light">Add</span><span class="rule-value"> {{ mapstr2str .RequestHeader.Add "=" ", " }}</span><br>
                                 {{ end }}{{ if .RequestHeader.Remove }}
                                 <span class="badge badge-light">Remove</span><span class="rule-value"> {{ join .RequestHeader.Remove ", " }}</span>
                                 {{ end }}
@@ -67,7 +66,7 @@ limitations under the License. -->
                                 {{ if .ResponseHeader }}<br>
                                 <span class="badge badge-secondary">Response Header</span><br>
                                 {{ if .ResponseHeader.Add }}
-                                <span class="badge badge-light">Add</span><span class="rule-value"> {{ mapstr2str .ResponseHeader.Add }}</span><br>
+                                <span class="badge badge-light">Add</span><span class="rule-value"> {{ mapstr2str .ResponseHeader.Add "=" ", " }}</span><br>
                                 {{ end }}{{ if .ResponseHeader.Remove }}
                                 <span class="badge badge-light">Remove</span><span class="rule-value"> {{ join .ResponseHeader.Remove ", " }}</span>
                                 {{ end }}
@@ -100,72 +99,6 @@ limitations under the License. -->
         </div>
     <!-- </div> -->
 </div>
-<!-- Add/Edit proxy host record -->
-<!-- <div class="modal fade admin-proxy-show-modal" id="addEditModal" tabindex="-1" role="dialog" aria-labelledby="addEditModalTitle" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addEditModalTitle">Add proxy rule</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="container-fluid">
-                    <div class="form-group row">
-                        <label for="proxyTargetURL" class="col-sm-2 col-form-label text-right">Target URL</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" id="proxyTargetURL" name="proxyTargetURL" placeholder="Proxy Target URL" aria-describedby="proxyTargetURLHelp" required>
-                            <small id="proxyTargetURLHelp" class="form-text text-muted">
-                            Required.
-                            </small>
-                        </div>
-                    </div>
-                    <div class="admin-proxy-rule-sec-hdr">
-                        Proxy Rules
-                    </div>
-                    <div class="form-group row">
-                        <label for="inputEmail3" class="col-sm-2 col-form-label text-right">Email</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" id="inputEmail3" placeholder="Email">
-                            <small id="goBinaryHelp" class="form-text text-muted">
-                            Request path to be matched. Regex supported.
-                            </small>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="goBinary">Path</label><span class="ml-2 badge badge-success">go{{ .Settings.GoVersion }}</span>
-                        <input type="text" class="form-control" id="goBinary" name="goBinary" value="{{ .Settings.GoBinary }}" placeholder="Enter the path to Go binary on the server" aria-describedby="goBinaryHelp" required>
-                        <small id="goBinaryHelp" class="form-text text-muted">
-                        Ensure given binary is go1.11 or above.
-                        </small>
-                        <div id="goBinaryError" class="invalid-feedback">Required</div>
-                    </div>
-                    <div class="admin-proxy-rule-sec-hdr">
-                        Restrict Files
-                    </div>
-                    <div class="admin-proxy-rule-sec-hdr">
-                        Static Files
-                    </div>
-                    <div class="admin-proxy-rule-sec-hdr">
-                        Request Headers
-                    </div>
-                    <div class="admin-proxy-rule-sec-hdr">
-                        Response Headers
-                    </div>
-                </div>
-                <form id="addEditForm" class="mt-3">
-                    
-                    <div class="float-right mt-3 pb-2">
-                        <button type="button" class="btn btn-sm btn-outline-secondary pl-4 pr-4" data-dismiss="modal">Close</button>
-                        <button id="modalAddBtn" type="submit" class="btn btn-sm btn-outline-success pl-4 pr-4">Add</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div> -->
-<!-- /addEditModal -->
 <script>
 window.jqReady(function() {
     $("#proxyBackBtn").click(function() {

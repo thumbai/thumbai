@@ -107,8 +107,9 @@ func init() {
 	// Doc: https://docs.aahframework.org/template-funcs.html
 	//__________________________________________________________________________
 	aah.AddTemplateFunc(template.FuncMap{
-		"mapstr2str":    util.MapStringToString,
 		"redirect2line": util.ProxyRedirects2Lines,
+		"mapstr2str":    util.MapString2String,
+		"static2line":   util.ProxyStatics2Lines,
 		"join":          strings.Join,
 	})
 

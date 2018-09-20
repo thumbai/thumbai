@@ -95,19 +95,16 @@ window.jqReady(function() {
             vanityHosts.push({host:$('#hostName').val(), paths: []});
             populateTable(vanityHosts);
             showFeedback('success', 'Vanity host added successfully!');
-            fadeOutFeedback(3000);
         }).fail(function (res) {
             var data = res.responseJSON;
             if (data.errors) {
                 markFieldErrors(data.errors);
             }
             showFormFeedback('failure', 'Unable to add vanity host!');
-            fadeOutFormFeedback(3000);
             enableWithoutSpinner('modalAddBtn');
         });
         return false;
     });
-    applyOnKeydownRemoveError('addEditForm');
 });
 function fetchVanityHosts() {
     $.getJSON('{{ rurl . "vanity_hosts" }}', function(data){
@@ -172,7 +169,6 @@ function populateTable(vanities) {
             }).fail(function (res) {
                 showFeedback('failure', 'Unable to delete vanity host!');
             });
-            fadeOutFeedback(3000);
         });
     });
 }

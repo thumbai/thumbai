@@ -15,21 +15,13 @@
 package util
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 
 	"thumbai/app/models"
-)
 
-// MapStringToString method converts map type to comma separated string.
-func MapStringToString(input map[string]string) string {
-	var str string
-	for k, v := range input {
-		str += ", " + fmt.Sprintf("%v: %v", k, v)
-	}
-	return strings.TrimPrefix(str, ", ")
-}
+	ess "aahframework.org/essentials.v0"
+)
 
 // ProxyRedirects2Lines method transforms the proxy redirects into display line text.
 func ProxyRedirects2Lines(redirectRules []*models.ProxyRedirect) string {
@@ -38,13 +30,39 @@ func ProxyRedirects2Lines(redirectRules []*models.ProxyRedirect) string {
 	}
 	var redirects []string
 	for _, r := range redirectRules {
-		str := r.Match + ", " + r.Target + ", "
-		if r.Code == 0 {
-			str += "301"
-		} else {
-			str += strconv.Itoa(r.Code)
+		str := r.Match + ", " + r.Target
+		if r.Code > 0 {
+			str += ", " + strconv.Itoa(r.Code)
 		}
 		redirects = append(redirects, str)
 	}
 	return strings.Join(redirects, "\n")
+}
+
+// MapString2String method transforms the map into multi-line wiyth given delimiter.
+func MapString2String(values map[string]string, delimiter, joinstr string) string {
+	if len(values) == 0 {
+		return ""
+	}
+	var result []string
+	for k, v := range values {
+		result = append(result, k+delimiter+v)
+	}
+	return strings.Join(result, joinstr)
+}
+
+// ProxyStatics2Lines method transforms the static config into mutli-line string.
+func ProxyStatics2Lines(statics []*models.ProxyStatic) string {
+	if len(statics) == 0 {
+		return ""
+	}
+	var lines []string
+	for _, s := range statics {
+		str := s.TargetPath
+		if !ess.IsStrEmpty(s.StripPrefix) {
+			str += ", " + s.StripPrefix
+		}
+		lines = append(lines, str)
+	}
+	return strings.Join(lines, "\n")
 }

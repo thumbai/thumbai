@@ -6,16 +6,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   {{- template "meta_extra" . -}}
   {{- block "title" . }}<title>Default page title from master layout</title>{{ end -}}
-  <link rel="preload" href="/@admin/assets/webfonts/fa-solid-900.woff2" as="font" crossorigin>
-  <link rel="preload" href="/@admin/assets/webfonts/source-sans-pro-v11.woff2" as="font" crossorigin>
-  <link rel="preload" href="/@admin/assets/css/source-sans-pro-v11.css" as="style">
-  <link rel="preload" href="/@admin/assets/css/font-awesome-5.3.1-all.css" as="style">
-  <link rel="preload" href="/@admin/assets/css/bootstrap-4.1.3.min.css" as="style">
-  <link rel="preload" href="/@admin/assets/css/thumbai-{{ .AppBuildInfo.Version }}.css" as="style">
-  <link rel="preload" href="/@admin/assets/js/jquery-3.3.1.slim.min.js" as="script">
-  <link rel="preload" href="/@admin/assets/js/popper-1.14.3.min.js" as="script">
-  <link rel="preload" href="/@admin/assets/js/bootstrap-4.1.3.min.js" as="script">
-  <link rel="preload" href="/@admin/assets/js/thumbai-{{ .AppBuildInfo.Version }}.js" as="script">
+  <link rel="preload" href="/thumbai/assets/webfonts/fa-solid-900.woff2" as="font" crossorigin>
+  <link rel="preload" href="/thumbai/assets/webfonts/source-sans-pro-v11.woff2" as="font" crossorigin>
+  <link rel="preload" href="/thumbai/assets/css/source-sans-pro-v11.css" as="style">
+  <link rel="preload" href="/thumbai/assets/css/font-awesome-5.3.1-all.css" as="style">
+  <link rel="preload" href="/thumbai/assets/css/bootstrap-4.1.3.min.css" as="style">
+  <link rel="preload" href="/thumbai/assets/css/thumbai-{{ .AppBuildInfo.Version }}.css" as="style">
+  <link rel="preload" href="/thumbai/assets/js/jquery-3.3.1.slim.min.js" as="script">
+  <link rel="preload" href="/thumbai/assets/js/popper-1.14.3.min.js" as="script">
+  <link rel="preload" href="/thumbai/assets/js/bootstrap-4.1.3.min.js" as="script">
+  <link rel="preload" href="/thumbai/assets/js/thumbai-{{ .AppBuildInfo.Version }}.js" as="script">
   {{ include "head_tags.html" . }}
 </head>
 
@@ -26,8 +26,8 @@
     <div class="row h-100">
       {{ include "sidebar.html" . }}
       <main role="main" class="col-md-9 ml-sm-auto col-lg-11 px-4">
-        <div class="justify-content-center align-items-center position-absolute" style="margin-left:40%;margin-top:-1.8%">
-          <span id="genericFeedback" class="text-success"></span>
+        <div class="justify-content-center align-items-center position-fixed pt-1" style="margin-left:35%;margin-top:-2.1%">
+          <span id="genericFeedback" class="invisible"></span>
         </div>
         {{ block "body-content" . -}}
         <p>Default body content from master layout</p>
@@ -37,7 +37,7 @@
   </div>
   {{ include "footer_scripts.html" . }}
   {{ include "footer.html" . }}
-  <script>$(window.jqReadyFuncs).each(function(k, fn){fn();});</script>
+  <script>$(window.jqReadyFuncs).each(function(k, fn){fn();});applyOnKeydownRemoveError();</script>
 </body>
 
 </html>

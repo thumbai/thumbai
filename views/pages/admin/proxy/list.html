@@ -59,7 +59,7 @@ limitations under the License. -->
                         <span id="hostNameError" class="invalid-feedback">Required</span>
                     </div>
                     <div class="form-group">
-                        <input type="text" class="form-control" id="targetURL" name="targetURL" placeholder="Enter prosy target URL" required>
+                        <input type="text" class="form-control" id="targetURL" name="targetURL" placeholder="Enter proxy target URL" required>
                         <span id="targetURLError" class="invalid-feedback">Required</span>
                     </div>
                     <div class="mt-4">
@@ -102,14 +102,12 @@ window.jqReady(function() {
             proxyHosts.push({host: $('#hostName').val(), proxyRules: [{'target_url': $('#targetURL').val()}]})
             populateTable(proxyHosts);
             showFeedback('success', 'Proxy host added successfully!');
-            fadeOutFeedback(3000);
         }).fail(function (res) {
             var data = res.responseJSON;
             if (data.errors) {
                 markFieldErrors(data.errors);
             }
             showFormFeedback('failure', 'Unable to add proxy host!');
-            fadeOutFormFeedback(3000);
             enableWithoutSpinner('modalAddBtn');
         });
         return false;
@@ -179,7 +177,6 @@ function populateTable(proxies) {
             }).fail(function (res) {
                 showFeedback('failure', 'Unable to delete proxy host!');
             });
-            fadeOutFeedback(3000);
         });
     });
 }
