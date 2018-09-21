@@ -20,6 +20,7 @@ import (
 	"net/http"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"thumbai/app/models"
@@ -29,7 +30,7 @@ import (
 
 // Lines2MapString method transforms multi-line input to map[string]string by given
 // delimiter.
-func Lines2MapString(input, delimiter string) (map[string]string, []string) {
+func Lines2MapString(input, delimiter string, hdr bool) (map[string]string, []string) {
 	if ess.IsStrEmpty(input) || ess.IsStrEmpty(delimiter) {
 		return nil, nil
 	}
@@ -46,7 +47,7 @@ func Lines2MapString(input, delimiter string) (map[string]string, []string) {
 			errResult = append(errResult, line)
 			continue
 		}
-		result[strings.TrimSpace(parts[0])] = strings.TrimSpace(parts[1])
+		result[mapKey(parts[0], hdr)] = strings.TrimSpace(parts[1])
 	}
 	return result, errResult
 }
@@ -109,6 +110,9 @@ func Lines2RestrictFiles(input string) ([]string, []string) {
 				errResult = append(errResult, line)
 				continue
 			}
+		} else if line[0] != '.' {
+			errResult = append(errResult, line+" - missing dot prefix in the extension")
+			continue
 		}
 		result = append(result, line)
 	}
@@ -151,6 +155,29 @@ func Lines2Statics(input string) ([]*models.ProxyStatic, []string) {
 	return result, errResult
 }
 
+// Lines2HeaderSlice method transforms the lines into header string slice.
+func Lines2HeaderSlice(input, shouldNotExists, msg string) ([]string, []string) {
+	if ess.IsStrEmpty(input) {
+		return nil, nil
+	}
+	result := make([]string, 0)
+	errResult := make([]string, 0)
+	scanner := bufio.NewScanner(strings.NewReader(input))
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if len(line) == 0 {
+			continue
+		}
+		if strings.Index(line, shouldNotExists) > 0 {
+			errResult = append(errResult, line+msg)
+			continue
+		}
+		result = append(result, http.CanonicalHeaderKey(line))
+	}
+	sort.Strings(result)
+	return result, errResult
+}
+
 // IsSupportedRedirectCode method returns if given code is supported by proxy.
 func IsSupportedRedirectCode(code int) bool {
 	switch code {
@@ -182,4 +209,25 @@ func IsVaildPath(p string) error {
 		return errors.New(p + " - path not exists on server")
 	}
 	return nil
+}
+
+//‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+// Unexported methods
+//______________________________________________________________________________
+
+func sortHeaderKeys(hdrs map[string]string) []string {
+	var keys []string
+	for key := range hdrs {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	return keys
+}
+
+func mapKey(v string, hdr bool) string {
+	v = strings.TrimSpace(v)
+	if hdr {
+		return http.CanonicalHeaderKey(v)
+	}
+	return v
 }

@@ -60,18 +60,18 @@ type VanityPackage struct {
 
 // ProxyRule represents one proxy pass rule.
 type ProxyRule struct {
-	Last           bool               `json:"last,omitempty"`
-	SkipTLSVerify  bool               `json:"skip_tls_verify,omitempty"`
-	Host           string             `json:"host,omitempty"`
-	Path           string             `json:"path,omitempty"`
-	TargetURL      string             `json:"target_url,omitempty"`
-	QueryParams    map[string]string  `json:"query_params,omitempty"`
-	Headers        map[string]string  `json:"headers,omitempty"`
-	RequestHeader  *ProxyHeader       `json:"request_header,omitempty"`
-	ResponseHeader *ProxyHeader       `json:"response_header,omitempty"`
-	RestrictFile   *ProxyRestrictFile `json:"restrict_file,omitempty"`
-	Redirects      []*ProxyRedirect   `json:"redirects,omitempty"`
-	Statics        []*ProxyStatic     `json:"statics,omitempty"`
+	Last            bool               `json:"last,omitempty"`
+	SkipTLSVerify   bool               `json:"skip_tls_verify,omitempty"`
+	Host            string             `json:"host,omitempty"`
+	Path            string             `json:"path,omitempty"`
+	TargetURL       string             `json:"target_url,omitempty"`
+	QueryParams     map[string]string  `json:"query_params,omitempty"`
+	Headers         map[string]string  `json:"headers,omitempty"`
+	RequestHeaders  *ProxyHeader       `json:"request_headers,omitempty"`
+	ResponseHeaders *ProxyHeader       `json:"response_headers,omitempty"`
+	RestrictFiles   *ProxyRestrictFile `json:"restrict_files,omitempty"`
+	Redirects       []*ProxyRedirect   `json:"redirects,omitempty"`
+	Statics         []*ProxyStatic     `json:"statics,omitempty"`
 }
 
 // ProxyRedirect holds single redirect for proxy server.
@@ -99,6 +99,6 @@ type ProxyStatic struct {
 // ProxyRestrictFile structs holds the restricts configurations of by file
 // extension and regex match.
 type ProxyRestrictFile struct {
-	Extension []string `json:"extensions,omitempty"`
-	Match     []string `json:"regexs,omitempty"`
+	Extensions []string `json:"extensions,omitempty"`
+	Regexs     []string `json:"regexs,omitempty"`
 }

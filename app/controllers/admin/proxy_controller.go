@@ -162,16 +162,7 @@ func (c *ProxyController) EditTargetURL(info *models.FormTargetURL) {
 	rule.TargetURL = info.TargetURL
 	rule.Last = info.Last
 	rule.SkipTLSVerify = info.SkipTLSVerify
-	if err := proxy.UpdateRule(info.OldTargetURL, rule); err != nil {
-		c.Log().Errorf("EditTargetURL: Unable to update proxy rule %s", err)
-		c.Reply().InternalServerError().JSON(aah.Data{
-			"message": "Unable to update proxy rule",
-		})
-		return
-	}
-	c.Reply().JSON(aah.Data{
-		"message": "success",
-	})
+	c.updateRule("EditTargetURL", info.OldTargetURL, rule)
 }
 
 // EditConditions method handles Conditions values of proxy rule.
@@ -191,7 +182,7 @@ func (c *ProxyController) EditConditions(info *models.FormConditions) {
 	}
 
 	var fieldErrors []*models.FieldError
-	queryParams, errs := util.Lines2MapString(info.QueryParams, "=")
+	queryParams, errs := util.Lines2MapString(info.QueryParams, "=", false)
 	if len(errs) > 0 {
 		c.Log().Errorf("Proxy conditions error on Query Param values %s", strings.Join(errs, ", "))
 		fieldErrors = append(fieldErrors, &models.FieldError{
@@ -206,7 +197,7 @@ func (c *ProxyController) EditConditions(info *models.FormConditions) {
 	}
 	rule.QueryParams = queryParams
 
-	headers, errs := util.Lines2MapString(info.Headers, "=")
+	headers, errs := util.Lines2MapString(info.Headers, "=", true)
 	if len(errs) > 0 {
 		c.Log().Errorf("Proxy conditions error on Header values %s", strings.Join(errs, ", "))
 		fieldErrors = append(fieldErrors, &models.FieldError{
@@ -220,17 +211,7 @@ func (c *ProxyController) EditConditions(info *models.FormConditions) {
 		return
 	}
 	rule.Headers = headers
-
-	if err := proxy.UpdateRule(info.TargetURL, rule); err != nil {
-		c.Log().Errorf("EditConditions: Unable to update proxy rule %s", err)
-		c.Reply().InternalServerError().JSON(aah.Data{
-			"message": "Unable to update proxy rule",
-		})
-		return
-	}
-	c.Reply().JSON(aah.Data{
-		"message": "success",
-	})
+	c.updateRule("EditConditions", info.TargetURL, rule)
 }
 
 // EditRedirects method handles proxy redirects configurations.
@@ -258,17 +239,7 @@ func (c *ProxyController) EditRedirects(info *models.FormRedirects) {
 		return
 	}
 	rule.Redirects = redirects
-	if err := proxy.UpdateRule(info.TargetURL, rule); err != nil {
-		c.Log().Errorf("EditRedirects: Unable to update proxy rule %s", err)
-		c.Reply().InternalServerError().JSON(aah.Data{
-			"message": "Unable to update proxy rule",
-		})
-		return
-	}
-
-	c.Reply().JSON(aah.Data{
-		"message": "success",
-	})
+	c.updateRule("EditRedirects", info.TargetURL, rule)
 }
 
 // EditRestricts method handles the file restricts by extension and regex.
@@ -295,10 +266,10 @@ func (c *ProxyController) EditRestricts(info *models.FormRestricts) {
 		})
 		return
 	}
-	if rule.RestrictFile == nil && len(exts) > 0 {
-		rule.RestrictFile = &models.ProxyRestrictFile{Extension: exts}
+	if rule.RestrictFiles == nil && len(exts) > 0 {
+		rule.RestrictFiles = &models.ProxyRestrictFile{Extensions: exts}
 	} else {
-		rule.RestrictFile.Extension = exts
+		rule.RestrictFiles.Extensions = exts
 	}
 
 	regexs, errs := util.Lines2RestrictFiles(info.ByRegex)
@@ -314,23 +285,13 @@ func (c *ProxyController) EditRestricts(info *models.FormRestricts) {
 		})
 		return
 	}
-	if rule.RestrictFile == nil && len(regexs) > 0 {
-		rule.RestrictFile = &models.ProxyRestrictFile{Match: regexs}
+	if rule.RestrictFiles == nil && len(regexs) > 0 {
+		rule.RestrictFiles = &models.ProxyRestrictFile{Regexs: regexs}
 	} else {
-		rule.RestrictFile.Match = regexs
+		rule.RestrictFiles.Regexs = regexs
 	}
 
-	if err := proxy.UpdateRule(info.TargetURL, rule); err != nil {
-		c.Log().Errorf("EditRedirects: Unable to update proxy rule %s", err)
-		c.Reply().InternalServerError().JSON(aah.Data{
-			"message": "Unable to update proxy rule",
-		})
-		return
-	}
-
-	c.Reply().JSON(aah.Data{
-		"message": "success",
-	})
+	c.updateRule("EditRestricts", info.TargetURL, rule)
 }
 
 // EditStatics method handles static files directory configuration.
@@ -360,8 +321,116 @@ func (c *ProxyController) EditStatics(info *models.FormStatics) {
 	}
 
 	rule.Statics = statics
-	if err := proxy.UpdateRule(info.TargetURL, rule); err != nil {
-		c.Log().Errorf("EditStatics: Unable to update proxy rule %s", err)
+	c.updateRule("EditStatics", info.TargetURL, rule)
+}
+
+// EditRequestHeaders methods handles request headers for proxy requests.
+func (c *ProxyController) EditRequestHeaders(info *models.FormRequestHeaders) {
+	rule := proxy.GetRule(info.Host, info.TargetURL)
+	if rule == nil {
+		c.Log().Errorf("Proxy rule not found for %#v", info)
+		c.Reply().BadRequest().JSON(aah.Data{
+			"message": "Proxy rule not found",
+		})
+		return
+	}
+
+	add, errs := util.Lines2MapString(info.Add, "=", true)
+	if len(errs) > 0 {
+		c.Log().Errorf("Proxy request headers has error on add values %s", strings.Join(errs, ", "))
+		fieldErrors := append([]*models.FieldError{}, &models.FieldError{
+			Name:    "requestHeadersAdd",
+			Message: "Add Headers has invalid values: \n" + strings.Join(errs, "\n"),
+		})
+		c.Reply().BadRequest().JSON(aah.Data{
+			"message": "failed",
+			"errors":  fieldErrors,
+		})
+		return
+	}
+	if rule.RequestHeaders == nil {
+		rule.RequestHeaders = &models.ProxyHeader{Add: add}
+	} else {
+		rule.RequestHeaders.Add = add
+	}
+
+	remove, errs := util.Lines2HeaderSlice(info.Remove, "=", " - provide header key only")
+	if len(errs) > 0 {
+		c.Log().Errorf("Proxy request headers has error on remove values %s", strings.Join(errs, ", "))
+		fieldErrors := append([]*models.FieldError{}, &models.FieldError{
+			Name:    "requestHeadersRemove",
+			Message: "Remove Headers has invalid values: \n" + strings.Join(errs, "\n"),
+		})
+		c.Reply().BadRequest().JSON(aah.Data{
+			"message": "failed",
+			"errors":  fieldErrors,
+		})
+		return
+	}
+	if rule.RequestHeaders == nil {
+		rule.RequestHeaders = &models.ProxyHeader{Remove: remove}
+	} else {
+		rule.RequestHeaders.Remove = remove
+	}
+
+	c.updateRule("EditRequestHeaders", info.TargetURL, rule)
+}
+
+// EditResponseHeaders methods handles response headers for proxy requests.
+func (c *ProxyController) EditResponseHeaders(info *models.FormResponseHeaders) {
+	rule := proxy.GetRule(info.Host, info.TargetURL)
+	if rule == nil {
+		c.Log().Errorf("Proxy rule not found for %#v", info)
+		c.Reply().BadRequest().JSON(aah.Data{
+			"message": "Proxy rule not found",
+		})
+		return
+	}
+
+	add, errs := util.Lines2MapString(info.Add, "=", true)
+	if len(errs) > 0 {
+		c.Log().Errorf("Proxy response headers has error on add values %s", strings.Join(errs, ", "))
+		fieldErrors := append([]*models.FieldError{}, &models.FieldError{
+			Name:    "responseHeadersAdd",
+			Message: "Add Headers has invalid values: \n" + strings.Join(errs, "\n"),
+		})
+		c.Reply().BadRequest().JSON(aah.Data{
+			"message": "failed",
+			"errors":  fieldErrors,
+		})
+		return
+	}
+	if rule.ResponseHeaders == nil {
+		rule.ResponseHeaders = &models.ProxyHeader{Add: add}
+	} else {
+		rule.ResponseHeaders.Add = add
+	}
+
+	remove, errs := util.Lines2HeaderSlice(info.Remove, "=", " - provide only header key")
+	if len(errs) > 0 {
+		c.Log().Errorf("Proxy response headers has error on values %s", strings.Join(errs, ", "))
+		fieldErrors := append([]*models.FieldError{}, &models.FieldError{
+			Name:    "responseHeadersRemove",
+			Message: "Remove Headers has invalid values: \n" + strings.Join(errs, "\n"),
+		})
+		c.Reply().BadRequest().JSON(aah.Data{
+			"message": "failed",
+			"errors":  fieldErrors,
+		})
+		return
+	}
+	if rule.ResponseHeaders == nil {
+		rule.ResponseHeaders = &models.ProxyHeader{Remove: remove}
+	} else {
+		rule.ResponseHeaders.Remove = remove
+	}
+
+	c.updateRule("EditResponseHeaders", info.TargetURL, rule)
+}
+
+func (c *ProxyController) updateRule(from, targetURL string, rule *models.ProxyRule) {
+	if err := proxy.UpdateRule(targetURL, rule); err != nil {
+		c.Log().Errorf("%s: Unable to update proxy rule %s", from, err)
 		c.Reply().InternalServerError().JSON(aah.Data{
 			"message": "Unable to update proxy rule",
 		})

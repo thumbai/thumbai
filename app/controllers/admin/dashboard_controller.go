@@ -40,6 +40,11 @@ func (c *DashboardController) Index() {
 	})
 }
 
+// Credits method serves the credits page.
+func (c *DashboardController) Credits() {
+	c.Reply().Ok()
+}
+
 // ToAdminDashboard method redirects path '/thumbai' to '/thumbai/dashboard.html'.
 func (c *DashboardController) ToAdminDashboard() {
 	c.Reply().Redirect(c.RouteURL("dashboard"))

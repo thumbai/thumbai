@@ -20,7 +20,7 @@ import (
 
 	"thumbai/app/models"
 
-	ess "aahframework.org/essentials.v0"
+	"aahframe.work/aah/essentials"
 )
 
 // ProxyRedirects2Lines method transforms the proxy redirects into display line text.
@@ -45,8 +45,8 @@ func MapString2String(values map[string]string, delimiter, joinstr string) strin
 		return ""
 	}
 	var result []string
-	for k, v := range values {
-		result = append(result, k+delimiter+v)
+	for _, k := range sortHeaderKeys(values) {
+		result = append(result, k+delimiter+values[k])
 	}
 	return strings.Join(result, joinstr)
 }

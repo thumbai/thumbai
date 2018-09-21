@@ -53,3 +53,19 @@ type FormStatics struct {
 	TargetURL string `bind:"targetURL" json:"target_url,omitempty"`
 	Statics   string `bind:"staticDirs" json:"statics,omitempty"`
 }
+
+// FormRequestHeaders represents fields of `formRequestHeaders` on page `/admin/proxy/edit.html`.
+type FormRequestHeaders struct {
+	Host      string `bind:"hostName" json:"host,omitempty"`
+	TargetURL string `bind:"targetURL" json:"target_url,omitempty"`
+	Add       string `bind:"requestHeadersAdd" json:"add_headers,omitempty"`
+	Remove    string `bind:"requestHeadersRemove" json:"remove_headers,omitempty"`
+}
+
+// FormResponseHeaders represents fields of `formResponseHeaders` on page `/admin/proxy/edit.html`.
+type FormResponseHeaders struct {
+	Host      string `bind:"hostName" json:"host,omitempty"`
+	TargetURL string `bind:"targetURL" json:"target_url,omitempty"`
+	Add       string `bind:"responseHeadersAdd" json:"add_headers,omitempty"`
+	Remove    string `bind:"responseHeadersRemove" json:"remove_headers,omitempty"`
+}

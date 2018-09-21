@@ -241,6 +241,15 @@ html {
   background-color: rgb(12, 97, 33);
 }
 
+/* admin/dashboard/credits.html */
+.thumbai-credits .credits-list a {
+  color: inherit;
+}
+.thumbai-credits .credits-list a:hover {
+  color: #007bff;
+  text-decoration: none;
+}
+
 /* admin/dashboard/index.html */
 .admin-dashboard .card {
   border-color: rgb(241, 241, 241);

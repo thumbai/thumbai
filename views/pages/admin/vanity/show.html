@@ -1,3 +1,17 @@
+<!-- Copyright Jeevanandam M. (https://github.com/jeevatkm, jeeva@myjeeva.com)
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License. -->
+
 {{ define "title" }}
 <title>Go Vanity Host: {{ .VanityHostName }} - THUMBAI</title>
 {{ end }} 
@@ -8,24 +22,29 @@
 
 {{ define "body-content" -}} 
 <div class="admin-vanity-show">
-    <h1>Go Vanity Host: <span class="ml-2" style="border-bottom: 1px dotted #a2a2a2">{{ .VanityHostName }}</span>
-        <span class="align-middle float-sm-right">
-        <button id="vanityPkgAddBtn" data-url="#" data-toggle="tooltip" title="Add new vanity package into host" class="btn btn-sm btn-outline-success pl-4 pr-4">Add Package</button>
-        <button id="vanityBackBtn" data-url="{{ rurl . "vanity_list" }}" data-toggle="tooltip" title="Back to Go vanities" class="btn btn-sm btn-outline-success pl-4 pr-4">Back</button>
-        </span>
-    </h1> 
-    <div class="mt-5">
-        <table id="vanityPackages" class="table table-hover">
-            <thead class="bg-dark text-white">
-                <tr>
-                <th scope="col" class="w-40">Path</th>
-                <th scope="col" class="w-50">Repo</th>
-                <th scope="col" class="w-20">VCS</th>
-                <th scope="col">&nbsp;</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+    <div class="container-fluid no-gutters mb-4">
+        <div class="row align-items-center no-gutters">
+            <div class="col">
+                <span class="h1">Go Vanity Host:</span><span class="h1 ml-2" style="border-bottom: 1px dotted #a2a2a2">{{ .VanityHostName }}</span>
+            </div>
+            <div class="col text-right">
+                <button id="vanityPkgAddBtn" data-toggle="tooltip" title="Add new vanity package into host" class="btn btn-sm btn-outline-success pl-4 pr-4 mr-1">Add Package</button>
+                <button id="vanityBackBtn" data-url="{{ rurl . "vanity_list" }}" data-toggle="tooltip" title="Back to Go vanities" class="btn btn-sm btn-outline-success pl-4 pr-4">Back</button>
+            </div>
+        </div>
+        <div class="row no-gutters mt-5">
+            <table id="vanityPackages" class="table table-hover">
+                <thead class="bg-dark text-white">
+                    <tr>
+                    <th scope="col" class="w-40">Path</th>
+                    <th scope="col" class="w-50">Repo</th>
+                    <th scope="col" class="w-20">VCS</th>
+                    <th scope="col">&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
     </div>
 </div>
 <!-- Add/Edit vanity host record -->

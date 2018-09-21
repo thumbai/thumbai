@@ -15,7 +15,9 @@
 package admin
 
 import (
+	"fmt"
 	"os"
+	"strings"
 
 	"thumbai/app/gomod"
 	"thumbai/app/models"
@@ -101,5 +103,55 @@ func (c *GoModController) SaveSettings(settings *models.ModuleSettings) {
 
 	c.Reply().JSON(aah.Data{
 		"message": "success",
+	})
+}
+
+// Publish method go modules into repository.
+//
+// Supported formats:
+//
+// aahframe.work/aah@latest    # same (@latest is default for 'go get')
+//
+// aahframe.work/aah@v0.12.0   # records v0.12.0
+//
+// aahframe.work/aah@7e312af   # records v0.0.0-20180908054125-7e312af9202b
+func (c *GoModController) Publish(pubReq *models.PublishRequest) {
+	fmt.Println("==>", pubReq)
+	if !gomod.Settings.Enabled {
+		c.Reply().ServiceUnavailable().JSON(aah.Data{
+			"message": "Go Proxy Server unavailable due to prerequisites not met on server, please check thumbai logs",
+		})
+		return
+	}
+
+	if len(pubReq.Modules) == 0 {
+		c.Reply().BadRequest().JSON(aah.Data{
+			"message": "module(s) path required",
+		})
+		return
+	}
+
+	go func() {
+		for _, m := range pubReq.Modules {
+			if ess.IsStrEmpty(m) {
+				continue
+			}
+			if strings.Contains(m, gomod.FSPathDelimiter) {
+				aah.AppLog().Errorf("Publish: invalid module path '%s'", m)
+				continue
+			}
+			parts := strings.Split(m, "@")
+			if len(parts) != 2 {
+				aah.AppLog().Errorf("Publish: invalid module path '%s'", m)
+				continue
+			}
+			if err := gomod.Download(&gomod.Request{Module: parts[0], Version: parts[1]}); err != nil {
+				aah.AppLog().Error(err)
+			}
+		}
+	}()
+
+	c.Reply().Accepted().JSON(aah.Data{
+		"message": "go module(s) publish request accepted",
 	})
 }

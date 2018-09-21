@@ -22,24 +22,27 @@ limitations under the License. -->
 
 {{ define "body-content" -}} 
 <div class="admin-vanity">
-    <div class="w-75">
-        <h1>Go Vanities
-            <span class="align-middle float-sm-right">
-                <button id="vanityHostAddBtn" data-url="#" data-toggle="tooltip" title="Add new vanity host" class="btn btn-sm btn-outline-success pl-4 pr-4">Add Vanity</button>
-            </span>
-        </h1>
-    </div>
-    <div class="mt-5 w-75">        
-        <table id="vanityHosts" class="table table-hover">
-            <thead class="bg-dark text-white">
-                <tr>
-                <th scope="col" class="w-75">Host</th>
-                <th scope="col" class="w-25">Packages</th>
-                <th scope="col">&nbsp;</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+    <div class="container-fluid no-gutters mb-4">
+        <div class="row align-items-center no-gutters w-75">
+            <div class="col">
+                <span class="h1">Go Vanities</span>
+            </div>
+            <div class="col text-right">
+                    <button id="vanityHostAddBtn" data-url="#" data-toggle="tooltip" title="Add new vanity host" class="btn btn-sm btn-outline-success pl-4 pr-4">Add Vanity</button>
+            </div>
+        </div>
+        <div class="row no-gutters mt-5 w-75">        
+            <table id="vanityHosts" class="table table-hover">
+                <thead class="bg-dark text-white">
+                    <tr>
+                    <th scope="col" class="w-75">Host</th>
+                    <th scope="col" class="w-25">Packages</th>
+                    <th scope="col">&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
     </div>
 </div>
 <!-- Add/Edit vanity host record -->

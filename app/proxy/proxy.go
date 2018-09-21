@@ -210,23 +210,23 @@ func (h *host) AddProxyRule(pr *models.ProxyRule) error {
 		r.Path = pr.Path
 	}
 
-	if pr.RequestHeader != nil {
-		reqHdr := *pr.RequestHeader
+	if pr.RequestHeaders != nil {
+		reqHdr := *pr.RequestHeaders
 		r.ReqHdr = &reqHdr
 	}
 
-	if pr.ResponseHeader != nil {
-		resHdr := *pr.ResponseHeader
+	if pr.ResponseHeaders != nil {
+		resHdr := *pr.ResponseHeaders
 		r.ResHdr = &resHdr
 	}
 
-	if pr.RestrictFile != nil {
+	if pr.RestrictFiles != nil {
 		r.RestrictFile = &restrictFile{}
-		if len(pr.RestrictFile.Extension) > 0 {
-			r.RestrictFile.Extension = pr.RestrictFile.Extension
+		if len(pr.RestrictFiles.Extensions) > 0 {
+			r.RestrictFile.Extension = pr.RestrictFiles.Extensions
 		}
-		if len(pr.RestrictFile.Match) > 0 {
-			for _, rr := range pr.RestrictFile.Match {
+		if len(pr.RestrictFiles.Regexs) > 0 {
+			for _, rr := range pr.RestrictFiles.Regexs {
 				regex, err := regexp.Compile(rr[1 : len(rr)-1])
 				if err != nil {
 					return fmt.Errorf("proxy restrict by match config error on host->'%s' match->'%s': %v", h.Name, rr, err)

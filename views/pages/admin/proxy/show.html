@@ -22,12 +22,11 @@ limitations under the License. -->
 
 {{ define "body-content" -}} 
 <div class="admin-proxy-show">
-    <!-- <div class="container-fluid"> -->
+    <div class="container-fluid no-gutters mb-4">
         <div>
             <h1>Proxy Host: <span class="font-weight-bold">{{ .ProxyHostName }}</span>
                 <div class="align-middle float-sm-right float-right">
                     <a href="{{ rurl . "proxy_add" .ProxyHostName }}" data-toggle="tooltip" title="Add new proxy rule" class="btn btn-sm btn-outline-success pl-4 pr-4">Add Rule</a>
-                    <!-- <button id="proxyRuleAddBtn" data-url="#" data-toggle="tooltip" title="Add new proxy rule" class="btn btn-sm btn-outline-success pl-4 pr-4">Add Rule</button> -->
                     <button id="proxyBackBtn" data-url="{{ rurl . "proxy_list" }}" data-toggle="tooltip" title="Back to Proxies" class="btn btn-sm btn-outline-success pl-4 pr-4">Back</button>
                 </div>
             </h1> 
@@ -55,29 +54,29 @@ limitations under the License. -->
                                 {{ if .Headers }}<br>
                                 <span class="badge badge-secondary">Headers</span><span class="rule-value"> {{ mapstr2str .Headers "=" ", " }}</span>
                                 {{ end }}
-                                {{ if .RequestHeader }}<br>
-                                <span class="badge badge-secondary">Request Header</span><br>
-                                {{ if .RequestHeader.Add }}
-                                <span class="badge badge-light">Add</span><span class="rule-value"> {{ mapstr2str .RequestHeader.Add "=" ", " }}</span><br>
-                                {{ end }}{{ if .RequestHeader.Remove }}
-                                <span class="badge badge-light">Remove</span><span class="rule-value"> {{ join .RequestHeader.Remove ", " }}</span>
+                                {{ if .RequestHeaders }}<br>
+                                <span class="badge badge-secondary">Request Headers</span><br>
+                                {{ if .RequestHeaders.Add }}
+                                <span class="badge badge-light">Add</span><span class="rule-value"> {{ mapstr2str .RequestHeaders.Add "=" ", " }}</span><br>
+                                {{ end }}{{ if .RequestHeaders.Remove }}
+                                <span class="badge badge-light">Remove</span><span class="rule-value"> {{ join .RequestHeaders.Remove ", " }}</span>
                                 {{ end }}
                                 {{ end }}
-                                {{ if .ResponseHeader }}<br>
-                                <span class="badge badge-secondary">Response Header</span><br>
-                                {{ if .ResponseHeader.Add }}
-                                <span class="badge badge-light">Add</span><span class="rule-value"> {{ mapstr2str .ResponseHeader.Add "=" ", " }}</span><br>
-                                {{ end }}{{ if .ResponseHeader.Remove }}
-                                <span class="badge badge-light">Remove</span><span class="rule-value"> {{ join .ResponseHeader.Remove ", " }}</span>
+                                {{ if .ResponseHeaders }}<br>
+                                <span class="badge badge-secondary">Response Headers</span><br>
+                                {{ if .ResponseHeaders.Add }}
+                                <span class="badge badge-light">Add</span><span class="rule-value"> {{ mapstr2str .ResponseHeaders.Add "=" ", " }}</span><br>
+                                {{ end }}{{ if .ResponseHeaders.Remove }}
+                                <span class="badge badge-light">Remove</span><span class="rule-value"> {{ join .ResponseHeaders.Remove ", " }}</span>
                                 {{ end }}
                                 {{ end }}
-                                {{ if .RestrictFile }}<br>
+                                {{ if .RestrictFiles }}<br>
                                 <span class="badge badge-secondary">Restrict File</span>
-                                {{ if .RestrictFile.Extension }}<br>
-                                <span class="badge badge-light">By Extension</span><span class="rule-value"> {{ join .RestrictFile.Extension ", " }}</span>
+                                {{ if .RestrictFiles.Extensions }}<br>
+                                <span class="badge badge-light">By Extension</span><span class="rule-value"> {{ join .RestrictFiles.Extensions ", " }}</span>
                                 {{ end }}
-                                {{ if .RestrictFile.Match }}<br>
-                                <span class="badge badge-light">By Match</span><span class="rule-value"> {{ join .RestrictFile.Match ", " }}</span>
+                                {{ if .RestrictFiles.Regexs }}<br>
+                                <span class="badge badge-light">By Match</span><span class="rule-value"> {{ join .RestrictFiles.Regexs ", " }}</span>
                                 {{ end }}
                                 {{ end }}
                                 {{ if .Statics }}<br>
@@ -97,7 +96,7 @@ limitations under the License. -->
                 </tbody>
             </table>
         </div>
-    <!-- </div> -->
+    </div>
 </div>
 <script>
 window.jqReady(function() {

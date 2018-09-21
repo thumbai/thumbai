@@ -28,7 +28,7 @@ limitations under the License. -->
                 <span class="h1">Proxy Host:</span><span class="h1 ml-2" style="border-bottom: 1px dotted #a2a2a2">{{ .Rule.Host }}</span>
             </div>
             <div class="col text-right">
-                <a href="{{ rurl . "proxy_show" .Rule.Host }}" data-toggle="tooltip" title="Back to Proxy Host" class="btn btn-sm btn-outline-success pl-4 pr-4">Back</a>
+                <a href="{{ rurl . "proxy_show" .Rule.Host }}" data-toggle="tooltip" title="Back to Proxy Host" role="button" class="btn btn-sm btn-outline-success pl-4 pr-4">Back</a>
             </div>
         </div>
         <div class="row no-gutters">
@@ -141,7 +141,7 @@ limitations under the License. -->
                             <div class="form-group row">
                                 <label for="restrictsByExt" class="col-sm-2 col-form-label text-right">By Extension</label>
                                 <div class="col-sm-10">
-                                    <textarea class="form-control rule-value" id="restrictsByExt" name="restrictsByExt" rows="3" placeholder="Enter file extension to restrict">{{ if .Rule.RestrictFile }}{{ join .Rule.RestrictFile.Extension "\n" }}{{ end }}</textarea>
+                                    <textarea class="form-control rule-value" id="restrictsByExt" name="restrictsByExt" rows="3" placeholder="Enter file extension to restrict">{{ if .Rule.RestrictFiles }}{{ join .Rule.RestrictFiles.Extensions "\n" }}{{ end }}</textarea>
                                     <small id="restrictsByExtHelp" class="form-text text-muted">
                                     Each file extension per line.
                                     </small>
@@ -151,7 +151,7 @@ limitations under the License. -->
                             <div class="form-group row">
                                 <label for="restrictsByRegex" class="col-sm-2 col-form-label text-right">By Regex</label>
                                 <div class="col-sm-10">
-                                    <textarea class="form-control rule-value" id="restrictsByRegex" name="restrictsByRegex" rows="3" placeholder="Enter regex to restrict files">{{ if .Rule.RestrictFile }}{{ join .Rule.RestrictFile.Match "\n" }}{{ end }}</textarea>
+                                    <textarea class="form-control rule-value" id="restrictsByRegex" name="restrictsByRegex" rows="3" placeholder="Enter regex to restrict files">{{ if .Rule.RestrictFiles }}{{ join .Rule.RestrictFiles.Regexs "\n" }}{{ end }}</textarea>
                                     <small id="restrictsByRegexHelp" class="form-text text-muted">
                                     Each regex per line, syntax: <code>{regex-here}</code>.
                                     </small>
@@ -197,11 +197,11 @@ limitations under the License. -->
                 </div>
                 <div class="collapse" id="requestResponseHdrSection">
                     <div class="card card-body mt-2">
-                        <form id="formRequestHeaders" action="">
+                        <form id="formRequestHeaders" action="{{ rurl . "proxy_edit_req_hdrs" .Rule.Host .Rule.TargetURL }}">
                             <div class="form-group row">
                                 <label for="requestHeadersAdd" class="col-sm-2 col-form-label text-right">Add</label>
                                 <div class="col-sm-10">
-                                    <textarea class="form-control rule-value" id="requestHeadersAdd" name="requestHeadersAdd" rows="3" placeholder="Enter request headers to be added before proxying a request"></textarea>
+                                    <textarea class="form-control rule-value" id="requestHeadersAdd" name="requestHeadersAdd" rows="3" placeholder="Enter request headers to be added before proxying a request">{{ if .Rule.RequestHeaders }}{{ mapstr2str .Rule.RequestHeaders.Add "=" "\n" }}{{ end }}</textarea>
                                     <small id="requestHeadersAddHelp" class="form-text text-muted">
                                     Each header key and value pair per line, syntax: <code>Header-Key=Header value</code>.
                                     </small>
@@ -211,7 +211,7 @@ limitations under the License. -->
                             <div class="form-group row">
                                 <label for="requestHeadersRemove" class="col-sm-2 col-form-label text-right">Remove</label>
                                 <div class="col-sm-10">
-                                    <textarea class="form-control rule-value" id="requestHeadersRemove" name="requestHeadersRemove" rows="3" placeholder="Enter request headers to be removed before proxying a request"></textarea>
+                                    <textarea class="form-control rule-value" id="requestHeadersRemove" name="requestHeadersRemove" rows="3" placeholder="Enter request headers to be removed before proxying a request">{{ if .Rule.RequestHeaders }}{{ join .Rule.RequestHeaders.Remove "\n" }}{{ end }}</textarea>
                                     <small id="requestHeadersRemoveHelp" class="form-text text-muted">
                                     Each header key per line, syntax: <code>Header-Key</code>.
                                     </small>
@@ -231,11 +231,11 @@ limitations under the License. -->
                 </div>
                 <div class="collapse" id="requestResponseHdrSection">
                     <div class="card card-body mt-2">
-                        <form id="formResponseHeaders" action="">
+                        <form id="formResponseHeaders" action="{{ rurl . "proxy_edit_res_hdrs" .Rule.Host .Rule.TargetURL }}">
                             <div class="form-group row">
                                 <label for="responseHeadersAdd" class="col-sm-2 col-form-label text-right">Add</label>
                                 <div class="col-sm-10">
-                                    <textarea class="form-control rule-value" id="responseHeadersAdd" name="responseHeadersAdd" rows="3" placeholder="Enter response headers to be added for the proxy response"></textarea>
+                                    <textarea class="form-control rule-value" id="responseHeadersAdd" name="responseHeadersAdd" rows="3" placeholder="Enter response headers to be added for the proxy response">{{ if .Rule.ResponseHeaders }}{{ mapstr2str .Rule.ResponseHeaders.Add "=" "\n" }}{{ end }}</textarea>
                                     <small id="responseHeadersAddHelp" class="form-text text-muted">
                                     Each header key and value pair per line, syntax: <code>Header-Key=Header value</code>.
                                     </small>
@@ -245,7 +245,7 @@ limitations under the License. -->
                             <div class="form-group row">
                                 <label for="responseHeadersRemove" class="col-sm-2 col-form-label text-right">Remove</label>
                                 <div class="col-sm-10">
-                                    <textarea class="form-control rule-value" id="responseHeadersRemove" name="responseHeadersRemove" rows="3" placeholder="Enter response headers to be removed for the proxy response"></textarea>
+                                    <textarea class="form-control rule-value" id="responseHeadersRemove" name="responseHeadersRemove" rows="3" placeholder="Enter response headers to be removed for the proxy response">{{ if .Rule.ResponseHeaders }}{{ join .Rule.ResponseHeaders.Remove "\n" }}{{ end }}</textarea>
                                     <small id="responseHeadersRemoveHelp" class="form-text text-muted">
                                     Each header key per line, syntax: <code>Header-Key</code>.
                                     </small>
@@ -265,7 +265,8 @@ limitations under the License. -->
 <script>
 window.jqReady(function(){
     $.each(['formTargetURL', 'formConditions', 'formRedirects',
-            'formRestricts', 'formStatics'], function(i, formName){
+            'formRestricts', 'formStatics', 'formRequestHeaders',
+            'formResponseHeaders'], function(i, formName){
         $('#'+formName).submit(function(e){
             e.preventDefault();
             var submitBtnName = formName+'Submit';
