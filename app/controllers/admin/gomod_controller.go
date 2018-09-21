@@ -15,7 +15,6 @@
 package admin
 
 import (
-	"fmt"
 	"os"
 	"strings"
 
@@ -116,7 +115,6 @@ func (c *GoModController) SaveSettings(settings *models.ModuleSettings) {
 //
 // aahframe.work/aah@7e312af   # records v0.0.0-20180908054125-7e312af9202b
 func (c *GoModController) Publish(pubReq *models.PublishRequest) {
-	fmt.Println("==>", pubReq)
 	if !gomod.Settings.Enabled {
 		c.Reply().ServiceUnavailable().JSON(aah.Data{
 			"message": "Go Proxy Server unavailable due to prerequisites not met on server, please check thumbai logs",

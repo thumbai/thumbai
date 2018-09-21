@@ -42,7 +42,9 @@ func (c *DashboardController) Index() {
 
 // Credits method serves the credits page.
 func (c *DashboardController) Credits() {
-	c.Reply().Ok()
+	c.Reply().HTML(aah.Data{
+		"IsCredits": true,
+	})
 }
 
 // ToAdminDashboard method redirects path '/thumbai' to '/thumbai/dashboard.html'.

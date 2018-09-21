@@ -26,7 +26,7 @@ limitations under the License. -->
   <link rel="preload" href="/thumbai/assets/css/font-awesome-5.3.1-all.css" as="style">
   <link rel="preload" href="/thumbai/assets/css/bootstrap-4.1.3.min.css" as="style">
   <link rel="preload" href="/thumbai/assets/css/thumbai-{{ .AppBuildInfo.Version }}.css" as="style">
-  <link rel="preload" href="/thumbai/assets/js/jquery-3.3.1.slim.min.js" as="script">
+  <link rel="preload" href="/thumbai/assets/js/jquery-3.3.1.min.js" as="script">
   <link rel="preload" href="/thumbai/assets/js/popper-1.14.3.min.js" as="script">
   <link rel="preload" href="/thumbai/assets/js/bootstrap-4.1.3.min.js" as="script">
   <link rel="preload" href="/thumbai/assets/js/thumbai-{{ .AppBuildInfo.Version }}.js" as="script">
@@ -38,7 +38,7 @@ limitations under the License. -->
   {{ include "header.html" . }}
   <div class="container-fluid h-100">
     <div class="row h-100">
-      {{ include "sidebar.html" . }}
+      {{ if not .IsCredits }}{{ include "sidebar.html" . }}{{ end }}
       <main role="main" class="col-md-9 ml-sm-auto col-lg-11 px-4">
         <div class="justify-content-center align-items-center position-fixed pt-1" style="margin-left:35%;margin-top:-2.1%">
           <span id="genericFeedback" class="invisible"></span>
