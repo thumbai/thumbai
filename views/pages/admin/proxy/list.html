@@ -143,7 +143,7 @@ function populateTable(proxies) {
         '<td class="proxy-col">' + v.host + '</td>' +
         '<td class="proxy-col">' + v.proxyRules.length + '</td>' +
         '<td class="text-center veritical-align-middle">' +
-        '<a class="proxy-row-del" href="#" title="delete" data-toggle="tooltip" data-url="' + apiBaseUrl + '/' + v.host + 
+        '<a class="proxy-row-del" role="button" title="Delete proxy host" data-toggle="tooltip" data-url="' + apiBaseUrl + '/' + v.host + 
         '" data-hostname="' + v.host + '"><i class="fas fa-trash-alt fa-lg"></i></a>' +
         '</td>' +
         '</tr>';
@@ -154,6 +154,7 @@ function populateTable(proxies) {
         location = $(this).parent().data('url');
     });
     $('.proxy-row-del').click(function(e) {
+        e.preventDefault();
         var hostname = $(this).data('hostname');
         $.confirmDialog('Are you sure to delete <strong>'+ hostname +'</strong>?<br>'+
         '<span style="font-size:80%">Note: Proxy configurations will be deleted too.</span>'
@@ -162,9 +163,9 @@ function populateTable(proxies) {
                 url: t.data('url'),
                 method: 'delete',
                 headers: antiCsrfHeader()
-            }).done(function (data) {
-                showFeedback('success', 'Proxy host deleted successfully!');
-                if (data.message === 'success') {
+            }).done(function (data, textStatus, jqXHR) {
+                if (jqXHR.status === 204) {
+                    showFeedback('success', 'Proxy host deleted successfully!');
                     t.parents('tr').remove();
                     var f = -1;
                     $(proxyHosts).each(function(i, v){
@@ -177,10 +178,11 @@ function populateTable(proxies) {
                         proxyHosts.splice(f, 1);
                     }
                 }
-            }).fail(function (res) {
+            }).fail(function (data, textStatus, jqXHR) {
                 showFeedback('failure', 'Unable to delete proxy host!');
             });
         });
+        return false;
     });
 }
 </script>

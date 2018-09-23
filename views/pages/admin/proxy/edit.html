@@ -292,30 +292,6 @@ window.jqReady(function(){
             return false;
         });
     });
-
-    // $('#formTargetURL').submit(function(e){
-    //     e.preventDefault();
-    //     disableWithSpinner('formTargetURLSubmit');
-    //     $.ajax({
-    //         url: e.currentTarget.action,
-    //         method: 'put',
-    //         data: $(this).serialize()
-    //     }).done(function (res) {
-    //         enableWithoutSpinner('formTargetURLSubmit');
-    //         showFeedback('success', 'Proxy rule updated successfully!');
-    //     }).fail(function (res) {
-    //         var data = res.responseJSON;
-    //         if (data.errors) {
-    //             markFieldErrors(data.errors);
-    //         } else if (data.message) {
-    //             showFeedback('failure', data.message);
-    //         } else {
-    //             showFeedback('failure', 'Unable to update proxy rule!');
-    //         }            
-    //         enableWithoutSpinner('formTargetURLSubmit');
-    //     });
-    //     return false;
-    // });
 });
 </script>
 {{ end }}

@@ -66,3 +66,39 @@ func ProxyStatics2Lines(statics []*models.ProxyStatic) string {
 	}
 	return strings.Join(lines, "\n")
 }
+
+// IsProxyConditionsExists method returns true if path, query params or headers exists
+// otherwise false.
+func IsProxyConditionsExists(rule *models.ProxyRule) bool {
+	if rule == nil {
+		return false
+	}
+	return len(rule.Path) > 0 || len(rule.QueryParams) > 0 || len(rule.Headers) > 0
+}
+
+// IsProxyRestrictFilesExists method returns true if rrestrict files config exists
+// otherwise false.
+func IsProxyRestrictFilesExists(rule *models.ProxyRule) bool {
+	if rule == nil || rule.RestrictFiles == nil {
+		return false
+	}
+	return len(rule.RestrictFiles.Extensions) > 0 || len(rule.RestrictFiles.Regexs) > 0
+}
+
+// IsProxyRequestHeadersExists method returns true if request headers present
+// otherwise false.
+func IsProxyRequestHeadersExists(rule *models.ProxyRule) bool {
+	if rule == nil || rule.RequestHeaders == nil {
+		return false
+	}
+	return len(rule.RequestHeaders.Add) > 0 || len(rule.RequestHeaders.Remove) > 0
+}
+
+// IsProxyResponseHeadersExists method returns true if request headers present
+// otherwise false.
+func IsProxyResponseHeadersExists(rule *models.ProxyRule) bool {
+	if rule == nil || rule.ResponseHeaders == nil {
+		return false
+	}
+	return len(rule.ResponseHeaders.Add) > 0 || len(rule.ResponseHeaders.Remove) > 0
+}

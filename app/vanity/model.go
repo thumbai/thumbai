@@ -1,3 +1,17 @@
+// Copyright Jeevanandam M. (https://github.com/jeevatkm, jeeva@myjeeva.com)
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package vanity
 
 import (
@@ -5,8 +19,8 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+	"thumbai/app/datastore"
 	"thumbai/app/models"
-	"thumbai/app/store"
 )
 
 //‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
@@ -15,11 +29,11 @@ import (
 
 // All method returns all the vanity host configurations from store.
 func All() map[string][]*models.VanityPackage {
-	keys := store.BucketKeys(store.BucketGoVanities)
+	keys := datastore.BucketKeys(datastore.BucketGoVanities)
 	allVanities := map[string][]*models.VanityPackage{}
 	for _, k := range keys {
 		vanities := make([]*models.VanityPackage, 0)
-		_ = store.Get(store.BucketGoVanities, k, &vanities)
+		_ = datastore.Get(datastore.BucketGoVanities, k, &vanities)
 		allVanities[k] = vanities
 	}
 	return allVanities
@@ -41,22 +55,22 @@ func Stats() map[string]int {
 // AddHost method adds the given host into vanities data store.
 func AddHost(hostName string) error {
 	hostName = strings.ToLower(hostName)
-	if store.IsKeyExists(store.BucketGoVanities, hostName) {
-		return store.ErrRecordAlreadyExists
+	if datastore.IsKeyExists(datastore.BucketGoVanities, hostName) {
+		return datastore.ErrRecordAlreadyExists
 	}
 	return Add(hostName, nil)
 }
 
 // DelHost method deletes the given host from vanities store.
 func DelHost(hostName string) error {
-	return store.Del(store.BucketGoVanities, strings.ToLower(hostName))
+	return datastore.Del(datastore.BucketGoVanities, strings.ToLower(hostName))
 }
 
 // Get method returns the vanity package configurations for given host.
 func Get(host string) []*models.VanityPackage {
 	host = strings.ToLower(host)
 	vanities := make([]*models.VanityPackage, 0)
-	_ = store.Get(store.BucketGoVanities, host, &vanities)
+	_ = datastore.Get(datastore.BucketGoVanities, host, &vanities)
 	return vanities
 }
 
@@ -64,22 +78,22 @@ func Get(host string) []*models.VanityPackage {
 func Add(host string, vp *models.VanityPackage) error {
 	host = strings.ToLower(host)
 	vanities := make([]*models.VanityPackage, 0)
-	_ = store.Get(store.BucketGoVanities, host, &vanities)
+	_ = datastore.Get(datastore.BucketGoVanities, host, &vanities)
 	if vp == nil {
-		return store.Put(store.BucketGoVanities, host, vanities)
+		return datastore.Put(datastore.BucketGoVanities, host, vanities)
 	}
 	for _, p := range vanities {
 		if p.Path == vp.Path {
-			return store.ErrRecordAlreadyExists
+			return datastore.ErrRecordAlreadyExists
 		}
 	}
-	return store.Put(store.BucketGoVanities, host, append(vanities, vp))
+	return datastore.Put(datastore.BucketGoVanities, host, append(vanities, vp))
 }
 
 // Del method deletes vanity package from vanities data store for given host.
 func Del(host, p string) error {
 	vanities := make([]*models.VanityPackage, 0)
-	_ = store.Get(store.BucketGoVanities, host, &vanities)
+	_ = datastore.Get(datastore.BucketGoVanities, host, &vanities)
 	f := -1
 	for i, v := range vanities {
 		if v.Path == p {
@@ -89,7 +103,7 @@ func Del(host, p string) error {
 	}
 	if f > -1 {
 		vanities = append(vanities[:f], vanities[f+1:]...)
-		return store.Put(store.BucketGoVanities, host, vanities)
+		return datastore.Put(datastore.BucketGoVanities, host, vanities)
 	}
 	return nil
 }

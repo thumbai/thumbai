@@ -69,18 +69,30 @@ func Lines2Redirects(input string) ([]*models.ProxyRedirect, []string) {
 		parts := strings.Split(line, ",")
 		partsLen := len(parts)
 		if partsLen == 2 {
+			parts[1] = strings.TrimSpace(parts[1])
+			isAbs := IsAbsURL(parts[1])
+			if !isAbs && parts[1][0] != '/' {
+				errResult = append(errResult, parts[1]+" - relative path must start with '/'")
+				continue
+			}
 			result = append(result, &models.ProxyRedirect{
 				Match:  strings.TrimSpace(parts[0]),
-				Target: strings.TrimSpace(parts[1]),
+				Target: parts[1],
 				IsAbs:  IsAbsURL(parts[1]),
 			})
 			continue
 		} else if partsLen == 3 {
+			parts[1] = strings.TrimSpace(parts[1])
+			isAbs := IsAbsURL(parts[1])
+			if !isAbs && parts[1][0] != '/' {
+				errResult = append(errResult, parts[1]+" - relative path must start with '/'")
+				continue
+			}
 			code, err := strconv.Atoi(strings.TrimSpace(parts[2]))
 			if err == nil && IsSupportedRedirectCode(code) {
 				result = append(result, &models.ProxyRedirect{
 					Match:  strings.TrimSpace(parts[0]),
-					Target: strings.TrimSpace(parts[1]),
+					Target: parts[1],
 					Code:   code,
 					IsAbs:  IsAbsURL(parts[1]),
 				})

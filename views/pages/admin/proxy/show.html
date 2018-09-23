@@ -23,7 +23,7 @@ limitations under the License. -->
 {{ define "body-content" -}} 
 <div class="admin-proxy-show">
     <div class="container-fluid no-gutters mb-4">
-        <div>
+        <div class="w-75">
             <h1>Proxy Host: <span class="font-weight-bold">{{ .ProxyHostName }}</span>
                 <div class="align-middle float-sm-right float-right">
                     <a href="{{ rurl . "proxy_add" .ProxyHostName }}" data-toggle="tooltip" title="Add new proxy rule" class="btn btn-sm btn-outline-success pl-4 pr-4">Add Rule</a>
@@ -31,12 +31,11 @@ limitations under the License. -->
                 </div>
             </h1> 
         </div>
-        <div class="mt-5">
+        <div class="mt-5 w-75">
             <table class="table table-hover">
                 <thead class="bg-dark text-white">
                     <tr>
-                    <th scope="col" class="w-75">Proxy Rules</th>
-                    <th scope="col" class="w-25">Target URL</th>
+                    <th scope="col" class="w-100">Proxy Rules</th>
                     <th scope="col">&nbsp;</th>
                     </tr>
                 </thead>
@@ -46,48 +45,20 @@ limitations under the License. -->
                     <tr class="proxy-rule-row" data-url="{{ rurl $ "proxy_edit" .Host .TargetURL }}">
                         <td class="proxy-rule-col">
                             <div>
-                                <span class="badge badge-secondary">Host</span><span class="rule-value"> {{ .Host }}</span>{{ if .Last }}<span class="badge badge-success ml-2">Last Rule</span>{{ end }}{{ if .SkipTLSVerify }}<span class="badge badge-warning ml-2">Skip TLS Verify</span>{{ end }}
-                                {{ if .Path }}<br><span class="badge badge-secondary">Path</span><span class="rule-value"> {{ .Path }}</span>{{ end }}
-                                {{ if .QueryParams }}<br>
-                                <span class="badge badge-secondary">Query Params</span><span class="rule-value"> {{ mapstr2str .QueryParams "=" ", " }}</span>
-                                {{ end }}
-                                {{ if .Headers }}<br>
-                                <span class="badge badge-secondary">Headers</span><span class="rule-value"> {{ mapstr2str .Headers "=" ", " }}</span>
-                                {{ end }}
-                                {{ if .RequestHeaders }}<br>
-                                <span class="badge badge-secondary">Request Headers</span><br>
-                                {{ if .RequestHeaders.Add }}
-                                <span class="badge badge-light">Add</span><span class="rule-value"> {{ mapstr2str .RequestHeaders.Add "=" ", " }}</span><br>
-                                {{ end }}{{ if .RequestHeaders.Remove }}
-                                <span class="badge badge-light">Remove</span><span class="rule-value"> {{ join .RequestHeaders.Remove ", " }}</span>
-                                {{ end }}
-                                {{ end }}
-                                {{ if .ResponseHeaders }}<br>
-                                <span class="badge badge-secondary">Response Headers</span><br>
-                                {{ if .ResponseHeaders.Add }}
-                                <span class="badge badge-light">Add</span><span class="rule-value"> {{ mapstr2str .ResponseHeaders.Add "=" ", " }}</span><br>
-                                {{ end }}{{ if .ResponseHeaders.Remove }}
-                                <span class="badge badge-light">Remove</span><span class="rule-value"> {{ join .ResponseHeaders.Remove ", " }}</span>
-                                {{ end }}
-                                {{ end }}
-                                {{ if .RestrictFiles }}<br>
-                                <span class="badge badge-secondary">Restrict File</span>
-                                {{ if .RestrictFiles.Extensions }}<br>
-                                <span class="badge badge-light">By Extension</span><span class="rule-value"> {{ join .RestrictFiles.Extensions ", " }}</span>
-                                {{ end }}
-                                {{ if .RestrictFiles.Regexs }}<br>
-                                <span class="badge badge-light">By Match</span><span class="rule-value"> {{ join .RestrictFiles.Regexs ", " }}</span>
-                                {{ end }}
-                                {{ end }}
-                                {{ if .Statics }}<br>
-                                <span class="badge badge-secondary">Static Files</span>
-                                {{ range .Statics }}<br><span class="rule-value">{{ .TargetPath }}</span>{{ end }}
-                                {{ end }}
+                                <span class="badge badge-secondary">From Host</span><span class="rule-value"> {{ .Host }}</span><br>
+                                <span class="badge badge-secondary">Target URL</span><span class="rule-value"> {{ .TargetURL }}</span>
+                                <div>{{ if .Last }}<span class="badge badge-success">Last Rule</span>{{ end }}
+                                    {{ if .SkipTLSVerify }}<span class="badge badge-warning">Skip TLS Verify</span>{{ end }}
+                                    {{ if proxyconditionexists . }}<span class="badge badge-info">Conditions</span>{{ end }}
+                                    {{ if .Redirects }}<span class="badge badge-info">Redirects</span>{{ end }}
+                                    {{ if proxyrestrictfilesexists . }}<span class="badge badge-info">Restrict Files</span>{{ end }}
+                                    {{ if .Statics }}<span class="badge badge-info">Static Files</span>{{ end }}
+                                    {{ if proxyrequesthdrexists . }}<span class="badge badge-info">Request Headers</span>{{ end }}
+                                    {{ if proxyresponsehdrexists . }}<span class="badge badge-info">Response Headers</span>{{ end }}</div>
                             </div>                        
                         </td>
-                        <td class="proxy-rule-col">{{ .TargetURL }}</td>
-                        <td class="text-center veritical-align-middle">
-                            <a class="proxy-rule-del" role="button" title="delete" data-toggle="tooltip"><i class="fas fa-trash-alt fa-lg"></i></a>
+                        <td class="text-center align-middle">
+                            <a class="proxy-rule-del" role="button" title="Delete proxy rule" data-toggle="tooltip" data-url="{{ rurl $ "proxy_rule_del" .Host .TargetURL }}" data-hostname="{{ .Host }}" data-target-url="{{ .TargetURL }}"><i class="fas fa-trash-alt fa-lg"></i></a>
                         </td>
                     </tr>
                     {{- end }}
@@ -108,44 +79,24 @@ window.jqReady(function() {
     $('.proxy-rule-del').click(function(e) {
         e.preventDefault();
         var hostname = $(this).data('hostname');
-        $.confirmDialog('Are you sure to delete <strong>'+ hostname +'</strong>?<br>'+
-        '<span style="font-size:80%">Note: Proxy configurations will be deleted too.</span>'
-        , $(e.currentTarget), function(t){
-            // $.ajax({
-            //     url: t.data('url'),
-            //     method: 'delete',
-            //     headers: antiCsrfHeader()
-            // }).done(function (data) {
-            //     showFeedback('success', 'Proxy host deleted successfully!');
-            //     if (data.message === 'success') {
-            //         t.parents('tr').remove();
-            //         var f = -1;
-            //         $(proxyHosts).each(function(i, v){
-            //             if (v.host == hostname) {
-            //                 f = i;
-            //                 return false;
-            //             }
-            //         });
-            //         if (f > -1) {
-            //             proxyHosts.splice(f, 1);
-            //         }
-            //     }
-            // }).fail(function (res) {
-            //     showFeedback('failure', 'Unable to delete proxy host!');
-            // });
+        var targetURL = $(this).data('target-url');
+        $.confirmDialog('Are you sure to delete target of <strong>'+ targetURL +'</strong> from host: '+ hostname +'?<br>', 
+            $(e.currentTarget), function(t){
+            $.ajax({
+                url: t.data('url'),
+                method: 'delete',
+                headers: antiCsrfHeader()
+            }).done(function (data, textStatus, jqXHR) {
+                if (jqXHR.status === 204) {
+                    showFeedback('success', 'Proxy rule deleted successfully from '+ hostname +'!');
+                    t.parents('tr').remove();
+                }
+            }).fail(function (data, textStatus, jqXHR) {
+                showFeedback('failure', 'Unable to delete proxy rule from host'+ hostname +'!');
+            });
         });
         return false;
     });
-    // $('#proxyRuleAddBtn').click(function() {
-    //     $('#addEditModal').modal();
-    // });
-    // $('#addEditModal').on('show.bs.modal', function(e) {
-    //     $('#addEditForm').trigger('reset');
-    // });
-    // $('#addEditForm').submit(function(e){
-    //     console.log('came here');
-    //     return false;
-    // });
 });
 </script>
 {{ end }}

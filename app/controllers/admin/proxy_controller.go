@@ -15,11 +15,10 @@
 package admin
 
 import (
-	"fmt"
 	"strings"
+	"thumbai/app/datastore"
 	"thumbai/app/models"
 	"thumbai/app/proxy"
-	"thumbai/app/store"
 	"thumbai/app/util"
 
 	"aahframe.work/aah"
@@ -94,7 +93,7 @@ func (c *ProxyController) AddHost(proxyInfo *models.FormTargetURL) {
 	var fieldErrors []*models.FieldError
 	if err := proxy.AddHost(proxyInfo); err != nil {
 		switch {
-		case err == store.ErrRecordAlreadyExists:
+		case err == datastore.ErrRecordAlreadyExists:
 			fieldErrors = append(fieldErrors, &models.FieldError{
 				Name:    "hostName",
 				Message: "Proxy host already exists",
@@ -125,9 +124,17 @@ func (c *ProxyController) DelHost(hostName string) {
 		})
 		return
 	}
-	c.Reply().JSON(aah.Data{
-		"message": "success",
-	})
+	c.Reply().NoContent()
+	go proxy.Thumbai.DelHost(hostName)
+}
+
+// DelProxyRule method handles delete proxy rule for the host.
+func (c *ProxyController) DelProxyRule(hostName, targetURL string) {
+	if err := proxy.DelRule(hostName, targetURL); err != nil {
+		c.Log().Error("Unexpected error during delete rule %v", err)
+	}
+	proxy.Thumbai.DeleteRule(hostName, targetURL)
+	c.Reply().NoContent()
 }
 
 // EditTargetURL method handles values of TargetURL, LastRule and SkipTLSVerify.
@@ -296,7 +303,6 @@ func (c *ProxyController) EditRestricts(info *models.FormRestricts) {
 
 // EditStatics method handles static files directory configuration.
 func (c *ProxyController) EditStatics(info *models.FormStatics) {
-	fmt.Printf("%#v\n", info)
 	rule := proxy.GetRule(info.Host, info.TargetURL)
 	if rule == nil {
 		c.Log().Errorf("Proxy rule not found for %#v", info)
@@ -436,7 +442,7 @@ func (c *ProxyController) updateRule(from, targetURL string, rule *models.ProxyR
 		})
 		return
 	}
-
+	proxy.Thumbai.UpdateRule(targetURL, rule)
 	c.Reply().JSON(aah.Data{
 		"message": "success",
 	})

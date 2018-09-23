@@ -136,27 +136,30 @@ function populateTable(vanities) {
         '<td class="vanity-col">' + v.host + '</td>' +
         '<td class="vanity-col">' + v.paths.length + '</td>' +
         '<td class="text-center veritical-align-middle">' +
-        '<a class="vanity-row-del" href="#" data-url="' + apiBaseUrl + '/' + v.host + 
+        '<a class="vanity-row-del" role="button" title="Delete vanity host" data-toggle="tooltip" '+
+        'data-url="' + apiBaseUrl + '/' + v.host + 
         '" data-hostname="' + v.host + '"><i class="fas fa-trash-alt fa-lg"></i></a>' +
         '</td>' +
         '</tr>';
     });
     $('#vanityHosts > tbody').html(rows);
+    $('#vanityHosts > tbody').find('[data-toggle="tooltip"]').tooltip();
     $('.vanity-col').click(function() {
         location = $(this).parent().data('url');
     });
     $('.vanity-row-del').click(function(e) {
+        e.preventDefault();
         var hostname = $(this).data('hostname');
         $.confirmDialog('Are you sure to delete <strong>'+ hostname +'</strong>?<br>'+
-        '<span style="font-size:80%">Note: Vanity package configurations will be deleted too.</span>'
-        , $(e.currentTarget), function(t){
+        '<span style="font-size:80%">Note: Vanity package configurations will be deleted too.</span>', 
+            $(e.currentTarget), function(t){
             $.ajax({
                 url: t.data('url'),
                 method: 'delete',
                 headers: antiCsrfHeader()
-            }).done(function (data) {
-                showFeedback('success', 'Vanity host deleted successfully!');
-                if (data.message === 'success') {
+            }).done(function (data, textStatus, jqXHR) {
+                if (jqXHR.status === 204) {
+                    showFeedback('success', 'Vanity host deleted successfully!');
                     t.parents('tr').remove();
                     var f = -1;
                     $(vanityHosts).each(function(i, v){
@@ -169,10 +172,11 @@ function populateTable(vanities) {
                         vanityHosts.splice(f, 1);
                     }
                 }
-            }).fail(function (res) {
+            }).fail(function (data, textStatus, jqXHR) {
                 showFeedback('failure', 'Unable to delete vanity host!');
             });
         });
+        return false;
     });
 }
 </script>

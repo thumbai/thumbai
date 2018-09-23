@@ -79,7 +79,7 @@ func Infer(_ *aah.Event) {
 
 	Settings.GoVersion = GoVersion(Settings.GoBinary)
 	if !InferGo111AndAbove(Settings.GoVersion) {
-		aah.AppLog().Errorf("Go version found: %s. Minimum go.11 & above is required to use go modules proxy server")
+		aah.AppLog().Errorf("Go version found: %s. Minimum go1.11 & above is required to use go modules proxy server")
 		return
 	}
 

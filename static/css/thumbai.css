@@ -284,14 +284,22 @@ html {
 }
 
 /* admin/proxy/show.html */
-.admin-proxy-show-modal .modal-lg {
-  max-width: 80% !important;
+.admin-proxy-show .proxy-rule-col .badge-info,
+.admin-proxy-show .proxy-rule-col .badge-success,
+.admin-proxy-show .proxy-rule-col .badge-warning {
+  font-size: 70%;
 }
-.admin-proxy-rule-sec .col-sm-2 {
+.admin-proxy-show .proxy-rule-col .opts {
+  font-weight: bold;
+  font-size: 70%;
+}
+
+/* admin/proxy/edit.html */
+.admin-proxy-edit .admin-proxy-rule-sec .col-sm-2 {
   padding-right: 0;
   padding-left: 5px;
 }
-.admin-proxy-rule-sec-hdr {
+.admin-proxy-edit .admin-proxy-rule-sec-hdr {
   width: 100%;
   line-height: 1.5em;
   background-color: #e1e1e3;
@@ -299,6 +307,7 @@ html {
   padding: 0.2rem 0 0.4rem 0.80rem;
   cursor: pointer;
 }
-.admin-proxy-rule-sec .card {
+.admin-proxy-edit .admin-proxy-rule-sec .card {
   border: none;
 }
+

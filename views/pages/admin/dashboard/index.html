@@ -50,14 +50,6 @@ limitations under the License. -->
                                     <p class="text-center h3">Proxies</p>
                                 </div>
                             </div>
-                            <!-- <div id="cardRedirects" class="card mb-4 shadow-sm">
-                                <div class="card-body">
-                                    <h3 class="card-title">{{ .RedirectStats.Host }} <span class="stats-lbl">hosts</span>,
-                                        {{ .RedirectStats.Redirects }} <span class="stats-lbl">redirects</span></h3>
-                                    <hr>
-                                    <p class="text-center h3">Redirects</p>
-                                </div>
-                            </div> -->
                         </div>
                     </div> <!-- /Grid column -->
                 </div> <!-- /Grid row -->
@@ -75,10 +67,7 @@ window.jqReady(function () {
     });
     $('#cardProxies').click(function () {
         location = '{{ rurl . "proxy_list" }}';
-    });
-    $('#cardRedirects').click(function () {
-        location = '{{ rurl . "redirect_admin" }}';
-    });    
+    }); 
 });
 </script>
 {{ end -}}

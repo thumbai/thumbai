@@ -15,8 +15,8 @@
 package gomod
 
 import (
+	"thumbai/app/datastore"
 	"thumbai/app/models"
-	"thumbai/app/store"
 
 	"aahframe.work/aah"
 )
@@ -24,8 +24,8 @@ import (
 // Stats returns go modules statistics.
 func Stats() *models.ModuleStats {
 	stats := &models.ModuleStats{}
-	if err := store.Get(store.BucketGoModules, "stats", stats); err != nil {
-		if err == store.ErrRecordNotFound {
+	if err := datastore.Get(datastore.BucketGoModules, "stats", stats); err != nil {
+		if err == datastore.ErrRecordNotFound {
 			aah.AppLog().Info("Go Modules stats data currently unavailable")
 		} else {
 			aah.AppLog().Error(err)
@@ -36,14 +36,14 @@ func Stats() *models.ModuleStats {
 
 // SaveStats method saves the given stats into data store.
 func SaveStats(stats *models.ModuleStats) error {
-	return store.Put(store.BucketGoModules, "stats", stats)
+	return datastore.Put(datastore.BucketGoModules, "stats", stats)
 }
 
 // GetSettings method gets the modules settings from data store.
 func GetSettings() *models.ModuleSettings {
 	settings := &models.ModuleSettings{}
-	if err := store.Get(store.BucketGoModules, "settings", settings); err != nil {
-		if err != store.ErrRecordNotFound {
+	if err := datastore.Get(datastore.BucketGoModules, "settings", settings); err != nil {
+		if err != datastore.ErrRecordNotFound {
 			aah.AppLog().Error(err)
 		}
 	}
@@ -52,5 +52,5 @@ func GetSettings() *models.ModuleSettings {
 
 // SaveSettings method saves the given modules into data store.
 func SaveSettings(settings *models.ModuleSettings) error {
-	return store.Put(store.BucketGoModules, "settings", settings)
+	return datastore.Put(datastore.BucketGoModules, "settings", settings)
 }

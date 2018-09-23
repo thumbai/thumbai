@@ -39,12 +39,6 @@ limitations under the License. -->
           {{ if .IsProxy }}<span class="sr-only">(current)</span>{{ end }}
         </a>
       </li>
-      <li class="nav-item">
-          <a class="nav-link {{ if .IsRedirect }}active{{ end }}" href="{{ rurl . "redirect_admin" }}">
-            <i class="fas fa-directions fa-2x"></i><br>Redirects
-            {{ if .IsRedirect }}<span class="sr-only">(current)</span>{{ end }}
-          </a>
-        </li>
     </ul>
   </div>
 </nav>

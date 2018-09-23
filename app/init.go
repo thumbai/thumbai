@@ -21,12 +21,10 @@ import (
 	"html/template"
 	"strings"
 
+	"thumbai/app/datastore"
 	"thumbai/app/gomod"
-	"thumbai/app/models"
 	"thumbai/app/proxy"
-	"thumbai/app/redirect"
 	"thumbai/app/security"
-	"thumbai/app/store"
 	"thumbai/app/util"
 	"thumbai/app/vanity"
 
@@ -59,21 +57,17 @@ func init() {
 	//
 	aah.OnStart(SubscribeHTTPEvents)
 	aah.OnStart(SubscribeWebSocketEvents)
-	aah.OnStart(store.Connect)
-	aah.OnStart(models.LoadRedirectStore, 1)
+	aah.OnStart(datastore.Connect)
 	aah.OnStart(vanity.Load, 2)
-	aah.OnStart(redirect.Load, 2)
 	aah.OnStart(proxy.Load, 2)
 	aah.OnStart(gomod.Infer)
 
 	// Event: OnPreShutdown
 	// Doc: https://docs.aahframework.org/server-extension.html#event-onpreshutdown
-	//
-	aah.OnPreShutdown(store.Disconnect)
-	aah.OnPreShutdown(models.PersistRedirectStore)
 
 	// Event: OnPostShutdown
 	// Doc: https://docs.aahframework.org/server-extension.html#event-onpostshutdown
+	aah.OnPostShutdown(datastore.Disconnect)
 
 	//‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 	// Middleware's
@@ -107,10 +101,14 @@ func init() {
 	// Doc: https://docs.aahframework.org/template-funcs.html
 	//__________________________________________________________________________
 	aah.AddTemplateFunc(template.FuncMap{
-		"redirect2line": util.ProxyRedirects2Lines,
-		"mapstr2str":    util.MapString2String,
-		"static2line":   util.ProxyStatics2Lines,
-		"join":          strings.Join,
+		"redirect2line":            util.ProxyRedirects2Lines,
+		"mapstr2str":               util.MapString2String,
+		"static2line":              util.ProxyStatics2Lines,
+		"proxyconditionexists":     util.IsProxyConditionsExists,
+		"proxyrestrictfilesexists": util.IsProxyRestrictFilesExists,
+		"proxyrequesthdrexists":    util.IsProxyRequestHeadersExists,
+		"proxyresponsehdrexists":   util.IsProxyResponseHeadersExists,
+		"join":                     strings.Join,
 	})
 
 	//‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾

@@ -16,7 +16,6 @@ package admin
 
 import (
 	"thumbai/app/gomod"
-	"thumbai/app/models"
 	"thumbai/app/proxy"
 	"thumbai/app/vanity"
 
@@ -36,7 +35,6 @@ func (c *DashboardController) Index() {
 		"GoModulesStats":   gomod.Settings.Stats,
 		"VanityStats":      vanity.Stats(),
 		"ProxyStats":       proxy.Stats(),
-		"RedirectStats":    models.RedirectStats(),
 	})
 }
 

@@ -15,8 +15,8 @@
 package admin
 
 import (
+	"thumbai/app/datastore"
 	"thumbai/app/models"
-	"thumbai/app/store"
 	"thumbai/app/vanity"
 
 	"aahframe.work/aah"
@@ -70,7 +70,7 @@ func (c *VanityController) AddHost(hostName string) {
 	var fieldErrors []*models.FieldError
 	if err := vanity.AddHost(hostName); err != nil {
 		switch {
-		case err == store.ErrRecordAlreadyExists:
+		case err == datastore.ErrRecordAlreadyExists:
 			fieldErrors = append(fieldErrors, &models.FieldError{
 				Name:    "hostName",
 				Message: "Vanity host already exists",
@@ -101,9 +101,7 @@ func (c *VanityController) DelHost(hostName string) {
 		})
 		return
 	}
-	c.Reply().JSON(aah.Data{
-		"message": "success",
-	})
+	c.Reply().NoContent()
 }
 
 // AddVanityPackage method adds the vanity package config into vanity store.
@@ -111,7 +109,7 @@ func (c *VanityController) AddVanityPackage(vp *models.VanityPackage) {
 	var fieldErrors []*models.FieldError
 	if err := vanity.Add(vp.Host, vp); err != nil {
 		switch {
-		case err == store.ErrRecordAlreadyExists:
+		case err == datastore.ErrRecordAlreadyExists:
 			fieldErrors = append(fieldErrors, &models.FieldError{
 				Name:    "vanityPkgPath",
 				Message: "Vanity package already exists",
@@ -145,7 +143,5 @@ func (c *VanityController) DelVanityPackage(hostName, pkg string) {
 		})
 		return
 	}
-	c.Reply().JSON(aah.Data{
-		"message": "success",
-	})
+	c.Reply().NoContent()
 }

@@ -44,7 +44,7 @@ func (c *GoModController) Handle(modPath string) {
 	}
 
 	if !ess.IsFileExists(modReq.ModuleFilePath) || !ess.IsFileExists(modReq.FilePath) {
-		c.Log().Infof("Requested module or version is not exists on server, let's download it '%s@%s'",
+		c.Log().Infof("Requested module or version does not exists on server, let's download it '%s@%s'",
 			modReq.Module, modReq.Version)
 		if err := gomod.Download(modReq); err != nil {
 			c.Log().Error(err)

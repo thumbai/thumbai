@@ -16,17 +16,17 @@ package proxy
 
 import (
 	"strings"
+	"thumbai/app/datastore"
 	"thumbai/app/models"
-	"thumbai/app/store"
 )
 
 // All method returns all the proxy configuration from the data store.
 func All() map[string][]*models.ProxyRule {
-	keys := store.BucketKeys(store.BucketProxies)
+	keys := datastore.BucketKeys(datastore.BucketProxies)
 	proxies := map[string][]*models.ProxyRule{}
 	for _, k := range keys {
 		rules := make([]*models.ProxyRule, 0)
-		_ = store.Get(store.BucketProxies, k, &rules)
+		_ = datastore.Get(datastore.BucketProxies, k, &rules)
 		proxies[k] = rules
 	}
 	return proxies
@@ -48,23 +48,27 @@ func Stats() map[string]int {
 // AddHost method adds the given host into proxies data store.
 func AddHost(proxyInfo *models.FormTargetURL) error {
 	proxyInfo.Host = strings.ToLower(proxyInfo.Host)
-	if store.IsKeyExists(store.BucketProxies, proxyInfo.Host) {
-		return store.ErrRecordAlreadyExists
+	if datastore.IsKeyExists(datastore.BucketProxies, proxyInfo.Host) {
+		return datastore.ErrRecordAlreadyExists
 	}
 	proxyRule := &models.ProxyRule{Host: proxyInfo.Host, TargetURL: proxyInfo.TargetURL}
-	return store.Put(store.BucketProxies, proxyRule.Host, append([]*models.ProxyRule{}, proxyRule))
+	if err := datastore.Put(datastore.BucketProxies, proxyRule.Host, append([]*models.ProxyRule{}, proxyRule)); err != nil {
+		return err
+	}
+	h := Thumbai.AddHost(proxyInfo.Host)
+	return h.AddProxyRule(proxyRule)
 }
 
 // DelHost method deletes the given host from proxies store.
 func DelHost(hostName string) error {
-	return store.Del(store.BucketProxies, strings.ToLower(hostName))
+	return datastore.Del(datastore.BucketProxies, strings.ToLower(hostName))
 }
 
 // Get method returns configured proxy rules for the given host.
 func Get(host string) []*models.ProxyRule {
 	host = strings.ToLower(host)
 	rules := make([]*models.ProxyRule, 0)
-	_ = store.Get(store.BucketProxies, host, &rules)
+	_ = datastore.Get(datastore.BucketProxies, host, &rules)
 	return rules
 }
 
@@ -82,7 +86,7 @@ func GetRule(host, targetURL string) *models.ProxyRule {
 // AddRule methods adds new proxy rule for the host.
 func AddRule(rule *models.ProxyRule) error {
 	rules := Get(rule.Host)
-	return store.Put(store.BucketProxies, rule.Host, append(rules, rule))
+	return datastore.Put(datastore.BucketProxies, rule.Host, append(rules, rule))
 }
 
 // UpdateRule method updates the given rule on the exiting rules for the host.
@@ -96,8 +100,28 @@ func UpdateRule(oldTargetURL string, rule *models.ProxyRule) error {
 	for i := range rules {
 		if rules[i].TargetURL == oldTargetURL {
 			rules[i] = rule
-			return store.Put(store.BucketProxies, rule.Host, rules)
+			return datastore.Put(datastore.BucketProxies, rule.Host, rules)
 		}
+	}
+	return nil
+}
+
+// DelRule method deletes configured proxy rule for the given host.
+func DelRule(host, targetURL string) error {
+	rules := Get(host)
+	if len(rules) == 0 {
+		return datastore.ErrRecordNotFound
+	}
+	f := -1
+	for i, r := range rules {
+		if r.TargetURL == targetURL {
+			f = i
+			break
+		}
+	}
+	if f > -1 {
+		rules = append(rules[:f], rules[f+1:]...)
+		return datastore.Put(datastore.BucketProxies, host, rules)
 	}
 	return nil
 }

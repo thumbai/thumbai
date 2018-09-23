@@ -149,21 +149,24 @@ function populateTable(packages) {
             '<td>' + v.repo + '</td>' +
             '<td>' + v.vcs + '</td>' +
             '<td class="text-center veritical-align-middle">' +
-            '<a class="vanity-row-pkg-del" data-pkg="'+ v.path + '" href="#"><i class="fas fa-trash-alt fa-lg"></i></a>' +
+            '<a class="vanity-row-pkg-del" title="Delete vanity package" data-toggle="tooltip" data-pkg="'+ 
+            v.path + '" role="button"><i class="fas fa-trash-alt fa-lg"></i></a>' +
             '</td>' +
             '</tr>';
     });
     $('#vanityPackages > tbody').html(rows);
-    $('.vanity-row-pkg-del').click(function() {
+    $('#vanityPackages > tbody').find('[data-toggle="tooltip"]').tooltip();
+    $('.vanity-row-pkg-del').click(function(e) {
+        e.preventDefault();
         var pkg = $(this).data('pkg');
-        $.confirmDialog('Are you sure to delete vanity package <strong>'+ pkg +'</strong>?', $(this), function(t){
+        $.confirmDialog('Are you sure to delete vanity package <strong>'+ pkg +'</strong>?', $(this), function(t) {
             $.ajax({
                 url: t.parent().parent().data('url'),
                 method: 'delete',
                 headers: antiCsrfHeader()
-            }).done(function (data) {
-                showFeedback('success', 'Vanity package deleted successfully!');
-                if (data.message === 'success') {
+            }).done(function (data, textStatus, jqXHR) {
+                if (jqXHR.status === 204) {
+                    showFeedback('success', 'Vanity package deleted successfully!');
                     t.parents('tr').remove();
                     var f = -1;
                     $(vanityPackages).each(function(i, v){
@@ -176,10 +179,11 @@ function populateTable(packages) {
                         vanityPackages.splice(f, 1);
                     }
                 }
-            }).fail(function (res) {
+            }).fail(function (data, textStatus, jqXHR) {
                 showFeedback('failure', 'Unable to delete vanity package!');
             });
         });
+        return false;
     });    
 }
 </script>
