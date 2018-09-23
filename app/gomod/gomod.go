@@ -100,11 +100,14 @@ func Infer(_ *aah.Event) {
 	}
 
 	Settings.Enabled = true
-	Settings.Stats = Stats()
-	if Settings.Stats.TotalCount == 0 {
-		Settings.Stats.TotalCount = Count(Settings.ModCachePath)
+
+	go func() {
+		cnt := Count(Settings.ModCachePath)
+		Settings.Lock()
+		Settings.Stats.TotalCount = cnt
 		_ = SaveStats(Settings.Stats)
-	}
+		Settings.Unlock()
+	}()
 }
 
 // FSPathDelimiter is used for mod cache operations.
