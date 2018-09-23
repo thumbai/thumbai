@@ -21,6 +21,7 @@ import (
 	"html/template"
 	"strings"
 
+	"thumbai/app/access"
 	"thumbai/app/datastore"
 	"thumbai/app/gomod"
 	"thumbai/app/proxy"
@@ -50,7 +51,7 @@ func init() {
 	// Event: OnInit
 	// Doc: https://docs.aahframework.org/server-extension.html#event-oninit
 	//
-	// aah.OnInit(config.LoadRemote)
+	aah.OnInit(CheckConfig, 2)
 
 	// Event: OnStart
 	// Doc: https://docs.aahframework.org/server-extension.html#event-onstart
@@ -61,6 +62,7 @@ func init() {
 	aah.OnStart(vanity.Load, 2)
 	aah.OnStart(proxy.Load, 2)
 	aah.OnStart(gomod.Infer)
+	aah.OnStart(access.Load)
 
 	// Event: OnPreShutdown
 	// Doc: https://docs.aahframework.org/server-extension.html#event-onpreshutdown

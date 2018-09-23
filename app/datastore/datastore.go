@@ -48,7 +48,7 @@ var (
 // Connect method connects to DB on app start up.
 func Connect(_ *aah.Event) {
 	var err error
-	storePath := filepath.Join(aah.AppBaseDir(), "data", "thumbai.db")
+	storePath := filepath.Join(aah.AppConfig().StringDefault("thumbai.admin.data_store.location", ""), "thumbai.db")
 	thumbaiDB, err = bolt.Open(storePath, 0644, &bolt.Options{Timeout: 100 * time.Millisecond})
 	if err != nil {
 		aah.AppLog().Fatal(err)

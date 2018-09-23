@@ -12,25 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package admin
+package access
 
 import (
-	"thumbai/app/access"
-
 	"aahframe.work/aah"
 )
 
-// BaseController for admin controllers.
-// Created for any common abstraction of admin controllers.
-type BaseController struct {
-	*aah.Context
+// Values
+var (
+	AdminHost  string
+	AllowedIPs []string
+)
+
+// Load method configures the thumbai access limits.
+func Load(_ *aah.Event) {
+	cfg := aah.AppConfig()
+	AdminHost = cfg.StringDefault("thumbai.admin.host", "")
+	AllowedIPs, _ = cfg.StringList("thumbai.admin.allow_only")
+	AllowedIPs = append(AllowedIPs, "127.0.0.1", "::1", "[::1]")
 }
 
-// Before method is an interceptor for admin path.
-func (c *BaseController) Before() {
-	if c.Req.Host != access.AdminHost || !access.IsAllowedFromIP(c.Req.ClientIP()) {
-		c.Reply().Forbidden().Text("403 Forbidden")
-		c.Abort()
-		return
+// IsAllowedFromIP method is used to check IP address allowed to admin interface.
+func IsAllowedFromIP(ip string) bool {
+	for _, ap := range AllowedIPs {
+		if ap == ip {
+			return true
+		}
 	}
+	return false
 }
