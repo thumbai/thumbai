@@ -20,7 +20,8 @@ limitations under the License. -->
 <meta name="anti_csrf_token" content="{{ anticsrftoken . }}">
 {{ end }}
 
-{{ define "body-content" -}} 
+{{ define "body-content" -}}
+{{ $proxyWritePermission := (ispermitted . "thumbai:proxy:write") }}
 <div class="admin-proxy">
     <div class="container-fluid no-gutters mb-4">
         <div class="row align-items-center no-gutters w-75">
@@ -28,7 +29,7 @@ limitations under the License. -->
                 <span class="h1">Proxies</span>
             </div>
             <div class="col text-right">
-                <button id="proxyHostAddBtn" data-toggle="tooltip" title="Add new proxy host" class="btn btn-sm btn-outline-success pl-4 pr-4">Add Proxy</button>
+                {{ if $proxyWritePermission }}<button id="proxyHostAddBtn" data-toggle="tooltip" title="Add new proxy host" class="btn btn-sm btn-outline-success pl-4 pr-4">Add Proxy</button>{{ end }}
             </div>
         </div>
         <div class="row no-gutters mt-5 w-75">
@@ -44,7 +45,7 @@ limitations under the License. -->
             </table>
         </div>
     </div>
-</div>
+</div> {{ if $proxyWritePermission }}
 <!-- Add/Edit proxy host record -->
 <div class="modal fade" id="addEditModal" tabindex="-1" role="dialog" aria-labelledby="addEditModalTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -77,14 +78,14 @@ limitations under the License. -->
         </div>
     </div>
 </div> 
-<!-- /addEditModal -->
+<!-- /addEditModal --> {{ end }}
 <script>
 var proxyHosts = [];
 window.jqReady(function() {
     fetchProxyHosts();
     $('.proxy-row').click(function() {
         location = $(this).data('url');
-    });
+    }); {{ if $proxyWritePermission }}
     $('#proxyHostAddBtn').click(function() {
         $('#addEditModal').modal();
     });
@@ -114,7 +115,7 @@ window.jqReady(function() {
             enableWithoutSpinner('modalAddBtn');
         });
         return false;
-    });
+    }); {{ end }}
 });
 function fetchProxyHosts() {
     $.getJSON('{{ rurl . "proxy_hosts" }}', function(data){
@@ -135,16 +136,16 @@ function populateTable(proxies) {
     proxies.sort(function(a, b){
         return a.host > b.host;
     });
-    var showUrl = '{{ rurl . "proxy_show" "$hostName$" }}';
-    var apiBaseUrl = '{{ rurl . "proxy_hosts" }}';
+    var showUrl = '{{ rurl . "proxy_show" "$hostName$" }}'; {{ if $proxyWritePermission }}
+    var apiBaseUrl = '{{ rurl . "proxy_hosts" }}'; {{ end }}
     var rows = '';
     $(proxies).each(function(i, v){
         rows += '<tr class="proxy-row" data-url="' + showUrl.replace('$hostName$', v.host) + '">' +
         '<td class="proxy-col">' + v.host + '</td>' +
         '<td class="proxy-col">' + v.proxyRules.length + '</td>' +
-        '<td class="text-center veritical-align-middle">' +
+        '<td class="text-center veritical-align-middle">' {{ if $proxyWritePermission }} +
         '<a class="proxy-row-del" role="button" title="Delete proxy host" data-toggle="tooltip" data-url="' + apiBaseUrl + '/' + v.host + 
-        '" data-hostname="' + v.host + '"><i class="fas fa-trash-alt fa-lg"></i></a>' +
+        '" data-hostname="' + v.host + '"><i class="fas fa-trash-alt fa-lg"></i></a>' {{ end }} +
         '</td>' +
         '</tr>';
     });
@@ -152,7 +153,7 @@ function populateTable(proxies) {
     $('#proxyHosts > tbody').find('[data-toggle="tooltip"]').tooltip();
     $('.proxy-col').click(function() {
         location = $(this).parent().data('url');
-    });
+    }); {{ if $proxyWritePermission }}
     $('.proxy-row-del').click(function(e) {
         e.preventDefault();
         var hostname = $(this).data('hostname');
@@ -183,7 +184,7 @@ function populateTable(proxies) {
             });
         });
         return false;
-    });
+    }); {{ end }}
 }
 </script>
 {{ end }}

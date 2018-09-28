@@ -13,7 +13,7 @@
 build {
   # Application binary name
   # Default value is `name` attribute value from `aah.conf`
-  #binary_name = "thumbai"
+  binary_name = "thumbai"
 
   # Used as fallback if
   #   - `git commit sha` or

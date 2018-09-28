@@ -45,13 +45,13 @@ var Thumbai *proxies
 // Load method reads proxy configurations from store and builds proxy
 // engine.
 func Load(_ *aah.Event) {
+	Thumbai = &proxies{RWMutex: sync.RWMutex{}, Hosts: make(map[string]*host)}
 	allProxies := All()
 	if allProxies == nil || len(allProxies) == 0 {
 		aah.AppLog().Info("Proxies are not yet configured on THUMBAI")
 		return
 	}
 
-	Thumbai = &proxies{RWMutex: sync.RWMutex{}, Hosts: make(map[string]*host)}
 	for h, rules := range allProxies {
 		host := Thumbai.AddHost(h)
 		for _, r := range rules {

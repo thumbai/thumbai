@@ -25,7 +25,6 @@ import (
 	"thumbai/app/datastore"
 	"thumbai/app/gomod"
 	"thumbai/app/proxy"
-	"thumbai/app/security"
 	"thumbai/app/util"
 	"thumbai/app/vanity"
 
@@ -145,7 +144,7 @@ func init() {
 //__________________________________________________________________________
 
 func SubscribeHTTPEvents(_ *aah.Event) {
-	he := aah.AppHTTPEngine()
+	// he := aah.AppHTTPEngine()
 
 	// Event: OnRequest
 	// Doc: https://docs.aahframework.org/server-extension.html#event-onrequest
@@ -175,7 +174,7 @@ func SubscribeHTTPEvents(_ *aah.Event) {
 	// Event: OnPostAuth
 	// Doc: https://docs.aahframework.org/server-extension.html#event-onpostauth
 	//
-	he.OnPostAuth(security.PostAuthEvent)
+	// he.OnPostAuth(security.PostAuthEvent)
 }
 
 //‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾

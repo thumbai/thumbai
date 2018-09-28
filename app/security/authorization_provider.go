@@ -1,6 +1,8 @@
 package security
 
 import (
+	"thumbai/app/access"
+
 	"aahframe.work/aah/config"
 	"aahframe.work/aah/security/authc"
 	"aahframe.work/aah/security/authz"
@@ -24,18 +26,10 @@ func (a *AuthorizationProvider) Init(appCfg *config.Config) error {
 // GetAuthorizationInfo method gets called after authentication is successful
 // to get Subject's (aka User) access control information such as roles and permissions.
 func (a *AuthorizationProvider) GetAuthorizationInfo(authcInfo *authc.AuthenticationInfo) *authz.AuthorizationInfo {
-	//‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-	// This code snippet provided as a reference
-	//
-	// Call your appropriate datasource here (such as DB, API, etc)
-	// to get the subject (aka user) authorization details (roles, permissions)
-	//__________________________________________________________________________
-
-	// authorities := models.FindUserByEmail(authcInfo.PrimaryPrincipal().Value)
-
 	authzInfo := authz.NewAuthorizationInfo()
-	// authzInfo.AddRole(authorities.Roles...)
-	// authzInfo.AddPermissionString(authorities.Permissions...)
-
+	u, found := access.UserStore[authcInfo.PrimaryPrincipal().Value]
+	if found {
+		authzInfo.AddPermissionString(u.Permissions...)
+	}
 	return authzInfo
 }

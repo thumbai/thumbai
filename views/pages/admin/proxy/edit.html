@@ -21,6 +21,7 @@ limitations under the License. -->
 {{ end }}
 
 {{ define "body-content" -}}
+{{ $proxyWritePermission := (ispermitted . "thumbai:proxy:write") }}
 <div class="admin-proxy-edit">
     <div class="container-fluid no-gutters mb-4">
         <div class="row align-items-center no-gutters">
@@ -48,10 +49,10 @@ limitations under the License. -->
                         <input type="text" class="form-control rule-value" id="targetURL" name="targetURL" placeholder="Enter Proxy Target URL" aria-describedby="targetURLHelp" value="{{ .Rule.TargetURL }}" required>
                         <div id="targetURLError" class="invalid-feedback">Required</div>
                         <input type="hidden" name="oldTargetURL" value="{{ .Rule.TargetURL }}">
-                    </div>
+                    </div> {{ if $proxyWritePermission }}
                     <div class="float-right mt-3 pb-2">
                         <button type="submit" id="formTargetURLSubmit" class="btn btn-sm btn-success pl-4 pr-4">Save</button>
-                    </div>
+                    </div> {{ end }}
                 </form>                
             </div>
         </div>
@@ -94,10 +95,10 @@ limitations under the License. -->
                                     </small>
                                     <div id="headersError" class="invalid-feedback"></div>
                                 </div>
-                            </div>
+                            </div> {{ if $proxyWritePermission }}
                             <div class="float-right mt-2 pb-2">
                                 <button type="submit" id="formConditionsSubmit" class="btn btn-sm btn-success pl-4 pr-4">Save</button>
-                            </div>
+                            </div> {{ end }}
                         </form>
                     </div>
                 </div>                
@@ -121,10 +122,10 @@ limitations under the License. -->
                                     </small>
                                     <div id="redirectsError" class="invalid-feedback"></div>
                                 </div>
-                            </div>
+                            </div> {{ if $proxyWritePermission }}
                             <div class="float-right mt-2 pb-2">
                                 <button type="submit" id="formRedirectsSubmit" class="btn btn-sm btn-success pl-4 pr-4">Save</button>
-                            </div>
+                            </div> {{ end }}
                         </form>
                     </div>
                 </div>
@@ -157,10 +158,10 @@ limitations under the License. -->
                                     </small>
                                     <div id="restrictsByRegexError" class="invalid-feedback"></div>
                                 </div>
-                            </div>
+                            </div> {{ if $proxyWritePermission }}
                             <div class="float-right mt-2 pb-2">
                                 <button type="submit" id="formRestrictsSubmit" class="btn btn-sm btn-success pl-4 pr-4">Save</button>
-                            </div>
+                            </div> {{ end }}
                         </form>
                     </div>
                 </div>
@@ -181,10 +182,10 @@ limitations under the License. -->
                                     </small>
                                     <div id="staticDirsError" class="invalid-feedback"></div>
                                 </div>
-                            </div>
+                            </div> {{ if $proxyWritePermission }}
                             <div class="float-right mt-2 pb-2">
                                 <button type="submit" id="formStaticsSubmit" class="btn btn-sm btn-success pl-4 pr-4">Save</button>
-                            </div>
+                            </div> {{ end }}
                         </form>
                     </div>
                 </div>
@@ -217,10 +218,10 @@ limitations under the License. -->
                                     </small>
                                     <div id="requestHeadersRemoveError" class="invalid-feedback"></div>
                                 </div>
-                            </div>
+                            </div> {{ if $proxyWritePermission }}
                             <div class="float-right mt-2 pb-2">
                                 <button type="submit" id="formRequestHeadersSubmit" class="btn btn-sm btn-success pl-4 pr-4">Save</button>
-                            </div>
+                            </div> {{ end }}
                         </form>
                     </div>
                 </div>
@@ -251,17 +252,17 @@ limitations under the License. -->
                                     </small>
                                     <div id="responseHeadersRemoveError" class="invalid-feedback"></div>
                                 </div>
-                            </div>
+                            </div> {{ if $proxyWritePermission }}
                             <div class="float-right mt-2 pb-2">
                                 <button type="submit" id="formResponseHeadersSubmit" class="btn btn-sm btn-success pl-4 pr-4">Save</button>
-                            </div>
+                            </div> {{ end }}
                         </form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</div> {{ if $proxyWritePermission }}
 <script>
 window.jqReady(function(){
     $.each(['formTargetURL', 'formConditions', 'formRedirects',
@@ -293,5 +294,5 @@ window.jqReady(function(){
         });
     });
 });
-</script>
+</script> {{ end }}
 {{ end }}

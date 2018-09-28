@@ -20,7 +20,8 @@ limitations under the License. -->
 <meta name="anti_csrf_token" content="{{ anticsrftoken . }}">
 {{ end }}
 
-{{ define "body-content" -}} 
+{{ define "body-content" -}}
+{{ $vanityWritePermission := (ispermitted . "thumbai:vanity:write") }}
 <div class="admin-vanity">
     <div class="container-fluid no-gutters mb-4">
         <div class="row align-items-center no-gutters w-75">
@@ -28,23 +29,23 @@ limitations under the License. -->
                 <span class="h1">Go Vanities</span>
             </div>
             <div class="col text-right">
-                    <button id="vanityHostAddBtn" data-url="#" data-toggle="tooltip" title="Add new vanity host" class="btn btn-sm btn-outline-success pl-4 pr-4">Add Vanity</button>
+                {{ if $vanityWritePermission }}<button id="vanityHostAddBtn" data-url="#" data-toggle="tooltip" title="Add new vanity host" class="btn btn-sm btn-outline-success pl-4 pr-4">Add Vanity</button>{{ end }}
             </div>
         </div>
-        <div class="row no-gutters mt-5 w-75">        
+        <div class="row no-gutters mt-5 w-75">
             <table id="vanityHosts" class="table table-hover">
                 <thead class="bg-dark text-white">
                     <tr>
-                    <th scope="col" class="w-75">Host</th>
-                    <th scope="col" class="w-25">Packages</th>
-                    <th scope="col">&nbsp;</th>
+                        <th scope="col" class="w-75">Host</th>
+                        <th scope="col" class="w-25">Packages</th>
+                        <th scope="col">&nbsp;</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
             </table>
         </div>
     </div>
-</div>
+</div> {{ if $vanityWritePermission}}
 <!-- Add/Edit vanity host record -->
 <div class="modal fade" id="addEditModal" tabindex="-1" role="dialog" aria-labelledby="addEditModalTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -52,7 +53,7 @@ limitations under the License. -->
             <div class="modal-header">
                 <h5 class="modal-title" id="addEditModalTitle">Add vanity host</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
+                    <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
@@ -66,118 +67,118 @@ limitations under the License. -->
                         <div class="float-right mb-1">
                             <button type="button" class="btn btn-sm btn-outline-secondary pl-4 pr-4 mr-1" data-dismiss="modal">Close</button>
                             <button id="modalAddBtn" type="submit" class="btn btn-sm btn-success pl-4 pr-4">Add</button>
-                        </div>                        
+                        </div>
                     </div>
                 </form>
             </div>
         </div>
     </div>
-</div> 
-<!-- /addEditModal -->
+</div>
+<!-- /addEditModal --> {{ end }}
 <script>
-var vanityHosts = [];
-window.jqReady(function() {
-    fetchVanityHosts();
-    $('#vanityHostAddBtn').click(function() {
-        $('#addEditModal').modal();
-    });
-    $('#addEditModal').on('shown.bs.modal', function() {
-        $('#addEditForm').trigger('reset');
-        $('#hostName').trigger('focus');
-    });
-    $('#addEditForm').submit(function(e){
-        e.preventDefault();
-        disableWithSpinner('modalAddBtn');
-        $.ajax({
-            url: e.currentTarget.action,
-            method: 'post',
-            data: $(this).serialize()
-        }).done(function (res) {
-            enableWithoutSpinner('modalAddBtn');
-            $('#addEditModal').modal('hide');
-            vanityHosts.push({host:$('#hostName').val(), paths: []});
-            populateTable(vanityHosts);
-            showFeedback('success', 'Vanity host added successfully!');
-        }).fail(function (res) {
-            var data = res.responseJSON;
-            if (data.errors) {
-                markFieldErrors(data.errors);
-            }
-            showFormFeedback('failure', 'Unable to add vanity host!');
-            enableWithoutSpinner('modalAddBtn');
+    var vanityHosts = [];
+    window.jqReady(function () {
+        fetchVanityHosts(); {{ if $vanityWritePermission }}
+        $('#vanityHostAddBtn').click(function () {
+            $('#addEditModal').modal();
         });
-        return false;
-    });
-});
-function fetchVanityHosts() {
-    $.getJSON('{{ rurl . "vanity_hosts" }}', function(data){
-        if (data.hosts) {            
-            $.each(data.hosts,function(k, v){
-                vanityHosts.push({host: k, paths: v})
-            });
-        }
-        populateTable(vanityHosts);
-    });
-}
-function populateTable(vanities) {
-    if (vanities.length === 0) {
-        $('#vanityHosts > tbody').html('<tr class="vanity-row"><td colspan="4" class="text-center">' +
-            'No vanity hosts configured yet.</td></tr>');
-        return;
-    }
-    vanities.sort(function(a, b){
-        return a.host > b.host;
-    });
-    var showUrl = '{{ rurl . "vanity_show" "$hostName$" }}';
-    var apiBaseUrl = '{{ rurl . "vanity_hosts" }}';
-    var rows = '';
-    $(vanities).each(function(i, v){
-        rows += '<tr class="vanity-row" data-url="' + showUrl.replace('$hostName$', v.host) + '">' +
-        '<td class="vanity-col">' + v.host + '</td>' +
-        '<td class="vanity-col">' + v.paths.length + '</td>' +
-        '<td class="text-center veritical-align-middle">' +
-        '<a class="vanity-row-del" role="button" title="Delete vanity host" data-toggle="tooltip" '+
-        'data-url="' + apiBaseUrl + '/' + v.host + 
-        '" data-hostname="' + v.host + '"><i class="fas fa-trash-alt fa-lg"></i></a>' +
-        '</td>' +
-        '</tr>';
-    });
-    $('#vanityHosts > tbody').html(rows);
-    $('#vanityHosts > tbody').find('[data-toggle="tooltip"]').tooltip();
-    $('.vanity-col').click(function() {
-        location = $(this).parent().data('url');
-    });
-    $('.vanity-row-del').click(function(e) {
-        e.preventDefault();
-        var hostname = $(this).data('hostname');
-        $.confirmDialog('Are you sure to delete <strong>'+ hostname +'</strong>?<br>'+
-        '<span style="font-size:80%">Note: Vanity package configurations will be deleted too.</span>', 
-            $(e.currentTarget), function(t){
+        $('#addEditModal').on('shown.bs.modal', function () {
+            $('#addEditForm').trigger('reset');
+            $('#hostName').trigger('focus');
+        });
+        $('#addEditForm').submit(function (e) {
+            e.preventDefault();
+            disableWithSpinner('modalAddBtn');
             $.ajax({
-                url: t.data('url'),
-                method: 'delete',
-                headers: antiCsrfHeader()
-            }).done(function (data, textStatus, jqXHR) {
-                if (jqXHR.status === 204) {
-                    showFeedback('success', 'Vanity host deleted successfully!');
-                    t.parents('tr').remove();
-                    var f = -1;
-                    $(vanityHosts).each(function(i, v){
-                        if (v.host == hostname) {
-                            f = i;
-                            return false;
-                        }
-                    });
-                    if (f > -1) {
-                        vanityHosts.splice(f, 1);
-                    }
+                url: e.currentTarget.action,
+                method: 'post',
+                data: $(this).serialize()
+            }).done(function (res) {
+                enableWithoutSpinner('modalAddBtn');
+                $('#addEditModal').modal('hide');
+                vanityHosts.push({host: $('#hostName').val(), paths: []});
+                populateTable(vanityHosts);
+                showFeedback('success', 'Vanity host added successfully!');
+            }).fail(function (res) {
+                var data = res.responseJSON;
+                if (data.errors) {
+                    markFieldErrors(data.errors);
                 }
-            }).fail(function (data, textStatus, jqXHR) {
-                showFeedback('failure', 'Unable to delete vanity host!');
+                showFormFeedback('failure', 'Unable to add vanity host!');
+                enableWithoutSpinner('modalAddBtn');
             });
-        });
-        return false;
+            return false;
+        }); {{ end }}
     });
-}
+    function fetchVanityHosts() {
+        $.getJSON('{{ rurl . "vanity_hosts" }}', function (data) {
+            if (data.hosts) {
+                $.each(data.hosts, function (k, v) {
+                    vanityHosts.push({host: k, paths: v})
+                });
+            }
+            populateTable(vanityHosts);
+        });
+    }
+    function populateTable(vanities) {
+        if (vanities.length === 0) {
+            $('#vanityHosts > tbody').html('<tr class="vanity-row"><td colspan="4" class="text-center">' +
+                'No vanity hosts configured yet.</td></tr>');
+            return;
+        }
+        vanities.sort(function (a, b) {
+            return a.host > b.host;
+        });
+        var showUrl = '{{ rurl . "vanity_show" "$hostName$" }}'; {{ if $vanityWritePermission }}
+        var apiBaseUrl = '{{ rurl . "vanity_hosts" }}';{{ end }}
+        var rows = '';
+        $(vanities).each(function (i, v) {
+            rows += '<tr class="vanity-row" data-url="' + showUrl.replace('$hostName$', v.host) + '">' +
+                '<td class="vanity-col">' + v.host + '</td>' +
+                '<td class="vanity-col">' + v.paths.length + '</td>' +
+                '<td class="text-center veritical-align-middle">'{{ if $vanityWritePermission }} +
+                '<a class="vanity-row-del" role="button" title="Delete vanity host" data-toggle="tooltip" ' +
+                    'data-url="' + apiBaseUrl + '/' + v.host +
+                    '" data-hostname="' + v.host + '"><i class="fas fa-trash-alt fa-lg"></i></a>'{{ end }} +
+                '</td>' +
+                '</tr>';
+        });
+        $('#vanityHosts > tbody').html(rows);
+        $('#vanityHosts > tbody').find('[data-toggle="tooltip"]').tooltip();
+        $('.vanity-col').click(function () {
+            location = $(this).parent().data('url');
+        }); {{ if $vanityWritePermission }}
+        $('.vanity-row-del').click(function (e) {
+            e.preventDefault();
+            var hostname = $(this).data('hostname');
+            $.confirmDialog('Are you sure to delete <strong>' + hostname + '</strong>?<br>' +
+                '<span style="font-size:80%">Note: Vanity package configurations will be deleted too.</span>',
+                $(e.currentTarget), function (t) {
+                    $.ajax({
+                        url: t.data('url'),
+                        method: 'delete',
+                        headers: antiCsrfHeader()
+                    }).done(function (data, textStatus, jqXHR) {
+                        if (jqXHR.status === 204) {
+                            showFeedback('success', 'Vanity host deleted successfully!');
+                            t.parents('tr').remove();
+                            var f = -1;
+                            $(vanityHosts).each(function (i, v) {
+                                if (v.host == hostname) {
+                                    f = i;
+                                    return false;
+                                }
+                            });
+                            if (f > -1) {
+                                vanityHosts.splice(f, 1);
+                            }
+                        }
+                    }).fail(function (data, textStatus, jqXHR) {
+                        showFeedback('failure', 'Unable to delete vanity host!');
+                    });
+                });
+            return false;
+        });{{ end }}
+    }
 </script>
 {{ end }}

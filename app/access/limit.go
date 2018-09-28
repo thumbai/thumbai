@@ -16,28 +16,68 @@ package access
 
 import (
 	"aahframe.work/aah"
+	"aahframe.work/aah/essentials"
 )
 
 // Values
 var (
 	AdminHost  string
 	AllowedIPs []string
+	UserStore  = map[string]User{}
 )
 
 // Load method configures the thumbai access limits.
 func Load(_ *aah.Event) {
 	cfg := aah.AppConfig()
 	AdminHost = cfg.StringDefault("thumbai.admin.host", "")
-	AllowedIPs, _ = cfg.StringList("thumbai.admin.allow_only")
-	AllowedIPs = append(AllowedIPs, "127.0.0.1", "::1", "[::1]")
+	var found bool
+	AllowedIPs, found = cfg.StringList("thumbai.admin.allow_only")
+	if found {
+		AllowedIPs = append(AllowedIPs, "127.0.0.1", "::1", "[::1]")
+	}
+
+	if !cfg.IsExists("thumbai.user_datastore") {
+		aah.AppLog().Fatal("'thumbai.user_datastore' configuration is missing")
+	}
+
+	// processing user data
+	userKeys := cfg.KeysByPath("thumbai.user_datastore")
+	keyPrefix := "thumbai.user_datastore."
+	for _, k := range userKeys {
+		password := cfg.StringDefault(keyPrefix+k+".password", "")
+		if ess.IsStrEmpty(password) {
+			aah.AppLog().Errorf("password value is missing for user [%s] on 'thumbai.user_datastore.%s.password'", k, k)
+			continue
+		}
+		permissions, _ := cfg.StringList(keyPrefix + k + ".permissions")
+		UserStore[k] = User{
+			Username:    k,
+			Password:    []byte(password),
+			Permissions: permissions,
+			Locked:      cfg.BoolDefault(keyPrefix+k+".locked", false),
+			Expired:     cfg.BoolDefault(keyPrefix+k+".expired", false),
+		}
+	}
 }
 
 // IsAllowedFromIP method is used to check IP address allowed to admin interface.
 func IsAllowedFromIP(ip string) bool {
+	if len(AllowedIPs) == 0 {
+		return true
+	}
 	for _, ap := range AllowedIPs {
 		if ap == ip {
 			return true
 		}
 	}
 	return false
+}
+
+// User struct represents the THUMBAI application user.
+type User struct {
+	Username    string
+	Password    []byte
+	Permissions []string
+	Locked      bool
+	Expired     bool
 }

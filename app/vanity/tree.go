@@ -25,6 +25,8 @@ import (
 
 var errNodeExists = errors.New("tree: node exists")
 
+var tree = &Tree{hosts: make(map[string]*node)}
+
 //‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 // Package methods
 //______________________________________________________________________________
@@ -48,14 +50,6 @@ func Load(_ *aah.Event) {
 			if err := Add2Tree(p); err != nil {
 				aah.AppLog().Error(err)
 			}
-
-			// if err := processVanityPackage(p); err != nil {
-			// 	aah.AppLog().Error(err)
-			// 	continue
-			// }
-			// if err := tree.add(h, p.Path, p); err != nil {
-			// 	aah.AppLog().Error(err)
-			// }
 		}
 	}
 	aah.AppLog().Info("Successfully created vanity route tree")
@@ -77,8 +71,6 @@ func Add2Tree(p *models.VanityPackage) error {
 type Tree struct {
 	hosts map[string]*node
 }
-
-var tree = &Tree{hosts: make(map[string]*node)}
 
 func (t *Tree) lookupRoot(host string) *node {
 	if root, found := t.hosts[strings.ToLower(host)]; found {

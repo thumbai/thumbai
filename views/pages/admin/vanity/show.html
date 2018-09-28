@@ -14,13 +14,14 @@ limitations under the License. -->
 
 {{ define "title" }}
 <title>Go Vanity Host: {{ .VanityHostName }} - THUMBAI</title>
-{{ end }} 
+{{ end }}
 
 {{ define "meta_extra" }}
 <meta name="anti_csrf_token" content="{{ anticsrftoken . }}">
 {{ end }}
 
-{{ define "body-content" -}} 
+{{ define "body-content" -}}
+{{ $vanityWritePermission := (ispermitted . "thumbai:vanity:write") }}
 <div class="admin-vanity-show">
     <div class="container-fluid no-gutters mb-4">
         <div class="row align-items-center no-gutters">
@@ -28,7 +29,7 @@ limitations under the License. -->
                 <span class="h1">Go Vanity Host:</span><span class="h1 ml-2" style="border-bottom: 1px dotted #a2a2a2">{{ .VanityHostName }}</span>
             </div>
             <div class="col text-right">
-                <button id="vanityPkgAddBtn" data-toggle="tooltip" title="Add new vanity package into host" class="btn btn-sm btn-outline-success pl-4 pr-4 mr-1">Add Package</button>
+                {{ if $vanityWritePermission }}<button id="vanityPkgAddBtn" data-toggle="tooltip" title="Add new vanity package into host" class="btn btn-sm btn-outline-success pl-4 pr-4 mr-1">Add Package</button>{{ end }}
                 <button id="vanityBackBtn" data-url="{{ rurl . "vanity_list" }}" data-toggle="tooltip" title="Back to Go vanities" class="btn btn-sm btn-outline-success pl-4 pr-4">Back</button>
             </div>
         </div>
@@ -36,17 +37,17 @@ limitations under the License. -->
             <table id="vanityPackages" class="table table-hover">
                 <thead class="bg-dark text-white">
                     <tr>
-                    <th scope="col" class="w-40">Path</th>
-                    <th scope="col" class="w-50">Repo</th>
-                    <th scope="col" class="w-20">VCS</th>
-                    <th scope="col">&nbsp;</th>
+                        <th scope="col" class="w-40">Path</th>
+                        <th scope="col" class="w-50">Repo</th>
+                        <th scope="col" class="w-20">VCS</th>
+                        <th scope="col">&nbsp;</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
             </table>
         </div>
     </div>
-</div>
+</div> {{ if $vanityWritePermission }}
 <!-- Add/Edit vanity host record -->
 <div class="modal fade" id="addEditModal" tabindex="-1" role="dialog" aria-labelledby="addEditModalTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -54,7 +55,7 @@ limitations under the License. -->
             <div class="modal-header">
                 <h5 class="modal-title" id="addEditModalTitle">Add vanity package</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
+                    <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body pr-5 pl-5 mb-2">
@@ -80,111 +81,112 @@ limitations under the License. -->
             </div>
         </div>
     </div>
-</div> 
-<!-- /addEditModal -->
+</div>
+<!-- /addEditModal --> {{ end }}
 <script>
-var vanityPackages = [];
-window.jqReady(function() {
-    fetchVanityHost();
-    $("#vanityBackBtn").click(function() {
-        location = $(this).data('url');
-    });
-    $('#vanityPkgAddBtn').click(function() {
-        $('#modalAddBtn').data('mode', 'add');
-        $('#addEditModal').modal();
-    });
-    $('#addEditModal').on('shown.bs.modal', function(e) {
-        $('#addEditForm').trigger('reset');
-        $('#vanityHostname').trigger('focus');
-    });
-    $('#addEditForm').submit(function(e){
-        e.preventDefault();
-        disableWithSpinner('modalAddBtn');
-        var mode = $('#modalAddBtn').data('mode');
-        $.ajax({
-            url: mode === 'add' ? $(this).data('add-url') : '',
-            method: 'post',
-            data: $(this).serialize()
-        }).done(function (res) {
-            enableWithoutSpinner('modalAddBtn');
-            $('#addEditModal').modal('hide');
-            showFeedback('success', 'Vanity package added successfully!')
-            vanityPackages.push({"path": $('#vanityPkgPath').val(), "repo": $('#vanityPkgRepo').val(), "vcs": $('#vanityPkgVcs').val()});
-            populateTable(vanityPackages);
-        }).fail(function (res) {
-            var data = res.responseJSON;
-            if (data.errors) {
-                markFieldErrors(data.errors);
-            }
-            showFormFeedback('failure', 'Unable to add vanity package!');
-            enableWithoutSpinner('modalAddBtn');
+    var vanityPackages = [];
+    window.jqReady(function () {
+        fetchVanityHost();
+        $("#vanityBackBtn").click(function () {
+            location = $(this).data('url');
+        }); {{ if $vanityWritePermission }}
+        $('#vanityPkgAddBtn').click(function () {
+            $('#modalAddBtn').data('mode', 'add');
+            $('#addEditModal').modal();
         });
-        return false;
-    });
-});
-function fetchVanityHost() {
-    $.getJSON('{{ rurl . "vanity_get_host" .VanityHostName }}', function(data){
-        if (data.packages) {
-            $.each(data.packages,function(k, v){
-                vanityPackages.push({"path": v.path, "repo": v.repo, "vcs": v.vcs});
-            });
-            populateTable(vanityPackages);
-        }
-    });
-}
-function populateTable(packages) {
-    if (packages.length === 0) {
-        $('#vanityPackages > tbody').html('<tr class="vanity-pkg-row"><td colspan="4" class="text-center">' +
-            'No vanity packages configured yet.</td></tr>');
-        return;
-    }
-    packages.sort(function(a, b){
-        return a.path > b.path;
-    });
-    var apiBaseUrl = '{{ rurl . "vanity_del_package" .VanityHostName "" }}';
-    var rows = '';
-    $(packages).each(function(i, v){
-        rows += '<tr class="vanity-pkg-row" data-url="' + apiBaseUrl + '/' + encodeURIComponent(v.path) + '">' +
-            '<td>' + v.path + '</td>' +
-            '<td>' + v.repo + '</td>' +
-            '<td>' + v.vcs + '</td>' +
-            '<td class="text-center veritical-align-middle">' +
-            '<a class="vanity-row-pkg-del" title="Delete vanity package" data-toggle="tooltip" data-pkg="'+ 
-            v.path + '" role="button"><i class="fas fa-trash-alt fa-lg"></i></a>' +
-            '</td>' +
-            '</tr>';
-    });
-    $('#vanityPackages > tbody').html(rows);
-    $('#vanityPackages > tbody').find('[data-toggle="tooltip"]').tooltip();
-    $('.vanity-row-pkg-del').click(function(e) {
-        e.preventDefault();
-        var pkg = $(this).data('pkg');
-        $.confirmDialog('Are you sure to delete vanity package <strong>'+ pkg +'</strong>?', $(this), function(t) {
+        $('#addEditModal').on('shown.bs.modal', function (e) {
+            $('#addEditForm').trigger('reset');
+            $('#vanityHostname').trigger('focus');
+        });
+        $('#addEditForm').submit(function (e) {
+            e.preventDefault();
+            disableWithSpinner('modalAddBtn');
+            var mode = $('#modalAddBtn').data('mode');
             $.ajax({
-                url: t.parent().parent().data('url'),
-                method: 'delete',
-                headers: antiCsrfHeader()
-            }).done(function (data, textStatus, jqXHR) {
-                if (jqXHR.status === 204) {
-                    showFeedback('success', 'Vanity package deleted successfully!');
-                    t.parents('tr').remove();
-                    var f = -1;
-                    $(vanityPackages).each(function(i, v){
-                        if (v.path == pkg) {
-                            f = i;
-                            return false;
-                        }
-                    });
-                    if (f > -1) {
-                        vanityPackages.splice(f, 1);
-                    }
+                url: mode === 'add' ? $(this).data('add-url') : '',
+                method: 'post',
+                data: $(this).serialize()
+            }).done(function (res) {
+                enableWithoutSpinner('modalAddBtn');
+                $('#addEditModal').modal('hide');
+                showFeedback('success', 'Vanity package added successfully!')
+                vanityPackages.push({"path": $('#vanityPkgPath').val(), "repo": $('#vanityPkgRepo').val(), "vcs": $('#vanityPkgVcs').val()});
+                populateTable(vanityPackages);
+            }).fail(function (res) {
+                var data = res.responseJSON;
+                if (data.errors) {
+                    markFieldErrors(data.errors);
                 }
-            }).fail(function (data, textStatus, jqXHR) {
-                showFeedback('failure', 'Unable to delete vanity package!');
+                showFormFeedback('failure', 'Unable to add vanity package!');
+                enableWithoutSpinner('modalAddBtn');
             });
+            return false;
+        }); {{ end }}
+    });
+    function fetchVanityHost() {
+        $.getJSON('{{ rurl . "vanity_get_host" .VanityHostName }}', function (data) {
+            if (data.packages) {
+                $.each(data.packages, function (k, v) {
+                    vanityPackages.push({"path": v.path, "repo": v.repo, "vcs": v.vcs});
+                });
+                populateTable(vanityPackages);
+            }
         });
-        return false;
-    });    
-}
+    }
+    function populateTable(packages) {
+        if (packages.length === 0) {
+            $('#vanityPackages > tbody').html('<tr class="vanity-pkg-row"><td colspan="4" class="text-center">' +
+                'No vanity packages configured yet.</td></tr>');
+            return;
+        }
+        packages.sort(function (a, b) {
+            return a.path > b.path;
+        }); {{ if $vanityWritePermission }}
+        var apiBaseUrl = '{{ rurl . "vanity_del_package" .VanityHostName "" }}'; {{ end }}
+        var rows = '';
+        $(packages).each(function (i, v) {
+            rows += '<tr class="vanity-pkg-row">' +
+                '<td class="rule-value">' + v.path + '</td>' +
+                '<td class="rule-value">' + v.repo + '</td>' +
+                '<td class="rule-value">' + v.vcs + '</td>' +
+                '<td class="text-center veritical-align-middle">' {{ if $vanityWritePermission }} + 
+                '<a class="vanity-row-pkg-del" title="Delete vanity package" data-toggle="tooltip" data-pkg="' +
+                v.path + '" data-url="' + apiBaseUrl + '/' + encodeURIComponent(v.path) + '" role="button">' +
+                '<i class="fas fa-trash-alt fa-lg"></i></a>'{{ end }} +
+                '</td>' +
+                '</tr>';
+        });
+        $('#vanityPackages > tbody').html(rows);
+        $('#vanityPackages > tbody').find('[data-toggle="tooltip"]').tooltip(); {{ if $vanityWritePermission }}
+        $('.vanity-row-pkg-del').click(function (e) {
+            e.preventDefault();
+            var pkg = $(this).data('pkg');
+            $.confirmDialog('Are you sure to delete vanity package <strong>' + pkg + '</strong>?', $(this), function (t) {
+                $.ajax({
+                    url: t.data('url'),
+                    method: 'delete',
+                    headers: antiCsrfHeader()
+                }).done(function (data, textStatus, jqXHR) {
+                    if (jqXHR.status === 204) {
+                        showFeedback('success', 'Vanity package deleted successfully!');
+                        t.parents('tr').remove();
+                        var f = -1;
+                        $(vanityPackages).each(function (i, v) {
+                            if (v.path == pkg) {
+                                f = i;
+                                return false;
+                            }
+                        });
+                        if (f > -1) {
+                            vanityPackages.splice(f, 1);
+                        }
+                    }
+                }).fail(function (data, textStatus, jqXHR) {
+                    showFeedback('failure', 'Unable to delete vanity package!');
+                });
+            });
+            return false;
+        }); {{ end }}
+    }
 </script>
 {{ end }}

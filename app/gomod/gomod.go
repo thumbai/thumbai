@@ -67,14 +67,12 @@ func Infer(_ *aah.Event) {
 	Settings.Lock()
 	defer Settings.Unlock()
 	Settings.storeSettings = GetSettings()
+	Settings.Stats = &models.ModuleStats{}
 	var err error
-	if ess.IsStrEmpty(Settings.storeSettings.GoBinary) {
-		if Settings.GoBinary, err = exec.LookPath("go"); err != nil {
-			aah.AppLog().Errorf("Go modules proxy server would unavailable: %v", err)
-			return
-		}
-	} else {
-		Settings.GoBinary = Settings.storeSettings.GoBinary
+	Settings.GoBinary, err = inferGoBinary(Settings.storeSettings.GoBinary)
+	if err != nil {
+		aah.AppLog().Errorf("Go modules proxy server would unavailable: %v", err)
+		return
 	}
 
 	Settings.GoVersion = GoVersion(Settings.GoBinary)
@@ -83,14 +81,7 @@ func Infer(_ *aah.Event) {
 		return
 	}
 
-	if ess.IsStrEmpty(Settings.storeSettings.GoPath) {
-		paths := filepath.SplitList(build.Default.GOPATH)
-		if len(paths) > 0 {
-			Settings.GoPath = paths[0]
-		}
-	} else {
-		Settings.GoPath = Settings.storeSettings.GoPath
-	}
+	Settings.GoPath = inferGopath(Settings.storeSettings.GoPath)
 	Settings.ModCachePath = filepath.Join(Settings.GoPath, "pkg", "mod", "cache", "download")
 
 	if ess.IsStrEmpty(Settings.storeSettings.GoProxy) {
@@ -328,4 +319,30 @@ func processModAndUpdateCount(r io.Reader) {
 	}
 	Settings.Stats.TotalCount += int64(len(mods))
 	_ = SaveStats(Settings.Stats)
+}
+
+func inferGoBinary(current string) (string, error) {
+	var currentExists bool
+	if !ess.IsStrEmpty(current) {
+		currentExists = ess.IsFileExists(current)
+		aah.AppLog().Warnf("%s go binary is not exists on server, will infer from server if possible", current)
+	}
+	if ess.IsStrEmpty(current) || !currentExists {
+		return exec.LookPath("go")
+	}
+	return current, nil
+}
+
+func inferGopath(current string) string {
+	var currentExists bool
+	if !ess.IsStrEmpty(current) {
+		currentExists = ess.IsFileExists(current)
+		aah.AppLog().Warnf("%s GOPATH is not exists on server, will infer from server if possible", current)
+	}
+	if ess.IsStrEmpty(current) || !currentExists {
+		if paths := filepath.SplitList(build.Default.GOPATH); len(paths) > 0 {
+			return paths[0]
+		}
+	}
+	return current
 }

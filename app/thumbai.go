@@ -12,7 +12,7 @@ import (
 // and puts default values as needed.
 func CheckConfig(e *aah.Event) {
 	cfg := aah.AppConfig()
-	cfg.SetString("env.active", "prod")
+	cfg.SetString("env.active", cfg.StringDefault("thumbai.env.active", "prod"))
 	if !cfg.IsExists("thumbai.admin.host") {
 		log.Fatalf("'thumbai.admin.host' value is not configured")
 	}

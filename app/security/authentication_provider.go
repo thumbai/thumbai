@@ -1,9 +1,8 @@
 package security
 
 import (
-	"strings"
+	"thumbai/app/access"
 
-	"aahframe.work/aah"
 	"aahframe.work/aah/config"
 	"aahframe.work/aah/security/authc"
 )
@@ -23,47 +22,21 @@ func (a *AuthenticationProvider) Init(appCfg *config.Config) error {
 
 // GetAuthenticationInfo method is `authc.Authenticator` interface
 func (a *AuthenticationProvider) GetAuthenticationInfo(authcToken *authc.AuthenticationToken) (*authc.AuthenticationInfo, error) {
-	if strings.ToLower(authcToken.Identity) != "admin" {
+	u, found := access.UserStore[authcToken.Identity]
+	if !found {
 		return nil, authc.ErrSubjectNotExists
 	}
 
-	//‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-	// This code snippet provided as a reference
-	//
-	// Call your appropriate datasource here (such as DB, API, LDAP, etc)
-	// to get the subject (aka user) authentication information.
-	//
-	// Form Auth Values from authcToken
-	// 		authcToken.Identity => username
-	// 		authcToken.Credential => passowrd
-	//_____________________________________________________________________
-
-	// user := models.FindUserByEmail(authcToken.Identity)
-	// if user == nil {
-	// 	// No subject exists, return nil and error
-	// 	return nil, authc.ErrSubjectNotExists
-	// }
-
-	// User found, now create authentication info and return to the framework
 	authcInfo := authc.NewAuthenticationInfo()
 	authcInfo.Principals = append(authcInfo.Principals,
 		&authc.Principal{
-			Value:     "admin@admin.com",
+			Value:     u.Username,
 			IsPrimary: true,
 			Realm:     "inmemory",
 		})
-	authcInfo.Credential = []byte("$2y$10$2A4GsJ6SmLAMvDe8XmTam.MSkKojdobBVJfIU7GiyoM.lWt.XV3H6") // welcome123
-	// authcInfo.IsLocked = user.IsLocked
-	// authcInfo.IsExpired = user.IsExpried
+	authcInfo.Credential = u.Password
+	authcInfo.IsLocked = u.Locked
+	authcInfo.IsExpired = u.Expired
 
 	return authcInfo, nil
-}
-
-// PostAuthEvent method used for activities after authentication successful.
-func PostAuthEvent(e *aah.Event) {
-	ctx := e.Data.(*aah.Context)
-
-	ctx.Log().Info("Method security.PostAuthEvent called")
-
-	// Do post successful authentication actions...
 }

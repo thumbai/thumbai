@@ -14,29 +14,30 @@ limitations under the License. -->
 
 {{ define "title" }}
 <title>Proxy Host: {{ .ProxyHostName }} - THUMBAI</title>
-{{ end }} 
+{{ end }}
 
 {{ define "meta_extra" }}
 <meta name="anti_csrf_token" content="{{ anticsrftoken . }}">
 {{ end }}
 
-{{ define "body-content" -}} 
+{{ define "body-content" -}}
+{{ $proxyWritePermission := (ispermitted . "thumbai:proxy:write") }}
 <div class="admin-proxy-show">
     <div class="container-fluid no-gutters mb-4">
         <div class="w-75">
             <h1>Proxy Host: <span class="font-weight-bold">{{ .ProxyHostName }}</span>
                 <div class="align-middle float-sm-right float-right">
-                    <a href="{{ rurl . "proxy_add" .ProxyHostName }}" data-toggle="tooltip" title="Add new proxy rule" class="btn btn-sm btn-outline-success pl-4 pr-4">Add Rule</a>
+                    {{ if $proxyWritePermission }}<a href="{{ rurl . "proxy_add" .ProxyHostName }}" data-toggle="tooltip" title="Add new proxy rule" class="btn btn-sm btn-outline-success pl-4 pr-4">Add Rule</a>{{ end }}
                     <button id="proxyBackBtn" data-url="{{ rurl . "proxy_list" }}" data-toggle="tooltip" title="Back to Proxies" class="btn btn-sm btn-outline-success pl-4 pr-4">Back</button>
                 </div>
-            </h1> 
+            </h1>
         </div>
         <div class="mt-5 w-75">
             <table class="table table-hover">
                 <thead class="bg-dark text-white">
                     <tr>
-                    <th scope="col" class="w-100">Proxy Rules</th>
-                    <th scope="col">&nbsp;</th>
+                        <th scope="col" class="w-100">Proxy Rules</th>
+                        {{ if $proxyWritePermission }}<th scope="col">&nbsp;</th>{{ end }}
                     </tr>
                 </thead>
                 <tbody>
@@ -50,16 +51,16 @@ limitations under the License. -->
                                 <div>{{ if .Last }}<span class="badge badge-success">Last Rule</span>{{ end }}
                                     {{ if .SkipTLSVerify }}<span class="badge badge-warning">Skip TLS Verify</span>{{ end }}
                                     {{ if proxyconditionexists . }}<span class="badge badge-info">Conditions</span>{{ end }}
-                                    {{ if .Redirects }}<span class="badge badge-info">Redirects</span>{{ end }}
+                                    {{ if .Redirects }}<span class="badge badge-info">Redirects <span>[{{ len .Redirects }}]</span> </span>{{ end }}
                                     {{ if proxyrestrictfilesexists . }}<span class="badge badge-info">Restrict Files</span>{{ end }}
-                                    {{ if .Statics }}<span class="badge badge-info">Static Files</span>{{ end }}
+                                    {{ if .Statics }}<span class="badge badge-info">Static Files <span>[{{ len .Statics }}]</span> </span>{{ end }}
                                     {{ if proxyrequesthdrexists . }}<span class="badge badge-info">Request Headers</span>{{ end }}
                                     {{ if proxyresponsehdrexists . }}<span class="badge badge-info">Response Headers</span>{{ end }}</div>
-                            </div>                        
-                        </td>
+                            </div>
+                        </td> {{ if $proxyWritePermission }}
                         <td class="text-center align-middle">
                             <a class="proxy-rule-del" role="button" title="Delete proxy rule" data-toggle="tooltip" data-url="{{ rurl $ "proxy_rule_del" .Host .TargetURL }}" data-hostname="{{ .Host }}" data-target-url="{{ .TargetURL }}"><i class="fas fa-trash-alt fa-lg"></i></a>
-                        </td>
+                        </td> {{ end }}
                     </tr>
                     {{- end }}
                     {{ end }}
@@ -69,34 +70,34 @@ limitations under the License. -->
     </div>
 </div>
 <script>
-window.jqReady(function() {
-    $("#proxyBackBtn").click(function() {
-        location = $(this).data('url');
-    });
-    $('.proxy-rule-row').click(function(){
-        location = $(this).data('url');
-    });
-    $('.proxy-rule-del').click(function(e) {
-        e.preventDefault();
-        var hostname = $(this).data('hostname');
-        var targetURL = $(this).data('target-url');
-        $.confirmDialog('Are you sure to delete target of <strong>'+ targetURL +'</strong> from host: '+ hostname +'?<br>', 
-            $(e.currentTarget), function(t){
-            $.ajax({
-                url: t.data('url'),
-                method: 'delete',
-                headers: antiCsrfHeader()
-            }).done(function (data, textStatus, jqXHR) {
-                if (jqXHR.status === 204) {
-                    showFeedback('success', 'Proxy rule deleted successfully from '+ hostname +'!');
-                    t.parents('tr').remove();
-                }
-            }).fail(function (data, textStatus, jqXHR) {
-                showFeedback('failure', 'Unable to delete proxy rule from host'+ hostname +'!');
-            });
+    window.jqReady(function () {
+        $("#proxyBackBtn").click(function () {
+            location = $(this).data('url');
         });
-        return false;
+        $('.proxy-rule-row').click(function () {
+            location = $(this).data('url');
+        }); {{ if $proxyWritePermission }}
+        $('.proxy-rule-del').click(function (e) {
+            e.preventDefault();
+            var hostname = $(this).data('hostname');
+            var targetURL = $(this).data('target-url');
+            $.confirmDialog('Are you sure to delete target of <strong>' + targetURL + '</strong> from host: ' + hostname + '?<br>',
+                $(e.currentTarget), function (t) {
+                    $.ajax({
+                        url: t.data('url'),
+                        method: 'delete',
+                        headers: antiCsrfHeader()
+                    }).done(function (data, textStatus, jqXHR) {
+                        if (jqXHR.status === 204) {
+                            showFeedback('success', 'Proxy rule deleted successfully from ' + hostname + '!');
+                            t.parents('tr').remove();
+                        }
+                    }).fail(function (data, textStatus, jqXHR) {
+                        showFeedback('failure', 'Unable to delete proxy rule from host' + hostname + '!');
+                    });
+                });
+            return false;
+        }); {{ end }}
     });
-});
 </script>
 {{ end }}

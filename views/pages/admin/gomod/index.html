@@ -17,17 +17,17 @@ limitations under the License. -->
 {{ end }}
 
 {{ define "body-content" -}}
+{{ $gomodWritePermission := (ispermitted . "thumbai:gomod:write") }}
 <div class="admin-gomodules">
     <div class="container-fluid no-gutters mb-4">
         <div class="row align-items-center no-gutters">
             <div>
                 <span class="h1">Go Modules</span><span class="total-mod-count pl-3">({{ .Stats.TotalCount }} available & counting ...)</span>
             </div>
-            {{ if not .Settings.Enabled }}
-            <div>
-                <p class="alert alert-danger w-50">Go Proxy Server unavailable due to prerequisites does not met on the server.</p>
-            </div>{{ end }}
         </div>
+        {{ if not .Settings.Enabled }}<div class="row no-gutters">
+            <p class="alert alert-danger w-50">Go Proxy Server unavailable due to prerequisites does not met on the server.</p>
+        </div>{{ end }}
         <div class="row no-gutters">
             <div class="col w-50 mt-4 pr-4">
                 <form id="goModulesForm" method="post" action="{{ rurl . "gomod_save_settings" }}">
@@ -35,7 +35,7 @@ limitations under the License. -->
                         <label for="goBinary">Go Binary</label><span class="ml-2 badge badge-success">go{{ .Settings.GoVersion }}</span>
                         <input type="text" class="form-control rule-value" id="goBinary" name="goBinary" value="{{ .Settings.GoBinary }}" placeholder="Enter the path to Go binary on the server" aria-describedby="goBinaryHelp" required>
                         <small id="goBinaryHelp" class="form-text text-muted">
-                        Ensure given binary is go1.11 or above.
+                            Ensure given binary is go1.11 or above.
                         </small>
                         <div id="goBinaryError" class="invalid-feedback">Required</div>
                     </div>
@@ -43,87 +43,87 @@ limitations under the License. -->
                         <label for="goPath">GOPATH</label>
                         <input type="text" class="form-control rule-value" id="goPath" name="goPath" value="{{ .Settings.GoPath }}" placeholder="Enter the GOPATH on the server" required>
                         <small id="goBinaryHelp" class="form-text text-muted">
-                        Ensure given GOPATH have read/write permission to thumbai app.
+                            Ensure given GOPATH have read/write permission to thumbai app.
                         </small>
                         <div id="goPathError" class="invalid-feedback">Required</div>
                     </div>
-                    <button id="goModulesSubmit" type="submit" class="btn btn-success float-right pl-4 pr-4">Save</button>
+                    {{ if $gomodWritePermission }}<button id="goModulesSubmit" type="submit" class="btn btn-success float-right pl-4 pr-4">Save</button>{{ end }}
                 </form>
             </div>
             <div class="col w-50 mt-4 pl-4">
-                <form id="formOnDemandPublish" action="{{ rurl . "gomod_publish" }}">
+                {{ if $gomodWritePermission }}<form id="formOnDemandPublish" action="{{ rurl . "gomod_publish" }}">
                     <div class="form-group">
                         <label for="onDemandPublish">On-Demand Publish</label>
-                        <textarea class="form-control rule-value" id="onDemandPublish" name="onDemandPublish" rows="7" placeholder="Enter module path per line. NOTE: By default thumbai automatically downloads the requested go module when unavailble on server. On-demand publish could be useful too :)" required></textarea>
+                        <textarea class="form-control rule-value" id="onDemandPublish" name="onDemandPublish" rows="6" placeholder="Enter module path per line. NOTE: By default thumbai automatically downloads the requested go module when unavailble on server. On-demand publish could be useful too :)" required></textarea>
                         <small id="onDemandPublishHelp" class="form-text text-muted">
-                        Supported go module path syntax's are <a tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-content="aahframe.work/aah@latest<br>aahframe.work/aah@v0.12.0<br>aahframe.work/aah@7e312af" data-html="true" data-placement="bottom"><i class="fas fa-question-circle"></i></a>
+                            Supported go module path syntax's are <a tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-content="aahframe.work/aah@latest<br>aahframe.work/aah@v0.12.0<br>aahframe.work/aah@7e312af" data-html="true" data-placement="bottom"><i class="fas fa-question-circle"></i></a>
                         </small>
                         <div id="onDemandPublishError" class="invalid-feedback">Required</div>
                     </div>
-                    <button id="formOnDemandPublishSubmit" type="submit" class="btn btn-primary float-right pl-4 pr-4" style="margin-top: -2px">Publish</button>
-                </form>
+                    <button id="formOnDemandPublishSubmit" type="submit" class="btn btn-primary float-right pl-4 pr-4">Publish</button>
+                </form>{{ end }}
             </div>
         </div>
     </div>
-</div>
+</div> {{ if $gomodWritePermission }}
 <script>
-window.jqReady(function () {
-    $('#goModulesForm').submit(function (e) {
-        e.preventDefault();
-        disableWithSpinner('goModulesSubmit');
-        $.ajax({
-            url: e.currentTarget.action,
-            method: 'post',
-            data: $(this).serialize(),
-        }).done(function (res) {
-            showFeedback('success', 'Go modules settings saved!');
-            enableWithoutSpinner('goModulesSubmit');
-        }).fail(function (res) {
-            var data = res.responseJSON;
-            if (data.errors) {
-                markFieldErrors(data.errors);
-            }
-            showFeedback('failure', 'Unable to save Go modules settings!');
-            enableWithoutSpinner('goModulesSubmit');
+    window.jqReady(function () {
+        $('#goModulesForm').submit(function (e) {
+            e.preventDefault();
+            disableWithSpinner('goModulesSubmit');
+            $.ajax({
+                url: e.currentTarget.action,
+                method: 'post',
+                data: $(this).serialize(),
+            }).done(function (res) {
+                showFeedback('success', 'Go modules settings saved!');
+                enableWithoutSpinner('goModulesSubmit');
+            }).fail(function (res) {
+                var data = res.responseJSON;
+                if (data.errors) {
+                    markFieldErrors(data.errors);
+                }
+                showFeedback('failure', 'Unable to save Go modules settings!');
+                enableWithoutSpinner('goModulesSubmit');
+            });
+            return false;
         });
-        return false;
+        $('#formOnDemandPublish').submit(function (e) {
+            e.preventDefault();
+            var lines = $('#onDemandPublish').val().split(/\n/);
+            var modules = [];
+            $.each(lines, function (i, line) {
+                if (/\S/.test(line)) {
+                    modules.push($.trim(line));
+                }
+            });
+            if (modules.length === 0) {
+                markFieldError({ 'name': 'onDemandPublish', 'message': 'Provide go module path(s)' });
+                return
+            }
+            disableWithSpinner('formOnDemandPublishSubmit');
+            $.ajax({
+                url: e.currentTarget.action,
+                method: 'post',
+                dataType: 'json',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({ 'modules': modules }),
+                headers: { 'X-Anti-CSRF-Token': $(this).find('input[name="anti_csrf_token"]').val() }
+            }).done(function (res) {
+                showFeedback('success', 'On-demand publish accepted!');
+                enableWithoutSpinner('formOnDemandPublishSubmit');
+            }).fail(function (res) {
+                var data = res.responseJSON;
+                if (data && data.errors) {
+                    markFieldErrors(data.errors);
+                } else if (data && data.message) {
+                    markFieldError({ 'name': 'onDemandPublish', 'message': data.message });
+                }
+                showFeedback('failure', 'Unable to accept on-demand publish!');
+                enableWithoutSpinner('formOnDemandPublishSubmit');
+            });
+            return false;
+        });
     });
-    $('#formOnDemandPublish').submit(function (e) {
-        e.preventDefault();
-        var lines = $('#onDemandPublish').val().split(/\n/);
-        var modules = [];
-        $.each(lines, function(i, line){
-            if (/\S/.test(line)) {
-                modules.push($.trim(line));
-            }
-        });
-        if (modules.length === 0) {
-            markFieldError({'name':'onDemandPublish', 'message': 'Provide go module path(s)'});
-            return
-        }        
-        disableWithSpinner('formOnDemandPublishSubmit');
-        $.ajax({
-            url: e.currentTarget.action,
-            method: 'post',
-            dataType: 'json',
-            contentType: "application/json; charset=utf-8",
-            data: JSON.stringify({'modules': modules}),
-            headers: {'X-Anti-CSRF-Token': $(this).find('input[name="anti_csrf_token"]').val()}
-        }).done(function (res) {
-            showFeedback('success', 'On-demand publish accepted!');
-            enableWithoutSpinner('formOnDemandPublishSubmit');
-        }).fail(function (res) {
-            var data = res.responseJSON;
-            if (data && data.errors) {
-                markFieldErrors(data.errors);
-            } else if (data && data.message) {
-                markFieldError({'name':'onDemandPublish', 'message': data.message});
-            }
-            showFeedback('failure', 'Unable to accept on-demand publish!');
-            enableWithoutSpinner('formOnDemandPublishSubmit');
-        });
-        return false;
-    });
-});
-</script>
+</script> {{ end }}
 {{ end }}
