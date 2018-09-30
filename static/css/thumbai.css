@@ -268,7 +268,7 @@ html {
 .admin-dashboard .proxy-server-unavailable {
   font-size: 85%;
   position: absolute;
-  margin-left: 3.75rem !important;
+  margin-left: 8.75rem !important;
   margin-top: 10rem !important;
 }
 
@@ -311,3 +311,17 @@ html {
   border: none;
 }
 
+/* admin/tools/index.html */
+.admin-tools .card-deck {
+  width: 25%;
+}
+.admin-tools .card-deck .card hr {
+  margin-bottom: 5px;
+}
+.admin-tools .card-deck .card a {
+  color: #4f5458;
+}
+.admin-tools #cardExport,
+.admin-tools #cardImport {
+  cursor: pointer;
+}

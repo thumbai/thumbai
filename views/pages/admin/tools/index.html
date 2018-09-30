@@ -1,0 +1,98 @@
+<!-- Copyright Jeevanandam M. (https://github.com/jeevatkm, jeeva@myjeeva.com)
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License. -->
+
+{{ define "title" }}
+<title>Tools - THUMBAI</title>
+{{ end }}
+
+{{ define "meta_extra" }}
+<meta name="anti_csrf_token" content="{{ anticsrftoken . }}">
+{{ end }}
+
+{{ define "body-content" -}}
+{{ $toolsWritePermission := (ispermitted . "thumbai:tools:write") }}
+<div class="admin-tools">
+    <div class="container-fluid no-gutters mb-4">
+        <div class="row align-items-center no-gutters">
+            <div>
+                <span class="h1">Tools</span>
+            </div>
+        </div>
+        <div class="row no-gutters mt-4">
+            <div class="col-md-12">
+                <div class="card-deck text-center">
+                    <div id="cardExport" class="card mb-4 shadow-sm">
+                        <a id="btnExport" class="btn" role="button" href="{{ rurl . "tools_config_export" }}">
+                            <div class="card-body">
+                                <i class="fas fa-file-export fa-2x"></i>
+                                <hr>
+                                <span>Export</span>
+                            </div>
+                        </a>
+                    </div>
+                    <div id="cardImport" class="card mb-4 shadow-sm" data-url="{{ rurl . "tools_config_import" }}">
+                        <a id="btnImport" class="btn" role="button">
+                            <div class="card-body">
+                                <i class="fas fa-file-import fa-2x"></i>
+                                <hr>
+                                <span>Import</span>
+                            </div>
+                        </a>
+                    </div><input type="file" id="fileUpload" name="fileUpload" hidden>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    window.jqReady(function () {
+        $('#btnImport').click(function(){
+            $('#fileUpload').trigger('click');
+        });
+        $('#fileUpload').change(function(e){
+            var files = e.target.files;
+            if (files && files[0]) {
+                var fc = '';
+                var fr = new FileReader();
+                fr.onload = function(e) {
+                    fc = e.target.result;
+                    if (files[0].type !== 'application/json' || fc.indexOf('vanities') < 0 || fc.indexOf('proxies') < 0) {
+                        showFeedback('failure', 'Given import file is not valid THUMBAI exported configruations!');
+                        return false;
+                    }
+                    $.confirmDialog('Are you sure, existing configurations will be overwitten if present?'
+                    , $('#cardImport'), function(t){
+                        $.ajax({
+                            url: $('#cardImport').data('url'),
+                            method: 'post',
+                            dataType: 'json',
+                            contentType: 'application/json; charset=utf-8',
+                            data: fc,
+                            headers: { 'X-Anti-CSRF-Token': $('input[name="anti_csrf_token"]').val() }
+                        }).done(function (data, textStatus, jqXHR) {
+                            if (jqXHR.status === 204) {
+                                showFeedback('success', 'THUMBAI configuration imported successfully!');
+                            }
+                        }).fail(function (data, textStatus, jqXHR) {
+                            showFeedback('failure', 'Unable to import THUMBAI configuration!');
+                        });   
+                        return false;                     
+                    });
+                }
+                fr.readAsText(files[0]);
+            }
+        });
+    });
+</script>
+{{ end }}

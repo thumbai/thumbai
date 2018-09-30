@@ -21,6 +21,8 @@ import (
 	"strings"
 	"thumbai/app/datastore"
 	"thumbai/app/models"
+
+	"aahframe.work/aah"
 )
 
 //‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
@@ -50,6 +52,21 @@ func Stats() map[string]int {
 	}
 	stats["Packages"] = c
 	return stats
+}
+
+// Import method deletes existing configuration and then saves given configurations.
+// Also reload the new imported configurations.
+func Import(configs map[string][]*models.VanityPackage) {
+	for k, vp := range configs {
+		if err := DelHost(k); err != nil && err != datastore.ErrRecordNotFound {
+			continue
+		}
+		if err := datastore.Put(datastore.BucketGoVanities, k, vp); err != nil {
+			aah.AppLog().Errorf("Unable to import vanity config for host: %s, error: %v", k, err)
+		}
+	}
+	tree = &Tree{hosts: make(map[string]*node)}
+	Load(nil)
 }
 
 // AddHost method adds the given host into vanities data store.

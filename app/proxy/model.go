@@ -18,6 +18,8 @@ import (
 	"strings"
 	"thumbai/app/datastore"
 	"thumbai/app/models"
+
+	"aahframe.work/aah"
 )
 
 // All method returns all the proxy configuration from the data store.
@@ -43,6 +45,20 @@ func Stats() map[string]int {
 	}
 	stats["ProxyRules"] = c
 	return stats
+}
+
+// Import method deletes existing configuration and then saves given configurations.
+// Also reload the new imported configurations.
+func Import(configs map[string][]*models.ProxyRule) {
+	for k, p := range configs {
+		if err := DelHost(k); err != nil && err != datastore.ErrRecordNotFound {
+			continue
+		}
+		if err := datastore.Put(datastore.BucketProxies, k, p); err != nil {
+			aah.AppLog().Errorf("Unable to import proxy config for host: %s, error: %v", k, err)
+		}
+	}
+	Load(nil)
 }
 
 // AddHost method adds the given host into proxies data store.

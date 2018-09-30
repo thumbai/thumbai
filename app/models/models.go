@@ -14,6 +14,13 @@
 
 package models
 
+// Configuration struct holds the THUMBAI configurations. Currently its
+// used for vanities and proxies.
+type Configuration struct {
+	Vanities map[string][]*VanityPackage `json:"vanities,omitempty"`
+	Proxies  map[string][]*ProxyRule     `json:"proxies,omitempty"`
+}
+
 // PublishRequest struct used to accept the module publish request.
 type PublishRequest struct {
 	Modules []string `json:"modules"`

@@ -60,8 +60,8 @@ $.extend({ confirmDialog: function (confirmText, confirmTarget, yesCallback) {
                 '</div>' +
                 '<div class="mt-1 mb-5">' +
                     '<div class="float-right">' +
-                        '<button type="button" class="no btn btn-sm btn-outline-secondary pl-3 pr-3 mr-1" data-dismiss="modal">No</button>'+
-                        '<button type="button" id="configmDialogYesBtn" class="yes btn btn-sm btn-danger pl-3 pr-3">Yes</button>' +
+                        '<button type="button" class="no btn btn-sm btn-outline-secondary pl-4 pr-4 mr-2" data-dismiss="modal">No</button>'+
+                        '<button type="button" id="configmDialogYesBtn" class="yes btn btn-sm btn-primary pl-4 pr-4">Yes</button>' +
                     '</div>' +
                 '</div>'+
             '</div>'+

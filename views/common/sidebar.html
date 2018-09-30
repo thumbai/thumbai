@@ -23,7 +23,7 @@ limitations under the License. -->
       </li>
       <li class="nav-item">
         <a class="nav-link {{ if .IsGoModules }}active{{ end }}" href="{{ rurl . "gomod_admin" }}">
-          <i class="fas fa-cogs fa-2x"></i><br>Go Modules
+          <i class="fas fa-cubes fa-2x"></i><br>Go Modules
           {{ if .IsGoModules }}<span class="sr-only">(current)</span>{{ end }}
         </a>
       </li>
@@ -38,7 +38,13 @@ limitations under the License. -->
           <i class="fas fa-sitemap fa-2x"></i><br>Proxies
           {{ if .IsProxy }}<span class="sr-only">(current)</span>{{ end }}
         </a>
-      </li>
+      </li> {{ if ispermitted . "thumbai:tools:write" }}
+      <li class="nav-item">
+        <a class="nav-link {{ if .IsTools }}active{{ end }}" href="{{ rurl . "tools_index" }}">
+          <i class="fas fa-cogs fa-2x"></i><br>Tools
+          {{ if .IsTools }}<span class="sr-only">(current)</span>{{ end }}
+        </a>
+      </li>{{ end }}
     </ul>
   </div>
 </nav>

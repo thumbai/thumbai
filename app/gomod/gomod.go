@@ -325,9 +325,9 @@ func inferGoBinary(current string) (string, error) {
 	var currentExists bool
 	if !ess.IsStrEmpty(current) {
 		currentExists = ess.IsFileExists(current)
-		aah.AppLog().Warnf("%s go binary is not exists on server, will infer from server if possible", current)
 	}
 	if ess.IsStrEmpty(current) || !currentExists {
+		aah.AppLog().Warnf("%s configured go binary is not exists on server, will infer from server if possible", current)
 		return exec.LookPath("go")
 	}
 	return current, nil
@@ -337,9 +337,9 @@ func inferGopath(current string) string {
 	var currentExists bool
 	if !ess.IsStrEmpty(current) {
 		currentExists = ess.IsFileExists(current)
-		aah.AppLog().Warnf("%s GOPATH is not exists on server, will infer from server if possible", current)
 	}
 	if ess.IsStrEmpty(current) || !currentExists {
+		aah.AppLog().Warnf("%s GOPATH is not exists on server, will infer from server if possible", current)
 		if paths := filepath.SplitList(build.Default.GOPATH); len(paths) > 0 {
 			return paths[0]
 		}
