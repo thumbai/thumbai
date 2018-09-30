@@ -1,5 +1,17 @@
 aahframe.work/aah v0.0.0-20180923085803-5d74468b6e04 h1:DYe5Jq0aP0oRRiB5eq87XxCaRFvzp8W2arebTQG/yK0=
 aahframe.work/aah v0.0.0-20180923085803-5d74468b6e04/go.mod h1:YEJCDMw29O7ZNXnlUVzpDxHq+vBBtaYHjBwMtwfnqCU=
+aahframework.org/ahttp.v0 v0.11.3 h1:Hb/1UaI8H5qfCKl8anGeuBXCFfk/0OuAw8JUjD8i68U=
+aahframework.org/ahttp.v0 v0.11.3/go.mod h1:xi1emlkuR9bRt8gr7+9FbaL0vYbI07K6EMM7pWdPdZ8=
+aahframework.org/config.v0 v0.5.0 h1:lNQyu1BIH05mTFFxF2awQAjCsxfMQfRM+xxELYDFUho=
+aahframework.org/config.v0 v0.5.0/go.mod h1:avkdl+KjnQCv958gfNw4Lk4tzonBf5HiVO2MecChZBs=
+aahframework.org/essentials.v0 v0.8.0 h1:R/lcfOuhvZptG4IWX/CzAtpiVJFUjbCxLao6DfmeWBA=
+aahframework.org/essentials.v0 v0.8.0/go.mod h1:GXu27JlcqcbCCzX14saI6RLFzhw6Svskt4HJ2sZBB98=
+aahframework.org/forge.v0 v0.5.1 h1:RzmCJn2BWbFyMbPJT8SCg/q9oP3/U0qDLaVfV1jfwHI=
+aahframework.org/forge.v0 v0.5.1/go.mod h1:1sPGDcvE75o0TL/uTL86jKk/NHvASITpnT9pUwDCeiA=
+aahframework.org/log.v0 v0.7.1 h1:L1H3lFn4ftJVF941JhQPlvCwbf9PUEbQW0+uTxFrwN4=
+aahframework.org/log.v0 v0.7.1/go.mod h1:gTikd5jhNw5WKu+DnH+iBJ3Tjv0sULb3qCQ66h96nKQ=
+aahframework.org/vfs.v0 v0.2.0 h1:4VI0qFl3LaU4aDzuihl4UxJcBFdUlGoDTDOCJ502VDs=
+aahframework.org/vfs.v0 v0.2.0/go.mod h1:y0iOnKKYPb+HML05cAAT6uT3RlkubCb3GblT5dUwvO0=
 cloud.google.com/go v0.26.0 h1:e0WKqKTd5BnrG8aKH3J3h+QvEIQtSUcf2n5UZ5ZgLtQ=
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=

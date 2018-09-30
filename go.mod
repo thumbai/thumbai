@@ -2,6 +2,12 @@ module thumbai
 
 require (
 	aahframe.work/aah v0.0.0-20180923085803-5d74468b6e04
+	aahframework.org/ahttp.v0 v0.11.3
+	aahframework.org/config.v0 v0.5.0 // indirect
+	aahframework.org/essentials.v0 v0.8.0 // indirect
+	aahframework.org/forge.v0 v0.5.1 // indirect
+	aahframework.org/log.v0 v0.7.1 // indirect
+	aahframework.org/vfs.v0 v0.2.0 // indirect
 	cloud.google.com/go v0.26.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-aah/forge v0.0.0-20180822163742-5469132a713e // indirect
