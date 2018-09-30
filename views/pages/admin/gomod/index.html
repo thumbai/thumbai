@@ -28,8 +28,8 @@ limitations under the License. -->
         {{ if not .Settings.Enabled }}<div class="row no-gutters">
             <p class="alert alert-danger w-50">Go Proxy Server unavailable due to prerequisites does not met on the server.</p>
         </div>{{ end }}
-        <div class="row no-gutters">
-            <div class="col w-50 mt-4 pr-4">
+        <div class="row no-gutters w-50">
+            <div class="col mt-4">
                 <form id="goModulesForm" method="post" action="{{ rurl . "gomod_save_settings" }}">
                     <div class="form-group">
                         <label for="goBinary">Go Binary</label><span class="ml-2 badge badge-success">go{{ .Settings.GoVersion }}</span>
@@ -50,20 +50,22 @@ limitations under the License. -->
                     {{ if $gomodWritePermission }}<button id="goModulesSubmit" type="submit" class="btn btn-success float-right pl-4 pr-4">Save</button>{{ end }}
                 </form>
             </div>
-            <div class="col w-50 mt-4 pl-4">
-                {{ if $gomodWritePermission }}<form id="formOnDemandPublish" action="{{ rurl . "gomod_publish" }}">
+        </div> {{ if $gomodWritePermission }}
+        <div class="row no-gutters w-50">
+            <div class="col mt-5">
+                <form id="formOnDemandPublish" action="{{ rurl . "gomod_publish" }}">
                     <div class="form-group">
                         <label for="onDemandPublish">On-Demand Publish</label>
-                        <textarea class="form-control rule-value" id="onDemandPublish" name="onDemandPublish" rows="6" placeholder="Enter module path per line. NOTE: By default thumbai automatically downloads the requested go module when unavailble on server. On-demand publish could be useful too :)" required></textarea>
+                        <textarea class="form-control rule-value" id="onDemandPublish" name="onDemandPublish" rows="7" placeholder="Enter module path per line. NOTE: By default thumbai automatically downloads the requested go module when unavailble on server. On-demand publish could be useful too :)" required></textarea>
                         <small id="onDemandPublishHelp" class="form-text text-muted">
                             Supported go module path syntax's are <a tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-content="aahframe.work/aah@latest<br>aahframe.work/aah@v0.12.0<br>aahframe.work/aah@7e312af" data-html="true" data-placement="bottom"><i class="fas fa-question-circle"></i></a>
                         </small>
                         <div id="onDemandPublishError" class="invalid-feedback">Required</div>
                     </div>
-                    <button id="formOnDemandPublishSubmit" type="submit" class="btn btn-primary float-right pl-4 pr-4">Publish</button>
-                </form>{{ end }}
+                    <button id="formOnDemandPublishSubmit" type="submit" class="btn btn-success float-right pl-3 pr-3">Publish</button>
+                </form>
             </div>
-        </div>
+        </div>{{ end }}
     </div>
 </div> {{ if $gomodWritePermission }}
 <script>
@@ -106,7 +108,7 @@ limitations under the License. -->
                 url: e.currentTarget.action,
                 method: 'post',
                 dataType: 'json',
-                contentType: "application/json; charset=utf-8",
+                contentType: 'application/json; charset=utf-8',
                 data: JSON.stringify({ 'modules': modules }),
                 headers: { 'X-Anti-CSRF-Token': $(this).find('input[name="anti_csrf_token"]').val() }
             }).done(function (res) {

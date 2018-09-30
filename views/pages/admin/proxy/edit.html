@@ -176,7 +176,7 @@ limitations under the License. -->
                             <div class="form-group row">
                                 <label for="staticDirs" class="col-sm-2 col-form-label text-right">Mapping</label>
                                 <div class="col-sm-10">
-                                    <textarea class="form-control rule-value" id="staticDirs" name="staticDirs" rows="3" placeholder="Enter directory mapping to deliver static files">{{ static2line .Rule.Statics }}</textarea>
+                                    <textarea class="form-control rule-value" id="staticDirs" name="staticDirs" rows="5" placeholder="Enter directory mapping to deliver static files">{{ static2line .Rule.Statics }}</textarea>
                                     <small id="staticDirsHelp" class="form-text text-muted">
                                     Each directory mapping per line, syntax: <code>root-directory, strip-prefix (optional)</code>.
                                     </small>
@@ -202,7 +202,7 @@ limitations under the License. -->
                             <div class="form-group row">
                                 <label for="requestHeadersAdd" class="col-sm-2 col-form-label text-right">Add</label>
                                 <div class="col-sm-10">
-                                    <textarea class="form-control rule-value" id="requestHeadersAdd" name="requestHeadersAdd" rows="3" placeholder="Enter request headers to be added before proxying a request">{{ if .Rule.RequestHeaders }}{{ mapstr2str .Rule.RequestHeaders.Add "=" "\n" }}{{ end }}</textarea>
+                                    <textarea class="form-control rule-value" id="requestHeadersAdd" name="requestHeadersAdd" rows="5" placeholder="Enter request headers to be added before proxying a request">{{ if .Rule.RequestHeaders }}{{ mapstr2str .Rule.RequestHeaders.Add "=" "\n" }}{{ end }}</textarea>
                                     <small id="requestHeadersAddHelp" class="form-text text-muted">
                                     Each header key and value pair per line, syntax: <code>Header-Key=Header value</code>.
                                     </small>
@@ -212,7 +212,7 @@ limitations under the License. -->
                             <div class="form-group row">
                                 <label for="requestHeadersRemove" class="col-sm-2 col-form-label text-right">Remove</label>
                                 <div class="col-sm-10">
-                                    <textarea class="form-control rule-value" id="requestHeadersRemove" name="requestHeadersRemove" rows="3" placeholder="Enter request headers to be removed before proxying a request">{{ if .Rule.RequestHeaders }}{{ join .Rule.RequestHeaders.Remove "\n" }}{{ end }}</textarea>
+                                    <textarea class="form-control rule-value" id="requestHeadersRemove" name="requestHeadersRemove" rows="5" placeholder="Enter request headers to be removed before proxying a request">{{ if .Rule.RequestHeaders }}{{ join .Rule.RequestHeaders.Remove "\n" }}{{ end }}</textarea>
                                     <small id="requestHeadersRemoveHelp" class="form-text text-muted">
                                     Each header key per line, syntax: <code>Header-Key</code>.
                                     </small>
@@ -236,7 +236,7 @@ limitations under the License. -->
                             <div class="form-group row">
                                 <label for="responseHeadersAdd" class="col-sm-2 col-form-label text-right">Add</label>
                                 <div class="col-sm-10">
-                                    <textarea class="form-control rule-value" id="responseHeadersAdd" name="responseHeadersAdd" rows="3" placeholder="Enter response headers to be added for the proxy response">{{ if .Rule.ResponseHeaders }}{{ mapstr2str .Rule.ResponseHeaders.Add "=" "\n" }}{{ end }}</textarea>
+                                    <textarea class="form-control rule-value" id="responseHeadersAdd" name="responseHeadersAdd" rows="5" placeholder="Enter response headers to be added for the proxy response">{{ if .Rule.ResponseHeaders }}{{ mapstr2str .Rule.ResponseHeaders.Add "=" "\n" }}{{ end }}</textarea>
                                     <small id="responseHeadersAddHelp" class="form-text text-muted">
                                     Each header key and value pair per line, syntax: <code>Header-Key=Header value</code>.
                                     </small>
@@ -246,7 +246,7 @@ limitations under the License. -->
                             <div class="form-group row">
                                 <label for="responseHeadersRemove" class="col-sm-2 col-form-label text-right">Remove</label>
                                 <div class="col-sm-10">
-                                    <textarea class="form-control rule-value" id="responseHeadersRemove" name="responseHeadersRemove" rows="3" placeholder="Enter response headers to be removed for the proxy response">{{ if .Rule.ResponseHeaders }}{{ join .Rule.ResponseHeaders.Remove "\n" }}{{ end }}</textarea>
+                                    <textarea class="form-control rule-value" id="responseHeadersRemove" name="responseHeadersRemove" rows="5" placeholder="Enter response headers to be removed for the proxy response">{{ if .Rule.ResponseHeaders }}{{ join .Rule.ResponseHeaders.Remove "\n" }}{{ end }}</textarea>
                                     <small id="responseHeadersRemoveHelp" class="form-text text-muted">
                                     Each header key per line, syntax: <code>Header-Key</code>.
                                     </small>
