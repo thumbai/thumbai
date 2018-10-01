@@ -12,13 +12,14 @@ import (
 // and puts default values as needed.
 func CheckConfig(e *aah.Event) {
 	cfg := aah.AppConfig()
-	cfg.SetString("env.active", cfg.StringDefault("thumbai.env.active", "prod"))
+	appProfile := cfg.StringDefault("thumbai.env.active", "prod")
+	cfg.SetString("env.active", cfg.StringDefault("thumbai.env.active", appProfile))
 	if !cfg.IsExists("thumbai.admin.host") {
 		log.Fatalf("'thumbai.admin.host' value is not configured")
 	}
 
 	if tocfg, found := cfg.GetSubConfig("thumbai.server"); found {
-		if err := cfg.Merge2Section("env.prod.server", tocfg); err != nil {
+		if err := cfg.Merge2Section("env."+appProfile+".server", tocfg); err != nil {
 			log.Error(err)
 		}
 	} else {
@@ -26,20 +27,20 @@ func CheckConfig(e *aah.Event) {
 	}
 
 	if tocfg, found := cfg.GetSubConfig("thumbai.log"); found {
-		if err := cfg.Merge2Section("env.prod.log", tocfg); err != nil {
+		if err := cfg.Merge2Section("env."+appProfile+".log", tocfg); err != nil {
 			log.Error(err)
 		}
 	} else {
 		log.Errorf("'thumbai.log' configuration not found")
 	}
 
-	cfg.SetString("env.prod.server.header", "thumbai "+aah.AppBuildInfo().Version)
+	cfg.SetString("env."+appProfile+".server.header", "thumbai "+aah.AppBuildInfo().Version)
 	adminHost := cfg.StringDefault("thumbai.admin.host", "")
 	if i := strings.IndexByte(adminHost, ':'); i > 0 {
-		cfg.SetString("env.prod.routes.domains.thumbai.port", adminHost[i+1:])
+		cfg.SetString("env."+appProfile+".routes.domains.thumbai.port", adminHost[i+1:])
 		adminHost = adminHost[:i]
 	}
-	cfg.SetString("env.prod.routes.domains.thumbai.host", adminHost)
+	cfg.SetString("env."+appProfile+".routes.domains.thumbai.host", adminHost)
 
 	if !cfg.IsExists("thumbai.admin.data_store.location") {
 		cfg.SetString("thumbai.admin.data_store.location", filepath.Join(aah.AppBaseDir(), "data"))
