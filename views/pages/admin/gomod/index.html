@@ -32,7 +32,7 @@ limitations under the License. -->
             <div class="col mt-4">
                 <form id="goModulesForm" method="post" action="{{ rurl . "gomod_save_settings" }}">
                     <div class="form-group">
-                        <label for="goBinary">Go Binary</label><span class="ml-2 badge badge-success">go{{ .Settings.GoVersion }}</span>
+                        <label for="goBinary">Go Binary</label><span class="ml-2 badge badge-info">go{{ .Settings.GoVersion }}</span>
                         <input type="text" class="form-control rule-value" id="goBinary" name="goBinary" value="{{ .Settings.GoBinary }}" placeholder="Enter the path to Go binary on the server" aria-describedby="goBinaryHelp" required>
                         <small id="goBinaryHelp" class="form-text text-muted">
                             Ensure given binary is go1.11 or above.

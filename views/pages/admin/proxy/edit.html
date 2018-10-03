@@ -62,8 +62,10 @@ limitations under the License. -->
                     Conditions <span class="text-muted">(Optional)</span>
                 </div>
                 <div class="collapse" id="conditionSection">
-                    <div class="card card-body mt-2">
-                        <p class="text-info">Conditions operates in AND mode. E.g.: Path AND Query Params AND Headers => selects proxy.</p>
+                    <div class="row no-gutters mt-3">
+                        <p class="text-secondary">Conditions operates in AND mode. E.g.: Path AND Query Params AND Headers => selects proxy.</p>
+                    </div>
+                    <div class="card card-body">
                         <form id="formConditions" action="{{ rurl . "proxy_edit_conditions" .Rule.Host .Rule.TargetURL }}"> 
                             <div class="form-group row">
                                 <label for="path" class="col-sm-2 col-form-label text-right">Path</label>
