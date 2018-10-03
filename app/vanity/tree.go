@@ -85,10 +85,6 @@ func (t *Tree) lookup(h, p string) *models.VanityPackage {
 		return nil
 	}
 
-	if p == "" || p == "/" { // root node vanity
-		p = "@"
-	}
-
 	s, l, sn, pn := strings.ToLower(p), len(p), root, root
 	ll := l
 	for {
