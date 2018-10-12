@@ -50,7 +50,7 @@ limitations under the License. -->
 </div> {{ if $vanityWritePermission }}
 <!-- Add/Edit vanity host record -->
 <div class="modal fade" id="addEditModal" tabindex="-1" role="dialog" aria-labelledby="addEditModalTitle" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="addEditModalTitle">Add vanity package</h5>
@@ -65,9 +65,14 @@ limitations under the License. -->
                         <input type="text" class="form-control" id="vanityPkgPath" name="vanityPkgPath" placeholder="/cache/provider/inmemory" required>
                         <span id="vanityPkgPathError" class="invalid-feedback">Required</span>
                     </div>
+                    <div id="vanityRootSubPkgsGrp" class="form-group d-none">
+                        <label for="vanityRootSubPkgs">Root Sub Packages</label><small class="text-muted"> (Only first level packages in comma seperated value if any)</small>
+                        <input type="text" class="form-control" id="vanityRootSubPkgs" name="vanityRootSubPkgs" placeholder="ahttp, config, vfs" required>
+                        <span id="vanityRootSubPkgsError" class="invalid-feedback">Required</span>
+                    </div>
                     <div class="form-group">
                         <label for="vanityPkgRepo">Repository URL</label>
-                        <input type="text" class="form-control" id="vanityPkgRepo" name="vanityPkgRepo" placeholder="https://github.com/go-aah/aah.git" required>
+                        <input type="text" class="form-control" id="vanityPkgRepo" name="vanityPkgRepo" placeholder="https://github.com/go-aah/inmemory-cache-provider.git" required>
                     </div>
                     <div class="form-group disabled">
                         <label for="vanityPkgVcs">VCS</label>
@@ -93,6 +98,15 @@ limitations under the License. -->
         $('#vanityPkgAddBtn').click(function () {
             $('#modalAddBtn').data('mode', 'add');
             $('#addEditModal').modal();
+        });
+        $('#vanityPkgPath').focusout(function(){
+            var v = $(this).val();
+            if (v === '@') {
+                $('#vanityRootSubPkgsGrp').removeClass('d-none');
+                $('#vanityRootSubPkgs').trigger('focus');
+            } else {
+                $('#vanityRootSubPkgsGrp').addClass('d-none');
+            }
         });
         $('#addEditModal').on('shown.bs.modal', function (e) {
             $('#addEditForm').trigger('reset');

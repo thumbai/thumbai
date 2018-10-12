@@ -15,9 +15,6 @@
 package vanity
 
 import (
-	"fmt"
-	"path"
-	"path/filepath"
 	"strings"
 	"thumbai/app/datastore"
 	"thumbai/app/models"
@@ -65,7 +62,6 @@ func Import(configs map[string][]*models.VanityPackage) {
 			aah.AppLog().Errorf("Unable to import vanity config for host: %s, error: %v", k, err)
 		}
 	}
-	tree = &Tree{hosts: make(map[string]*node)}
 	Load(nil)
 }
 
@@ -121,33 +117,6 @@ func Del(host, p string) error {
 	if f > -1 {
 		vanities = append(vanities[:f], vanities[f+1:]...)
 		return datastore.Put(datastore.BucketGoVanities, host, vanities)
-	}
-	return nil
-}
-
-//‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-// Unexporetd package methods
-//______________________________________________________________________________
-
-func processVanityPackage(p *models.VanityPackage) error {
-	if p.Path == "/" {
-		return fmt.Errorf("root path '/' is not valid Go package path for host:%s", p.Host)
-	}
-	p.Path = strings.TrimSuffix(p.Path, "/")
-
-	repo := strings.TrimSuffix(p.Repo, path.Ext(p.Repo))
-	if strings.HasPrefix(p.Repo, "https://github.com/") {
-		p.Src = fmt.Sprintf("%s %s/tree/master{/dir} %s/blob/master{/dir}/{file}#L{line}", repo, repo, repo)
-	} else if strings.HasPrefix(p.Repo, "https://bitbucket.org/") {
-		p.Src = fmt.Sprintf("%s %s/src/default{/dir} %s/src/default{/dir}/{file}#{file}-{line}", repo, repo, repo)
-	}
-
-	if len(p.VCS) == 0 {
-		p.VCS = "git"
-	}
-
-	if p.VCS == "git" && filepath.Ext(p.Repo) != ".git" {
-		return fmt.Errorf("invalid repo URL for path '%s', it doesn't end with .git", p.Path)
 	}
 	return nil
 }

@@ -18,6 +18,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"testing"
 
 	"thumbai/app/models"
@@ -26,16 +27,15 @@ import (
 )
 
 func TestTreeAddAndLookup(t *testing.T) {
-	tt := &Tree{hosts: make(map[string]*node)}
+	Thumbai = &vanities{RWMutex: sync.RWMutex{}, Hosts: make(map[string]*vanityHost)}
 
 	for _, importPath := range []string{
 		"/aah",
 		"/cli",
 		"/cache/provider/redis",
 	} {
-		err := tt.add("aahframe.work", importPath, &models.VanityPackage{Path: importPath})
+		err := Add2Tree(&models.VanityPackage{Host: "aahframe.work", Path: importPath, Repo: "https://github.com/go-aah/aah.git"})
 		assert.Nil(t, err)
-		// assert.Equal(t, errNodeExists, err)
 	}
 
 	// Lookup
@@ -48,7 +48,9 @@ func TestTreeAddAndLookup(t *testing.T) {
 		"/aah/cache",
 		"/unknown",
 	} {
-		r := tt.lookup("aahframe.work", importPath)
+		vh := Thumbai.Lookup("aahframe.work")
+		assert.NotNil(t, vh)
+		r := vh.Lookup(importPath)
 		if r != nil {
 			assert.True(t, strings.HasPrefix(importPath, r.Path))
 		}

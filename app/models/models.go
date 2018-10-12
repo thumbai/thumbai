@@ -54,11 +54,12 @@ type ModuleStats struct {
 
 // VanityPackage holds the single vanity Go package for the domain.
 type VanityPackage struct {
-	Host string `bind:"hostName" json:"host"`
-	Path string `bind:"vanityPkgPath" json:"path,omitempty"`
-	Repo string `bind:"vanityPkgRepo" json:"repo,omitempty"`
-	VCS  string `bind:"vanityPkgVcs" json:"vcs,omitempty"`
-	Src  string `json:"-"`
+	Host        string `bind:"hostName" json:"host"`
+	Path        string `bind:"vanityPkgPath" json:"path,omitempty"`
+	Repo        string `bind:"vanityPkgRepo" json:"repo,omitempty"`
+	RootSubPkgs string `bind:"vanityRootSubPkgs" json:"root_sub_pkgs,omitempty"`
+	VCS         string `bind:"vanityPkgVcs" json:"vcs,omitempty"`
+	Src         string `json:"-"`
 }
 
 //‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾

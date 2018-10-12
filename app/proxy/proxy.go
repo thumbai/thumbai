@@ -35,7 +35,7 @@ import (
 	"aahframe.work/aah/essentials"
 )
 
-// Thumbai instance.
+// Thumbai proxies instance.
 var Thumbai *proxies
 
 //‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾

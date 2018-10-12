@@ -16,16 +16,22 @@ package vanity
 
 import (
 	"errors"
+	"fmt"
+	"path"
+	"path/filepath"
 	"strings"
+	"sync"
 
 	"thumbai/app/models"
 
 	"aahframe.work/aah"
+	"aahframe.work/aah/essentials"
 )
 
 var errNodeExists = errors.New("tree: node exists")
 
-var tree = &Tree{hosts: make(map[string]*node)}
+// Thumbai vanities instance.
+var Thumbai *vanities
 
 //‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 // Package methods
@@ -34,18 +40,32 @@ var tree = &Tree{hosts: make(map[string]*node)}
 // Lookup method searches the vanity mapping defined in the store for given host
 // and request path. If found returns the package info otherwise nil.
 func Lookup(host, p string) *models.VanityPackage {
-	return tree.lookup(host, p)
+	vh := Thumbai.Lookup(host)
+	if vh == nil {
+		return nil
+	}
+	if p == "/" || p == "" {
+		return vh.Root
+	}
+	vp := vh.Lookup(p)
+	if vp == nil {
+		if vh.IsRootVanity(p) { // check root vanity
+			return vh.Root
+		}
+	}
+	return vp
 }
 
 // Load method creates a vanity tree using data store.
 func Load(_ *aah.Event) {
-	vanities := All()
-	if vanities == nil || len(vanities) == 0 {
+	Thumbai = &vanities{RWMutex: sync.RWMutex{}, Hosts: make(map[string]*vanityHost)}
+	allVanities := All()
+	if allVanities == nil || len(allVanities) == 0 {
 		aah.AppLog().Info("Vanities are not yet configured on THUMBAI")
 		return
 	}
 
-	for _, ps := range vanities {
+	for _, ps := range allVanities {
 		for _, p := range ps {
 			if err := Add2Tree(p); err != nil {
 				aah.AppLog().Error(err)
@@ -60,32 +80,98 @@ func Add2Tree(p *models.VanityPackage) error {
 	if err := processVanityPackage(p); err != nil {
 		return err
 	}
-	return tree.add(p.Host, p.Path, p)
-}
-
-//‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-// Tree struct and its methods
-//______________________________________________________________________________
-
-// Tree implements route implementation of vanity imports using Radix tree.
-type Tree struct {
-	hosts map[string]*node
-}
-
-func (t *Tree) lookupRoot(host string) *node {
-	if root, found := t.hosts[strings.ToLower(host)]; found {
-		return root
+	host := Thumbai.AddHost(p.Host)
+	if p.Path == "@" {
+		host.AddRootVanity(p)
+	} else if err := host.AddVanity2Tree(p.Path, p); err != nil {
+		return err
 	}
 	return nil
 }
 
-func (t *Tree) lookup(h, p string) *models.VanityPackage {
-	root := t.lookupRoot(h)
-	if root == nil {
+//‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+// Vanity struct and its methods
+//______________________________________________________________________________
+
+type vanities struct {
+	sync.RWMutex
+	Hosts map[string]*vanityHost
+}
+
+func (v *vanities) Lookup(hostname string) *vanityHost {
+	v.RLock()
+	defer v.RUnlock()
+	if h, f := v.Hosts[strings.ToLower(hostname)]; f {
+		return h
+	}
+	return nil
+}
+
+func (v *vanities) AddHost(hostname string) *vanityHost {
+	h := v.Lookup(hostname)
+	if h == nil {
+		h = &vanityHost{
+			RWMutex: sync.RWMutex{},
+			Name:    hostname,
+			Tree:    &node{edges: make([]*node, 0)},
+		}
+		v.Lock()
+		v.Hosts[strings.ToLower(hostname)] = h
+		v.Unlock()
+	}
+	return h
+}
+
+func (v *vanities) DelHost(hostname string) {
+	v.Lock()
+	delete(v.Hosts, hostname)
+	v.Unlock()
+}
+
+//‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+// VanityHost struct and its methods
+//______________________________________________________________________________
+
+type vanityHost struct {
+	sync.RWMutex
+	Name        string
+	Root        *models.VanityPackage
+	RootSubPkgs map[string]bool
+	Tree        *node
+}
+
+func (vh *vanityHost) AddRootVanity(vp *models.VanityPackage) {
+	vh.Lock()
+	defer vh.Unlock()
+	p := *vp
+	p.Path = ""
+	vh.Root = &p
+	if !ess.IsStrEmpty(vh.Root.RootSubPkgs) {
+		pkgs := strings.Split(vh.Root.RootSubPkgs, ",")
+		vh.RootSubPkgs = map[string]bool{}
+		for _, v := range pkgs {
+			vh.RootSubPkgs[strings.TrimSpace(v)] = true
+		}
+	}
+}
+
+func (vh *vanityHost) IsRootVanity(p string) bool {
+	p = strings.TrimLeft(p, "/")
+	if i := strings.IndexByte(p, '/'); i > 0 {
+		p = p[:i]
+	}
+	_, found := vh.RootSubPkgs[p]
+	return found
+}
+
+func (vh *vanityHost) Lookup(p string) *models.VanityPackage {
+	vh.RLock()
+	defer vh.RUnlock()
+	if vh.Tree == nil {
 		return nil
 	}
 
-	s, l, sn, pn := strings.ToLower(p), len(p), root, root
+	s, l, sn, pn := strings.ToLower(p), len(p), vh.Tree, vh.Tree
 	ll := l
 	for {
 		i, max := 0, len(sn.label)
@@ -121,13 +207,10 @@ nomore:
 	return sn.value
 }
 
-func (t *Tree) add(host, p string, v *models.VanityPackage) error {
-	root := t.lookupRoot(host)
-	if root == nil {
-		root = &node{edges: make([]*node, 0)}
-		t.hosts[host] = root
-	}
-	s, sn := strings.ToLower(p), root
+func (vh *vanityHost) AddVanity2Tree(p string, v *models.VanityPackage) error {
+	vh.Lock()
+	defer vh.Unlock()
+	s, sn := strings.ToLower(p), vh.Tree
 	for {
 		i, max := 0, min(len(s), len(sn.label))
 		for i < max && s[i] == sn.label[i] {
@@ -211,4 +294,27 @@ func newNode(label string, value *models.VanityPackage, edges []*node) *node {
 		value: value,
 		edges: edges,
 	}
+}
+
+func processVanityPackage(p *models.VanityPackage) error {
+	if p.Path == "/" {
+		return fmt.Errorf("root path '/' is not valid Go package path for host:%s", p.Host)
+	}
+	p.Path = strings.TrimSuffix(p.Path, "/")
+
+	repo := strings.TrimSuffix(p.Repo, path.Ext(p.Repo))
+	if strings.HasPrefix(p.Repo, "https://github.com/") {
+		p.Src = fmt.Sprintf("%s %s/tree/master{/dir} %s/blob/master{/dir}/{file}#L{line}", repo, repo, repo)
+	} else if strings.HasPrefix(p.Repo, "https://bitbucket.org/") {
+		p.Src = fmt.Sprintf("%s %s/src/default{/dir} %s/src/default{/dir}/{file}#{file}-{line}", repo, repo, repo)
+	}
+
+	if len(p.VCS) == 0 {
+		p.VCS = "git"
+	}
+
+	if p.VCS == "git" && filepath.Ext(p.Repo) != ".git" {
+		return fmt.Errorf("invalid repo URL for path '%s', it doesn't end with .git", p.Path)
+	}
+	return nil
 }
