@@ -97,6 +97,8 @@ limitations under the License. -->
         }); {{ if $vanityWritePermission }}
         $('#vanityPkgAddBtn').click(function () {
             $('#modalAddBtn').data('mode', 'add');
+            $('#vanityRootSubPkgs').val('');
+            $('#vanityRootSubPkgsGrp').addClass('d-none');
             $('#addEditModal').modal();
         });
         $('#vanityPkgPath').focusout(function(){

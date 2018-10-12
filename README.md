@@ -1,23 +1,20 @@
 <p align="center">
-  <img src="https://cdn.thumbai.app/static/img/thumbai-logo-dark-256.png" />
-  <h2 align="center">THUMBAI</h2>
+    <strong>THUMBAI is currently in internal beta testing</strong>
+</p>
+<p align="center">
+  <img src="https://thumbai.app/static/img/thumbai-logo-dark-256.png" />
   <p align="center">Go Mod Repository, Go Vanity and Proxy Server</p>
 </p>
 
 ## About 
 
-THUMBAI application developed for [aah framework](https://aahframework.org) then I have made it generizalied and with reasonable user interface to make it user friendly for Go community.
+THUMBAI app developed for [aah framework](https://aahframework.org) then I have made it generizalied and with reasonable user interface to make it user friendly for Go community.
 
-Screenshot here.
+![THUMBAI dashboard screenshot](https://thumbai.app/static/img/thumbai-dashboard.png)
 
-## Installation
+## Usage
 
-Note: In upcoming version release I will make easy to install script, for now please go with manual steps.
-
-1. Download appropriate version from here `TODO`
-2. Binary archive comes with default configuration, customize it as needed
-3. `path-to-binary/thumbai -config thumbai.conf`
-4. Enjoy :smile:
+**TODO**
 
 ## Creator 
 

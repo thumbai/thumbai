@@ -97,14 +97,6 @@ window.jqReady(function() {
     });
     $('#addEditForm').submit(function(e){
         e.preventDefault();
-        var targetURL = $('#targetURL').val();
-        if (!targetURL.startsWith('http://') || targetURL.startsWith('https://')) {
-            markFieldError({
-                "name": "targetURL",
-                "message": "Target URL must begin with http or https"
-            });
-            return false;
-        }
         disableWithSpinner('modalAddBtn');
         $.ajax({
             url: e.currentTarget.action,

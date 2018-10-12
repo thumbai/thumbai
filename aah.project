@@ -47,8 +47,8 @@ build {
   # from embedding.
   #
   # For valid pattern syntax, refer to https://golang.org/pkg/path/filepath/#Match
-  excludes = ["*.go", ".*", "*.bak", "*.tmp", "*.pid",
-    "vendor", "app", "build", "tests", "logs", "data", "certs"]
+  excludes = ["*.go", ".*", "*.bak", "*.tmp", "*.pid", "thumbai-local.conf", "thumbai-prod.conf", "thumbai.conf", 
+    "vendor", "app", "build", "tests", "logs", "data", "certs", "dev-certs"]
 }
 
 # ---------------------------------------------------------------------------
