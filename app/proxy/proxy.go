@@ -32,7 +32,7 @@ import (
 
 	"aahframe.work/aah"
 	"aahframe.work/aah/ahttp"
-	"aahframe.work/aah/essentials"
+	ess "aahframe.work/essentials"
 )
 
 // Thumbai proxies instance.
@@ -163,16 +163,18 @@ func Do(ctx *aah.Context) {
 	}
 
 	// Static file try from filesystem
-	for _, sf := range tr.Statics {
-		tp := ctx.Req.Path
-		if len(sf.StripPrefix) > 0 {
-			tp = strings.TrimPrefix(tp, sf.StripPrefix)
-		}
+	if ctx.Req.Path != "/" {
+		for _, sf := range tr.Statics {
+			tp := ctx.Req.Path
+			if len(sf.StripPrefix) > 0 {
+				tp = strings.TrimPrefix(tp, sf.StripPrefix)
+			}
 
-		tp = filepath.Join(sf.TargetPath, tp)
-		if ess.IsFileExists(tp) {
-			ctx.Reply().File(tp)
-			return
+			tp = filepath.Join(sf.TargetPath, tp)
+			if ess.IsFileExists(tp) {
+				ctx.Reply().File(tp)
+				return
+			}
 		}
 	}
 
