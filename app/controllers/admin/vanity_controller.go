@@ -15,7 +15,6 @@
 package admin
 
 import (
-	"fmt"
 	"strings"
 	"thumbai/app/datastore"
 	"thumbai/app/models"
@@ -109,10 +108,6 @@ func (c *VanityController) DelHost(hostName string) {
 // AddVanityPackage method adds the vanity package config into vanity store.
 func (c *VanityController) AddVanityPackage(vp *models.VanityPackage) {
 	vp.Path = strings.TrimSpace(vp.Path)
-	fmt.Printf("%#v\n", vp)
-	// c.Reply().JSON(aah.Data{
-	// 	"message": "success",
-	// })
 	var fieldErrors []*models.FieldError
 	if err := vanity.Add(vp.Host, vp); err != nil {
 		switch {
