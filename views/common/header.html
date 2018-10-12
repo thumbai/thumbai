@@ -11,15 +11,16 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. -->
-
 <div class="header">
-  <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="{{ rurl . "dashboard" }}"><img src="/thumbai/assets/img/thumbai-logo-128.png" alt="logo"></a>
-    <ul class="navbar-nav px-3">
-      <li class="nav-item text-nowrap">
-        {{ if not .IsCredits }}<a class="nav-link" href="javascript:logout();" data-toggle="tooltip" title="Sign out"><i class="fas fa-power-off fa-sm hdr-sign-out"></i></a>{{ end }}
-      </li>
-    </ul>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark p-0 shadow">
+    <a class="navbar-brand pl-3" href="{{ rurl . "dashboard" }}"><img src="/thumbai/assets/img/thumbai-logo-128.png" alt="logo"></a>
+    <div class="ml-auto text-right">
+      <ul class="navbar-nav pr-3">
+        <li class="nav-item text-nowrap">
+          {{ if not .IsCredits }}<a class="nav-link" href="javascript:logout();" data-toggle="tooltip" title="Sign out"><i class="fas fa-power-off fa-sm hdr-sign-out"></i></a>{{ end }}
+        </li>
+      </ul>
+    </div>    
   </nav>
 </div>
 <form action="{{ rurl . "logout" }}" method="post" id="logoutForm">

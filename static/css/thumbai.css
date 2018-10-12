@@ -14,7 +14,6 @@ limitations under the License. */
 
 /* global */
 html {
-  position: relative;
   min-height: 100%;
 }
 .form-control:focus {
@@ -81,6 +80,7 @@ html {
 /* sidebar.html */
 .sidebar {
   position: fixed;
+  width: 150px;
   top: 0;
   bottom: 0;
   left: 0;
@@ -125,7 +125,10 @@ html {
 
 /* body-content */
 [role="main"] {
-  padding: 5%;
+  padding-left: 180px;
+  padding-right: 2%;
+  padding-top: 70px;
+  width: 100%;
 }
 
 /* confimDialog */

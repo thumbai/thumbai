@@ -64,8 +64,9 @@ func (c *ProxyController) AddRulePage(hostName string) {
 func (c *ProxyController) EditRulePage(hostName, targetURL string) {
 	rule := proxy.GetRule(hostName, targetURL)
 	c.Reply().HTMLf("edit.html", aah.Data{
-		"IsProxy": true,
-		"Rule":    rule,
+		"IsProxy":  true,
+		"EditRule": true,
+		"Rule":     rule,
 	})
 }
 

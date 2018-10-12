@@ -25,10 +25,10 @@ limitations under the License. -->
 <div class="admin-vanity-show">
     <div class="container-fluid no-gutters mb-4">
         <div class="row align-items-center no-gutters">
-            <div class="col">
+            <div class="col-9">
                 <span class="h1">Go Vanity Host:</span><span class="h1 ml-2" style="border-bottom: 1px dotted #a2a2a2">{{ .VanityHostName }}</span>
             </div>
-            <div class="col text-right">
+            <div class="col-3 text-right">
                 {{ if $vanityWritePermission }}<button id="vanityPkgAddBtn" data-toggle="tooltip" title="Add new vanity package into host" class="btn btn-sm btn-outline-success pl-4 pr-4 mr-1">Add Package</button>{{ end }}
                 <button id="vanityBackBtn" data-url="{{ rurl . "vanity_list" }}" data-toggle="tooltip" title="Back to Go vanities" class="btn btn-sm btn-outline-success pl-4 pr-4">Back</button>
             </div>

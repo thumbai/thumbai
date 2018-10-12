@@ -24,13 +24,14 @@ limitations under the License. -->
 {{ $proxyWritePermission := (ispermitted . "thumbai:proxy:write") }}
 <div class="admin-proxy-show">
     <div class="container-fluid no-gutters mb-4">
-        <div class="w-75">
-            <h1>Proxy Host: <span class="font-weight-bold">{{ .ProxyHostName }}</span>
-                <div class="align-middle float-sm-right float-right">
-                    {{ if $proxyWritePermission }}<a href="{{ rurl . "proxy_add" .ProxyHostName }}" data-toggle="tooltip" title="Add new proxy rule" class="btn btn-sm btn-outline-success pl-4 pr-4">Add Rule</a>{{ end }}
-                    <button id="proxyBackBtn" data-url="{{ rurl . "proxy_list" }}" data-toggle="tooltip" title="Back to Proxies" class="btn btn-sm btn-outline-success pl-4 pr-4">Back</button>
-                </div>
-            </h1>
+        <div class="row align-items-center no-gutters w-75">
+            <div class="col-9">
+                <span class="h1">Proxy Host: </span><span class="h1 ml-2" style="border-bottom: 1px dotted #a2a2a2">{{ .ProxyHostName }}</span>
+            </div>
+            <div class="col-3 text-right">
+                {{ if $proxyWritePermission }}<a href="{{ rurl . "proxy_add" .ProxyHostName }}" data-toggle="tooltip" title="Add new proxy rule" class="btn btn-sm btn-outline-success pl-4 pr-4">Add Rule</a>{{ end }}
+                <button id="proxyBackBtn" data-url="{{ rurl . "proxy_list" }}" data-toggle="tooltip" title="Back to Proxies" class="btn btn-sm btn-outline-success pl-4 pr-4">Back</button>
+            </div>
         </div>
         <div class="mt-5 w-75">
             <table class="table table-hover">
