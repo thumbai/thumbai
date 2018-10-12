@@ -19,7 +19,7 @@ import (
 	"thumbai/app/datastore"
 	"thumbai/app/models"
 
-	"aahframe.work/aah"
+	"aahframe.work"
 )
 
 // All method returns all the proxy configuration from the data store.

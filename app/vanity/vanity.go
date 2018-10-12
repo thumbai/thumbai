@@ -24,8 +24,8 @@ import (
 
 	"thumbai/app/models"
 
-	"aahframe.work/aah"
-	"aahframe.work/aah/essentials"
+	"aahframe.work"
+	"aahframe.work/essentials"
 )
 
 var errNodeExists = errors.New("tree: node exists")

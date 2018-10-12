@@ -25,7 +25,7 @@ import (
 	"strings"
 	"thumbai/app/models"
 
-	"aahframe.work/aah/essentials"
+	"aahframe.work/essentials"
 )
 
 // Lines2MapString method transforms multi-line input to map[string]string by given

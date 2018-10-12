@@ -3,8 +3,8 @@ package security
 import (
 	"thumbai/app/access"
 
-	"aahframe.work/aah/config"
-	"aahframe.work/aah/security/authc"
+	"aahframe.work/config"
+	"aahframe.work/security/authc"
 )
 
 var _ authc.Authenticator = (*AuthenticationProvider)(nil)

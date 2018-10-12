@@ -30,9 +30,9 @@ import (
 
 	"thumbai/app/models"
 
-	"aahframe.work/aah"
-	"aahframe.work/aah/ahttp"
-	ess "aahframe.work/essentials"
+	"aahframe.work"
+	"aahframe.work/ahttp"
+	"aahframe.work/essentials"
 )
 
 // Thumbai proxies instance.

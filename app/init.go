@@ -28,7 +28,7 @@ import (
 	"thumbai/app/util"
 	"thumbai/app/vanity"
 
-	"aahframe.work/aah"
+	"aahframe.work"
 )
 
 func init() {

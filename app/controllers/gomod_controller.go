@@ -19,9 +19,9 @@ import (
 
 	"thumbai/app/gomod"
 
-	"aahframe.work/aah"
-	"aahframe.work/aah/ahttp"
-	"aahframe.work/aah/essentials"
+	"aahframe.work"
+	"aahframe.work/ahttp"
+	"aahframe.work/essentials"
 )
 
 // GoModController handles `go mod` requests, this is gonna be future package management way.

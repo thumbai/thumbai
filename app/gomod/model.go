@@ -18,7 +18,7 @@ import (
 	"thumbai/app/datastore"
 	"thumbai/app/models"
 
-	"aahframe.work/aah"
+	"aahframe.work"
 )
 
 // Stats returns go modules statistics.

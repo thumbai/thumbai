@@ -4,8 +4,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"aahframe.work/aah"
-	"aahframe.work/aah/log"
+	"aahframe.work"
+	"aahframe.work/log"
 )
 
 // CheckConfig method subscribes to aah `OnInit` event to check config

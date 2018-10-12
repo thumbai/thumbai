@@ -3,9 +3,9 @@ package security
 import (
 	"thumbai/app/access"
 
-	"aahframe.work/aah/config"
-	"aahframe.work/aah/security/authc"
-	"aahframe.work/aah/security/authz"
+	"aahframe.work/config"
+	"aahframe.work/security/authc"
+	"aahframe.work/security/authz"
 )
 
 var _ authz.Authorizer = (*AuthorizationProvider)(nil)

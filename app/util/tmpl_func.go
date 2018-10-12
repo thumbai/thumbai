@@ -20,7 +20,7 @@ import (
 
 	"thumbai/app/models"
 
-	"aahframe.work/aah/essentials"
+	"aahframe.work/essentials"
 )
 
 // ProxyRedirects2Lines method transforms the proxy redirects into display line text.

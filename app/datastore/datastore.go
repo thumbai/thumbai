@@ -21,7 +21,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"aahframe.work/aah"
+	"aahframe.work"
 	bolt "go.etcd.io/bbolt"
 )
 

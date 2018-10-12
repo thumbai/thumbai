@@ -19,8 +19,8 @@ import (
 	"thumbai/app/proxy"
 	"thumbai/app/vanity"
 
-	"aahframe.work/aah"
-	"aahframe.work/aah/ahttp"
+	"aahframe.work"
+	"aahframe.work/ahttp"
 )
 
 // ToolsController defines admin tools actions.

@@ -17,7 +17,7 @@ package admin
 import (
 	"thumbai/app/access"
 
-	"aahframe.work/aah"
+	"aahframe.work"
 )
 
 // BaseController for admin controllers.

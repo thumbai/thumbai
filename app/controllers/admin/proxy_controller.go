@@ -21,8 +21,8 @@ import (
 	"thumbai/app/proxy"
 	"thumbai/app/util"
 
-	"aahframe.work/aah"
-	"aahframe.work/aah/essentials"
+	"aahframe.work"
+	"aahframe.work/essentials"
 )
 
 // ProxyController controller manages the host and its proxy rules.

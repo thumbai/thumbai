@@ -21,8 +21,8 @@ import (
 	"thumbai/app/gomod"
 	"thumbai/app/models"
 
-	"aahframe.work/aah"
-	"aahframe.work/aah/essentials"
+	"aahframe.work"
+	"aahframe.work/essentials"
 )
 
 // GoModController manages settings of go modules proxy server.

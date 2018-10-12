@@ -20,7 +20,7 @@ import (
 	"thumbai/app/models"
 	"thumbai/app/vanity"
 
-	"aahframe.work/aah"
+	"aahframe.work"
 )
 
 // VanityController controller manages the Vanity host and its packages.

@@ -19,7 +19,7 @@ import (
 	"thumbai/app/proxy"
 	"thumbai/app/vanity"
 
-	"aahframe.work/aah"
+	"aahframe.work"
 )
 
 // DashboardController defines admin dashboard actions.

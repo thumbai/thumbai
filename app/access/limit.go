@@ -15,8 +15,8 @@
 package access
 
 import (
-	"aahframe.work/aah"
-	"aahframe.work/aah/essentials"
+	"aahframe.work"
+	"aahframe.work/essentials"
 )
 
 // Values

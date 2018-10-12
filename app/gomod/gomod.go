@@ -31,8 +31,8 @@ import (
 	"syscall"
 	"thumbai/app/models"
 
-	"aahframe.work/aah"
-	"aahframe.work/aah/essentials"
+	"aahframe.work"
+	"aahframe.work/essentials"
 )
 
 // errors
