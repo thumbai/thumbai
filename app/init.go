@@ -29,6 +29,7 @@ import (
 	"thumbai/app/vanity"
 
 	"aahframe.work"
+	_ "aahframe.work/minify/html"
 )
 
 func init() {
