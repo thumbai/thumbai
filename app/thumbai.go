@@ -35,7 +35,6 @@ func CheckConfig(e *aah.Event) {
 		log.Errorf("'thumbai.log' configuration not found")
 	}
 
-	cfg.SetString("env."+appProfile+".server.header", "thumbai "+aah.AppBuildInfo().Version)
 	adminHost := cfg.StringDefault("thumbai.admin.host", "")
 	if i := strings.IndexByte(adminHost, ':'); i > 0 {
 		cfg.SetString("env."+appProfile+".routes.domains.thumbai.port", adminHost[i+1:])

@@ -25,6 +25,7 @@ import (
 	"thumbai/app/datastore"
 	"thumbai/app/gomod"
 	"thumbai/app/proxy"
+	"thumbai/app/settings"
 	"thumbai/app/util"
 	"thumbai/app/vanity"
 
@@ -63,6 +64,7 @@ func init() {
 	aah.OnStart(proxy.Load, 2)
 	aah.OnStart(gomod.Infer)
 	aah.OnStart(access.Load)
+	aah.OnStart(settings.Load)
 
 	// Event: OnPreShutdown
 	// Doc: https://docs.aahframework.org/server-extension.html#event-onpreshutdown

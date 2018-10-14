@@ -27,6 +27,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"thumbai/app/settings"
 
 	"thumbai/app/models"
 
@@ -179,6 +180,9 @@ func Do(ctx *aah.Context) {
 	}
 
 	ctx.Reply().Done()
+	if len(settings.ServerHeader) > 0 {
+		ctx.Res.Header().Set(ahttp.HeaderServer, settings.ServerHeader)
+	}
 	tr.Proxy.ServeHTTP(ctx.Res, ctx.Req.Unwrap())
 }
 
