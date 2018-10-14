@@ -14,9 +14,10 @@
 
 package controllers
 
-import (
+import (	
 	"net/http"
 
+	"thumbai/app/access"
 	"thumbai/app/gomod"
 
 	"aahframe.work"
@@ -33,6 +34,12 @@ type GoModController struct {
 func (c *GoModController) Handle(modPath string) {
 	if !gomod.Settings.Enabled {
 		c.Reply().ServiceUnavailable().Text("Go Proxy Server unavailable due to prerequisites not met on server, please check thumbai logs")
+		return
+	}
+
+	if access.GoModDisabled {
+		c.Reply().ServiceUnavailable().Text("Go Mod repository is disabled, please contact your administrator (%s).",
+		aah.AppConfig().StringDefault("thumbai.admin.contact_email", ""))
 		return
 	}
 

@@ -21,15 +21,18 @@ import (
 
 // Values
 var (
-	AdminHost  string
-	AllowedIPs []string
-	UserStore  = map[string]User{}
+	AdminHost     string
+	AllowedIPs    []string
+	UserStore     = map[string]User{}
+	GoModDisabled bool
 )
 
 // Load method configures the thumbai access limits.
 func Load(_ *aah.Event) {
 	cfg := aah.AppConfig()
 	AdminHost = cfg.StringDefault("thumbai.admin.host", "")
+	GoModDisabled = cfg.BoolDefault("thumbai.admin.disable.gomod_repo", false)
+
 	var found bool
 	AllowedIPs, found = cfg.StringList("thumbai.admin.allow_only")
 	if found {

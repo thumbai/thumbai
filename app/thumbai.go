@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"aahframe.work"
+	"aahframe.work/essentials"
 	"aahframe.work/log"
 )
 
@@ -44,5 +45,9 @@ func CheckConfig(e *aah.Event) {
 
 	if !cfg.IsExists("thumbai.admin.data_store.location") {
 		cfg.SetString("thumbai.admin.data_store.location", filepath.Join(aah.AppBaseDir(), "data"))
+	}
+
+	if ess.IsStrEmpty(cfg.StringDefault("thumbai.admin.contact_email", "")) {
+		log.Warn("'thumbai.admin.contact_email' value is not yet configured. Highly recommended to configure it.")
 	}
 }
