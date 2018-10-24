@@ -26,9 +26,9 @@ func Stats() *models.ModuleStats {
 	stats := &models.ModuleStats{}
 	if err := datastore.Get(datastore.BucketGoModules, "stats", stats); err != nil {
 		if err == datastore.ErrRecordNotFound {
-			aah.AppLog().Info("Go Modules stats data currently unavailable")
+			aah.App().Log().Info("Go Modules stats data currently unavailable")
 		} else {
-			aah.AppLog().Error(err)
+			aah.App().Log().Error(err)
 		}
 	}
 	return stats
@@ -44,7 +44,7 @@ func GetSettings() *models.ModuleSettings {
 	settings := &models.ModuleSettings{}
 	if err := datastore.Get(datastore.BucketGoModules, "settings", settings); err != nil {
 		if err != datastore.ErrRecordNotFound {
-			aah.AppLog().Error(err)
+			aah.App().Log().Error(err)
 		}
 	}
 	return settings

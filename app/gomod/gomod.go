@@ -71,13 +71,13 @@ func Infer(_ *aah.Event) {
 	var err error
 	Settings.GoBinary, err = inferGoBinary(Settings.storeSettings.GoBinary)
 	if err != nil {
-		aah.AppLog().Errorf("Go modules proxy server would unavailable: %v", err)
+		aah.App().Log().Errorf("Go modules proxy server would unavailable: %v", err)
 		return
 	}
 
 	Settings.GoVersion = GoVersion(Settings.GoBinary)
 	if !InferGo111AndAbove(Settings.GoVersion) {
-		aah.AppLog().Errorf("Go version found: %s. Minimum go1.11 & above is required to use go modules proxy server")
+		aah.App().Log().Errorf("Go version found: %s. Minimum go1.11 & above is required to use go modules proxy server")
 		return
 	}
 
@@ -159,11 +159,12 @@ var modMutex = map[string]bool{}
 // Download method downloads the requested go module using 'go get'
 // which populates the mod cache.
 func Download(modReq *Request) error {
+	app := aah.App()
 	mutexModPath := modReq.Module + "@" + modReq.Version
-	aah.AppLog().Info("Download request recevied for ", mutexModPath)
+	app.Log().Info("Download request recevied for ", mutexModPath)
 	srcZipPath := filepath.Join(Settings.ModCachePath, modReq.Module, "@v", modReq.Version+".zip")
 	if ess.IsFileExists(srcZipPath) {
-		aah.AppLog().Info("Module ", mutexModPath, " already exists on server")
+		app.Log().Info("Module ", mutexModPath, " already exists on server")
 		return nil
 	}
 	if _, found := modMutex[mutexModPath]; found {
@@ -182,7 +183,7 @@ func Download(modReq *Request) error {
 	}
 	defer func() {
 		if err = os.RemoveAll(dirPath); err != nil {
-			aah.AppLog().Warn(err)
+			app.Log().Warn(err)
 		}
 	}()
 
@@ -197,7 +198,7 @@ func Download(modReq *Request) error {
 	if modReq.gogetRequired() {
 		args = []string{"get", decodedPath + "@" + modReq.Version}
 	}
-	aah.AppLog().Info("Executing ", Settings.GoBinary, " ", strings.Join(args, " "))
+	app.Log().Info("Executing ", Settings.GoBinary, " ", strings.Join(args, " "))
 	cmd := exec.Command(Settings.GoBinary, args...)
 	env := os.Environ()
 	env = append(env, fmt.Sprintf("GOPATH=%s", Settings.GoPath))
@@ -218,12 +219,12 @@ func Download(modReq *Request) error {
 
 	status, errInfo := inferExitStatus(cmd, cmd.Run())
 	if status != 0 {
-		aah.AppLog().Error(strings.TrimSpace(buf.String()))
-		aah.AppLog().Error(errInfo)
+		app.Log().Error(strings.TrimSpace(buf.String()))
+		app.Log().Error(errInfo)
 		return ErrExecFailure
 	}
 	processModAndUpdateCount(buf)
-	aah.AppLog().Infof("Module %s@%s downloaded successfully", decodedPath, modReq.Version)
+	app.Log().Infof("Module %s@%s downloaded successfully", decodedPath, modReq.Version)
 	return nil
 }
 
@@ -285,7 +286,7 @@ func GoVersion(gocmd string) string {
 	cmd := exec.Command(gocmd, "version")
 	verBytes, err := cmd.CombinedOutput()
 	if err != nil {
-		aah.AppLog().Errorf("Unable to infer go version: %v", err)
+		aah.App().Log().Errorf("Unable to infer go version: %v", err)
 		return "0.0.0"
 	}
 	return strings.TrimPrefix(strings.Fields(string(verBytes))[2], "go")
@@ -327,7 +328,7 @@ func inferGoBinary(current string) (string, error) {
 		currentExists = ess.IsFileExists(current)
 	}
 	if ess.IsStrEmpty(current) || !currentExists {
-		aah.AppLog().Warnf("%s configured go binary is not exists on server, will infer from server if possible", current)
+		aah.App().Log().Warnf("%s configured go binary is not exists on server, will infer from server if possible", current)
 		return exec.LookPath("go")
 	}
 	return current, nil
@@ -339,7 +340,7 @@ func inferGopath(current string) string {
 		currentExists = ess.IsFileExists(current)
 	}
 	if ess.IsStrEmpty(current) || !currentExists {
-		aah.AppLog().Warnf("%s GOPATH is not exists on server, will infer from server if possible", current)
+		aah.App().Log().Warnf("%s GOPATH is not exists on server, will infer from server if possible", current)
 		if paths := filepath.SplitList(build.Default.GOPATH); len(paths) > 0 {
 			return paths[0]
 		}

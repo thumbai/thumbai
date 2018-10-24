@@ -58,21 +58,22 @@ func Lookup(host, p string) *models.VanityPackage {
 
 // Load method creates a vanity tree using data store.
 func Load(_ *aah.Event) {
+	log := aah.App().Log()
 	Thumbai = &vanities{RWMutex: sync.RWMutex{}, Hosts: make(map[string]*vanityHost)}
 	allVanities := All()
 	if allVanities == nil || len(allVanities) == 0 {
-		aah.AppLog().Info("Vanities are not yet configured on THUMBAI")
+		log.Info("Vanities are not yet configured on THUMBAI")
 		return
 	}
 
 	for _, ps := range allVanities {
 		for _, p := range ps {
 			if err := Add2Tree(p); err != nil {
-				aah.AppLog().Error(err)
+				log.Error(err)
 			}
 		}
 	}
-	aah.AppLog().Info("Successfully created vanity route tree")
+	log.Info("Successfully created vanity route tree")
 }
 
 // Add2Tree method adds vanity package into vanity tree.

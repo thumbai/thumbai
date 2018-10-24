@@ -48,10 +48,10 @@ var (
 // Connect method connects to DB on app start up.
 func Connect(_ *aah.Event) {
 	var err error
-	storePath := filepath.Join(aah.AppConfig().StringDefault("thumbai.admin.data_store.location", ""), "thumbai.db")
+	storePath := filepath.Join(aah.App().Config().StringDefault("thumbai.admin.data_store.location", ""), "thumbai.db")
 	thumbaiDB, err = bolt.Open(storePath, 0644, &bolt.Options{Timeout: 100 * time.Millisecond})
 	if err != nil {
-		aah.AppLog().Fatal(err)
+		aah.App().Log().Fatal(err)
 	}
 	if err = thumbaiDB.Update(func(tx *bolt.Tx) error {
 		var err error
@@ -64,16 +64,16 @@ func Connect(_ *aah.Event) {
 		_, err = tx.CreateBucketIfNotExists([]byte(BucketProxies))
 		return err
 	}); err != nil {
-		aah.AppLog().Fatal(err)
+		aah.App().Log().Fatal(err)
 	}
-	aah.AppLog().Info("Connected to thumbai data store successfully at ", storePath)
+	aah.App().Log().Info("Connected to thumbai data store successfully at ", storePath)
 }
 
 // Disconnect method disconects from DB.
 func Disconnect(_ *aah.Event) {
 	if thumbaiDB != nil {
 		if err := thumbaiDB.Close(); err != nil {
-			aah.AppLog().Error(err)
+			aah.App().Log().Error(err)
 		}
 	}
 }
@@ -130,7 +130,7 @@ func BucketKeys(name string) []string {
 			keys = append(keys, string(k))
 			return nil
 		}); err != nil {
-			aah.AppLog().Error("store.BucketKeys ", err)
+			aah.App().Log().Error("store.BucketKeys ", err)
 		}
 		return nil
 	})

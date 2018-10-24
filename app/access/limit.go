@@ -29,7 +29,8 @@ var (
 
 // Load method configures the thumbai access limits.
 func Load(_ *aah.Event) {
-	cfg := aah.AppConfig()
+	app := aah.App()
+	cfg := app.Config()
 	AdminHost = cfg.StringDefault("thumbai.admin.host", "")
 	GoModDisabled = cfg.BoolDefault("thumbai.admin.disable.gomod_repo", false)
 
@@ -40,7 +41,7 @@ func Load(_ *aah.Event) {
 	}
 
 	if !cfg.IsExists("thumbai.user_datastore") {
-		aah.AppLog().Fatal("'thumbai.user_datastore' configuration is missing")
+		app.Log().Fatal("'thumbai.user_datastore' configuration is missing")
 	}
 
 	// processing user data
@@ -49,7 +50,7 @@ func Load(_ *aah.Event) {
 	for _, k := range userKeys {
 		password := cfg.StringDefault(keyPrefix+k+".password", "")
 		if ess.IsStrEmpty(password) {
-			aah.AppLog().Errorf("password value is missing for user [%s] on 'thumbai.user_datastore.%s.password'", k, k)
+			app.Log().Errorf("password value is missing for user [%s] on 'thumbai.user_datastore.%s.password'", k, k)
 			continue
 		}
 		permissions, _ := cfg.StringList(keyPrefix + k + ".permissions")

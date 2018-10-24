@@ -46,10 +46,11 @@ var Thumbai *proxies
 // Load method reads proxy configurations from store and builds proxy
 // engine.
 func Load(_ *aah.Event) {
+	log := aah.App().Log()
 	Thumbai = &proxies{RWMutex: sync.RWMutex{}, Hosts: make(map[string]*host)}
 	allProxies := All()
 	if allProxies == nil || len(allProxies) == 0 {
-		aah.AppLog().Info("Proxies are not yet configured on THUMBAI")
+		log.Info("Proxies are not yet configured on THUMBAI")
 		return
 	}
 
@@ -57,7 +58,7 @@ func Load(_ *aah.Event) {
 		host := Thumbai.AddHost(h)
 		for _, r := range rules {
 			if err := host.AddProxyRule(r); err != nil {
-				aah.AppLog().Error(err)
+				log.Error(err)
 			}
 		}
 		if host.LastRule == nil {
@@ -67,12 +68,12 @@ func Load(_ *aah.Event) {
 				host.ProxyRules = nil
 				host.Unlock()
 			} else {
-				aah.AppLog().Errorf("Incomplete proxy configuration for host->%s; last rule not found, reverse proxy may not work properly", host.Name)
+				log.Errorf("Incomplete proxy configuration for host->%s; last rule not found, reverse proxy may not work properly", host.Name)
 			}
 		}
 	}
 
-	aah.AppLog().Info("Successfully created reverse proxy engine")
+	log.Info("Successfully created reverse proxy engine")
 }
 
 // Do method performs the reverse proxy based on the header `Host` and proxy rules.
@@ -334,7 +335,7 @@ func (h *host) createProxyRule(pr *models.ProxyRule) (*rule, error) {
 		r.RegexRedirect = make([]*redirectRule, 0)
 		for _, redirect := range pr.Redirects {
 			if err := r.AddRedirect(redirect); err != nil {
-				aah.AppLog().Error(err)
+				aah.App().Log().Error(err)
 			}
 		}
 	}

@@ -25,6 +25,6 @@ var (
 
 // Load method loads required thumbai config values on app startup.
 func Load(_ *aah.Event) {
-	cfg := aah.AppConfig()
+	cfg := aah.App().Config()
 	ServerHeader = cfg.StringDefault("thumbai.server.header", "")
 }

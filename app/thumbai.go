@@ -12,7 +12,8 @@ import (
 // CheckConfig method subscribes to aah `OnInit` event to check config
 // and puts default values as needed.
 func CheckConfig(e *aah.Event) {
-	cfg := aah.AppConfig()
+	app := aah.App()
+	cfg := app.Config()
 	appProfile := cfg.StringDefault("thumbai.env.active", "prod")
 	cfg.SetString("env.active", cfg.StringDefault("thumbai.env.active", appProfile))
 	if !cfg.IsExists("thumbai.admin.host") {
@@ -43,7 +44,7 @@ func CheckConfig(e *aah.Event) {
 	cfg.SetString("env."+appProfile+".routes.domains.thumbai.host", adminHost)
 
 	if !cfg.IsExists("thumbai.admin.data_store.location") {
-		cfg.SetString("thumbai.admin.data_store.location", filepath.Join(aah.AppBaseDir(), "data"))
+		cfg.SetString("thumbai.admin.data_store.location", filepath.Join(app.BaseDir(), "data"))
 	}
 
 	if ess.IsStrEmpty(cfg.StringDefault("thumbai.admin.contact_email", "")) {

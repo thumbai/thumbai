@@ -34,6 +34,7 @@ import (
 )
 
 func init() {
+	app := aah.App()
 
 	//‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 	// Server Extensions
@@ -52,26 +53,26 @@ func init() {
 	// Event: OnInit
 	// Doc: https://docs.aahframework.org/server-extension.html#event-oninit
 	//
-	aah.OnInit(CheckConfig, 2)
+	app.OnInit(CheckConfig, 2)
 
 	// Event: OnStart
 	// Doc: https://docs.aahframework.org/server-extension.html#event-onstart
 	//
-	aah.OnStart(SubscribeHTTPEvents)
-	aah.OnStart(SubscribeWebSocketEvents)
-	aah.OnStart(datastore.Connect)
-	aah.OnStart(vanity.Load, 2)
-	aah.OnStart(proxy.Load, 2)
-	aah.OnStart(gomod.Infer)
-	aah.OnStart(access.Load)
-	aah.OnStart(settings.Load)
+	app.OnStart(SubscribeHTTPEvents)
+	app.OnStart(SubscribeWebSocketEvents)
+	app.OnStart(datastore.Connect)
+	app.OnStart(vanity.Load, 2)
+	app.OnStart(proxy.Load, 2)
+	app.OnStart(gomod.Infer)
+	app.OnStart(access.Load)
+	app.OnStart(settings.Load)
 
 	// Event: OnPreShutdown
 	// Doc: https://docs.aahframework.org/server-extension.html#event-onpreshutdown
 
 	// Event: OnPostShutdown
 	// Doc: https://docs.aahframework.org/server-extension.html#event-onpostshutdown
-	aah.OnPostShutdown(datastore.Disconnect)
+	app.OnPostShutdown(datastore.Disconnect)
 
 	//‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 	// Middleware's
@@ -80,7 +81,7 @@ func init() {
 	// Executed in the order they are defined. It is recommended; NOT to change
 	// the order of pre-defined aah framework middleware's.
 	//__________________________________________________________________________
-	aah.AppHTTPEngine().Middlewares(
+	app.HTTPEngine().Middlewares(
 		aah.RouteMiddleware,
 		// aah.CORSMiddleware,
 		aah.BindMiddleware,
@@ -104,7 +105,7 @@ func init() {
 	// Add Custom Template Functions
 	// Doc: https://docs.aahframework.org/template-funcs.html
 	//__________________________________________________________________________
-	aah.AddTemplateFunc(template.FuncMap{
+	app.AddTemplateFunc(template.FuncMap{
 		"redirect2line":            util.ProxyRedirects2Lines,
 		"mapstr2str":               util.MapString2String,
 		"static2line":              util.ProxyStatics2Lines,

@@ -59,7 +59,7 @@ func Import(configs map[string][]*models.VanityPackage) {
 			continue
 		}
 		if err := datastore.Put(datastore.BucketGoVanities, k, vp); err != nil {
-			aah.AppLog().Errorf("Unable to import vanity config for host: %s, error: %v", k, err)
+			aah.App().Log().Errorf("Unable to import vanity config for host: %s, error: %v", k, err)
 		}
 	}
 	Load(nil)

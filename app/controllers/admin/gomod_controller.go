@@ -135,16 +135,16 @@ func (c *GoModController) Publish(pubReq *models.PublishRequest) {
 				continue
 			}
 			if strings.Contains(m, gomod.FSPathDelimiter) {
-				aah.AppLog().Errorf("Publish: invalid module path '%s'", m)
+				aah.App().Log().Errorf("Publish: invalid module path '%s'", m)
 				continue
 			}
 			parts := strings.Split(m, "@")
 			if len(parts) != 2 {
-				aah.AppLog().Errorf("Publish: invalid module path '%s'", m)
+				aah.App().Log().Errorf("Publish: invalid module path '%s'", m)
 				continue
 			}
 			if err := gomod.Download(&gomod.Request{Module: parts[0], Version: parts[1]}); err != nil {
-				aah.AppLog().Error(err)
+				aah.App().Log().Error(err)
 			}
 		}
 	}()

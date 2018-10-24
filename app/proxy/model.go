@@ -55,7 +55,7 @@ func Import(configs map[string][]*models.ProxyRule) {
 			continue
 		}
 		if err := datastore.Put(datastore.BucketProxies, k, p); err != nil {
-			aah.AppLog().Errorf("Unable to import proxy config for host: %s, error: %v", k, err)
+			aah.App().Log().Errorf("Unable to import proxy config for host: %s, error: %v", k, err)
 		}
 	}
 	Load(nil)

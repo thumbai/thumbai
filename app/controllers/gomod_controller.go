@@ -39,7 +39,7 @@ func (c *GoModController) Handle(modPath string) {
 
 	if access.GoModDisabled {
 		c.Reply().ServiceUnavailable().Text("Go Mod repository is disabled, please contact your administrator (%s).",
-		aah.AppConfig().StringDefault("thumbai.admin.contact_email", ""))
+		aah.App().Config().StringDefault("thumbai.admin.contact_email", ""))
 		return
 	}
 
