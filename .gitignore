@@ -4,6 +4,7 @@
 aah.go
 aah_*_vfs.go
 *.pid
+app/generated
 build/
 vendor/*/
 

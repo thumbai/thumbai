@@ -1,7 +1,7 @@
-aahframe.work v0.0.0-20181024052212-5cb3b31d02c3 h1:90ahxiuyrm7iQZ6wgE2y9Fsg88lJPkMlb3FL7cBmd6s=
-aahframe.work v0.0.0-20181024052212-5cb3b31d02c3/go.mod h1:Myl29CGPFtox02z2geOwC5XIfFmqCNzMp+37UlanACg=
-aahframe.work/minify/html v0.0.0-20181024053927-02e24ad3366e h1:aehWioSyqRM4X7nLQ0YxKnh0SgraUTsIJYmPc3tIhKk=
-aahframe.work/minify/html v0.0.0-20181024053927-02e24ad3366e/go.mod h1:JWionpQVTUErdiTVquXeLJ/6qO0Y08KJAl5EtLhALek=
+aahframe.work v0.0.0-20181103212526-cd7b92071338 h1:f8/7AwC0D9BjlntLVfbOgv15NFK78Tq9s7Hl/LxGSJU=
+aahframe.work v0.0.0-20181103212526-cd7b92071338/go.mod h1:Myl29CGPFtox02z2geOwC5XIfFmqCNzMp+37UlanACg=
+aahframe.work/minify/html v0.0.0-20181103214207-e165c0fdbcbf h1:hENIdqmsUMx+eWfh935klKNrfWcWgPnGdCAlo/71YUg=
+aahframe.work/minify/html v0.0.0-20181103214207-e165c0fdbcbf/go.mod h1:XuIt20XPxMNkxNaYn7DRI0Fl2gf13BkcT+vEk7KG2VE=
 cloud.google.com/go v0.30.0 h1:xKvyLgk56d0nksWq49J0UyGEeUIicTl4+UBiX1NPX9g=
 cloud.google.com/go v0.30.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -23,6 +23,7 @@ github.com/tdewolff/minify v0.0.0-20180913035026-a8ba821b5bd8 h1:6Qma2kK0EN7PtkZ
 github.com/tdewolff/minify v0.0.0-20180913035026-a8ba821b5bd8/go.mod h1:9Ov578KJUmAWpS6NeZwRZyT56Uf6o3Mcz9CEsg8USYs=
 github.com/tdewolff/parse v0.0.0-20180825090006-bcb5c6a1c04e h1:SGuyRvswMypdT1DArhyqIGbn3UMQEmA2y7ZFWNeP4/0=
 github.com/tdewolff/parse v0.0.0-20180825090006-bcb5c6a1c04e/go.mod h1:8oBwCsVmUkgHO8M5iCzSIDtpzXOT0WXX9cWhz+bIzJQ=
+github.com/urfave/cli v1.20.0 h1:fDqGv3UG/4jbVl/QkFwEdddtEDjh/5Ov6X+0B/3bPaw=
 github.com/urfave/cli v1.20.0/go.mod h1:70zkFmudgCuE/ngEzBv17Jvp/497gISqfk5gWijbERA=
 go.etcd.io/bbolt v1.3.1-etcd.8 h1:6J7QAKqfFBGnU80KRnuQxfjjeE5xAGE/qB810I3FQHQ=
 go.etcd.io/bbolt v1.3.1-etcd.8/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=
