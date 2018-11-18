@@ -20,12 +20,12 @@ limitations under the License. -->
     {{ block "title" . }}
     <title>Default page title from basic layout</title>
     {{ end }}
-    {{ include "head_tags.html" . }}
+    {{ include "/common/head_tags.html" . }}
   </head>
   <body>
     {{ block "body" . -}}
     <p>Default body content from basic layout</p>
     {{ end }}
-    {{ include "footer_scripts.html" . }}
+    {{ include "/common/footer_scripts.html" . }}
   </body>
 </html>

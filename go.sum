@@ -1,5 +1,6 @@
-aahframe.work v0.0.0-20181103212526-cd7b92071338 h1:f8/7AwC0D9BjlntLVfbOgv15NFK78Tq9s7Hl/LxGSJU=
 aahframe.work v0.0.0-20181103212526-cd7b92071338/go.mod h1:Myl29CGPFtox02z2geOwC5XIfFmqCNzMp+37UlanACg=
+aahframe.work v0.0.0-20181116070044-7e8c1f894ed3 h1:V27oXJ2xRfnR7nnwbiPD8Hb2Ou6eNGuE8BOOt2oUzPE=
+aahframe.work v0.0.0-20181116070044-7e8c1f894ed3/go.mod h1:Myl29CGPFtox02z2geOwC5XIfFmqCNzMp+37UlanACg=
 aahframe.work/minify/html v0.0.0-20181103214207-e165c0fdbcbf h1:hENIdqmsUMx+eWfh935klKNrfWcWgPnGdCAlo/71YUg=
 aahframe.work/minify/html v0.0.0-20181103214207-e165c0fdbcbf/go.mod h1:XuIt20XPxMNkxNaYn7DRI0Fl2gf13BkcT+vEk7KG2VE=
 cloud.google.com/go v0.30.0 h1:xKvyLgk56d0nksWq49J0UyGEeUIicTl4+UBiX1NPX9g=
