@@ -39,27 +39,9 @@ func init() {
 	//‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 	// Server Extensions
 	// Doc: https://docs.aahframework.org/server-extension.html
-	//
-	// Best Practice: Define a function with meaningful name in a package and
-	// register it here. Extensions function name gets logged in the log,
-	// its very helpful to have meaningful log information.
-	//
-	// Such as:
-	//    - Dedicated package for config loading
-	//    - Dedicated package for datasource connections
-	//    - etc
 	//__________________________________________________________________________
-
-	// Event: OnInit
-	// Doc: https://docs.aahframework.org/server-extension.html#event-oninit
-	//
 	app.OnInit(CheckConfig, 2)
 
-	// Event: OnStart
-	// Doc: https://docs.aahframework.org/server-extension.html#event-onstart
-	//
-	app.OnStart(SubscribeHTTPEvents)
-	app.OnStart(SubscribeWebSocketEvents)
 	app.OnStart(datastore.Connect)
 	app.OnStart(vanity.Load, 2)
 	app.OnStart(proxy.Load, 2)
@@ -67,11 +49,6 @@ func init() {
 	app.OnStart(access.Load)
 	app.OnStart(settings.Load)
 
-	// Event: OnPreShutdown
-	// Doc: https://docs.aahframework.org/server-extension.html#event-onpreshutdown
-
-	// Event: OnPostShutdown
-	// Doc: https://docs.aahframework.org/server-extension.html#event-onpostshutdown
 	app.OnPostShutdown(datastore.Disconnect)
 
 	//‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
@@ -87,19 +64,8 @@ func init() {
 		aah.BindMiddleware,
 		aah.AntiCSRFMiddleware,
 		aah.AuthcAuthzMiddleware,
-
-		//
-		// NOTE: Register your Custom middleware's right here
-		//
-
 		aah.ActionMiddleware,
 	)
-
-	//‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-	// Add Application Error Handler
-	// Doc: https://docs.aahframework.org/error-handling.html
-	//__________________________________________________________________________
-	// aah.SetErrorHandler(AppErrorHandler)
 
 	//‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 	// Add Custom Template Functions
@@ -115,99 +81,4 @@ func init() {
 		"proxyresponsehdrexists":   util.IsProxyResponseHeadersExists,
 		"join":                     strings.Join,
 	})
-
-	//‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-	// Add Custom Session Store
-	// Doc: https://docs.aahframework.org/session.html
-	//__________________________________________________________________________
-	// aah.AddSessionStore("redis", &RedisSessionStore{})
-
-	//‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-	// Add Custom Value Parser
-	// Doc: https://docs.aahframework.org/request-parameters-auto-bind.html
-	//__________________________________________________________________________
-	// if err := aah.AddValueParser(reflect.TypeOf(CustomType{}), customParser); err != nil {
-	//   log.Error(err)
-	// }
-
-	//‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-	// Add Custom Validation Functions
-	// Doc: https://godoc.org/gopkg.in/go-playground/validator.v9
-	//__________________________________________________________________________
-	// Obtain aah validator instance, then add yours
-	// validator := aah.Validator()
-	//
-	// // Add your validation funcs
-
-}
-
-//‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-// HTTP Events
-//
-// Subscribing HTTP events on app start.
-//__________________________________________________________________________
-
-func SubscribeHTTPEvents(_ *aah.Event) {
-	// he := aah.AppHTTPEngine()
-
-	// Event: OnRequest
-	// Doc: https://docs.aahframework.org/server-extension.html#event-onrequest
-	//
-	// he.OnRequest(repo.Switch)
-
-	// Event: OnPreReply
-	// Doc: https://docs.aahframework.org/server-extension.html#event-onprereply
-	//
-	// he.OnPreReply(myserverext.OnPreReply)
-
-	// Event: OnHeaderReply
-	// Doc: https://docs.aahframework.org/server-extension.html#event-onheaderreply
-	//
-	// he.OnHeaderReply(myserverext.OnHeaderReply)
-
-	// Event: OnPostReply
-	// Doc: https://docs.aahframework.org/server-extension.html#event-onpostreply
-	//
-	// he.OnPostReply(myserverext.OnPostReply)
-
-	// Event: OnPreAuth
-	// Doc: https://docs.aahframework.org/server-extension.html#event-onpreauth
-	//
-	// he.OnPreAuth(myserverext.OnPreAuth)
-
-	// Event: OnPostAuth
-	// Doc: https://docs.aahframework.org/server-extension.html#event-onpostauth
-	//
-	// he.OnPostAuth(security.PostAuthEvent)
-}
-
-//‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-// WebSocket Events
-// Doc: https://docs.aahframework.org/websocket.html#events
-//
-// Subscribing WebSocket events on app start.
-//__________________________________________________________________________
-
-func SubscribeWebSocketEvents(_ *aah.Event) {
-	// wse := aah.AppWSEngine()
-
-	// Custom ID Generator
-	//
-	// wse.SetIDGenerator(websockets.MyCustomIDGenerator)
-
-	// Event: OnPreConnect
-	//
-	// wse.OnPreConnect(mywebsockets.HandleEvents)
-
-	// Event: OnPostConnect
-	//
-	// wse.OnPostConnect(mywebsockets.HandleEvents)
-
-	// Event: OnPostDisconnect
-	//
-	// wse.OnPostDisconnect(mywebsockets.HandleEvents)
-
-	// Event: OnError
-	//
-	// wse.OnError(mywebsockets.HandleEvents)
 }
