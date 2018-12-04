@@ -18,6 +18,7 @@ import (
 	"os"
 	"strings"
 
+	"thumbai/app/access"
 	"thumbai/app/gomod"
 	"thumbai/app/models"
 
@@ -32,11 +33,16 @@ type GoModController struct {
 
 // Index method display the Go modules settings page.
 func (c *GoModController) Index() {
-	c.Reply().HTML(aah.Data{
-		"IsGoModules": true,
-		"Stats":       gomod.Settings.Stats,
-		"Settings":    gomod.Settings,
-	})
+	data := aah.Data{
+		"IsGoModules":   true,
+		"Stats":         gomod.Settings.Stats,
+		"Settings":      gomod.Settings,
+		"GoModDisabled": access.GoModDisabled,
+	}
+	if adminEmail := aah.App().Config().StringDefault("thumbai.admin.contact_email", ""); len(adminEmail) > 0 {
+		data["AdminContactEmail"] = adminEmail
+	}
+	c.Reply().HTML(data)
 }
 
 // SaveSettings method saves user settings into data store.

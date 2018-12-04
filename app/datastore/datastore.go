@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"aahframe.work"
+	"aahframe.work/essentials"
 	bolt "go.etcd.io/bbolt"
 )
 
@@ -48,10 +49,17 @@ var (
 // Connect method connects to DB on app start up.
 func Connect(_ *aah.Event) {
 	var err error
-	storePath := filepath.Join(aah.App().Config().StringDefault("thumbai.admin.data_store.location", ""), "thumbai.db")
+	app := aah.App()
+	storeBasePath := app.Config().StringDefault("thumbai.admin.data_store.location", "")
+	if !ess.IsFileExists(storeBasePath) {
+		if err = ess.MkDirAll(storeBasePath, 0755); err != nil {
+			app.Log().Fatal(err)
+		}
+	}
+	storePath := filepath.Join(storeBasePath, "thumbai.db")
 	thumbaiDB, err = bolt.Open(storePath, 0644, &bolt.Options{Timeout: 100 * time.Millisecond})
 	if err != nil {
-		aah.App().Log().Fatal(err)
+		app.Log().Fatal(err)
 	}
 	if err = thumbaiDB.Update(func(tx *bolt.Tx) error {
 		var err error
@@ -64,9 +72,9 @@ func Connect(_ *aah.Event) {
 		_, err = tx.CreateBucketIfNotExists([]byte(BucketProxies))
 		return err
 	}); err != nil {
-		aah.App().Log().Fatal(err)
+		app.Log().Fatal(err)
 	}
-	aah.App().Log().Info("Connected to thumbai data store successfully at ", storePath)
+	app.Log().Info("Connected to thumbai data store successfully at ", storePath)
 }
 
 // Disconnect method disconects from DB.

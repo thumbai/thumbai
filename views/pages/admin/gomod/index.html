@@ -25,8 +25,11 @@ limitations under the License. -->
                 <span class="h1">Go Modules</span><span class="total-mod-count pl-3">({{ .Stats.TotalCount }} available & counting ...)</span>
             </div>
         </div>
-        {{ if not .Settings.Enabled }}<div class="row no-gutters">
-            <p class="alert alert-danger w-50">Go Proxy Server unavailable due to prerequisites does not met on the server.</p>
+        {{ if not .Settings.Enabled }}<div class="row no-gutters mt-3">
+            <p class="alert alert-danger w-50">Go Modules Server unavailable due to prerequisites does not met on the server.</p>
+        </div>{{ end }}
+        {{ if .GoModDisabled }}<div class="row no-gutters mt-3">
+            <p class="alert alert-danger w-50">Go Modules Server disabled by administrator{{ if .AdminContactEmail }}, contact <code>{{ .AdminContactEmail }}</code>{{ end }}.</p>
         </div>{{ end }}
         <div class="row no-gutters w-50">
             <div class="col mt-4">
@@ -47,7 +50,7 @@ limitations under the License. -->
                         </small>
                         <div id="goPathError" class="invalid-feedback">Required</div>
                     </div>
-                    {{ if $gomodWritePermission }}<button id="goModulesSubmit" type="submit" class="btn btn-success float-right pl-4 pr-4">Save</button>{{ end }}
+                    {{ if $gomodWritePermission }}<button id="goModulesSubmit" type="submit" class="btn btn-success float-right pl-4 pr-4" {{ if .GoModDisabled }} disabled{{ end }}>Save</button>{{ end }}
                 </form>
             </div>
         </div> {{ if $gomodWritePermission }}
@@ -62,7 +65,7 @@ limitations under the License. -->
                         </small>
                         <div id="onDemandPublishError" class="invalid-feedback">Required</div>
                     </div>
-                    <button id="formOnDemandPublishSubmit" type="submit" class="btn btn-success float-right pl-3 pr-3">Publish</button>
+                    <button id="formOnDemandPublishSubmit" type="submit" class="btn btn-success float-right pl-3 pr-3" {{ if .GoModDisabled }} disabled{{ end }}>Publish</button>
                 </form>
             </div>
         </div>{{ end }}
