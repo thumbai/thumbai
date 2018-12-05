@@ -8,7 +8,7 @@
 
 ## About 
 
-THUMBAI app developed for [aah framework](https://aahframework.org) then I have made it generizalied and with reasonable user interface to make it user friendly for Go community.
+THUMBAI app developed for [aah framework](https://aahframework.org) then I have made it generalized and with simple user interface to make it user friendly for Go community.
 
 ![THUMBAI dashboard screenshot](https://thumbai.app/static/img/thumbai-dashboard.png)
 
