@@ -108,13 +108,13 @@ upload() {
     for file in $build_base_dir/*.zip; do
         filename=$(basename -- "$file")
         say "Uploading $filename"
-        github-release upload --replace --user go-aah --repo tools --tag "v$app_version" --name $filename --file $file
+        github-release upload --replace --user thumbai --repo thumbai --tag "v$app_version" --name $filename --file $file
     done
     say "Finished THUMBAI zip archives upload into GitHub Release."
 
     checksum_filename=$(basename -- "$checksum_file")
     say "\nUploading $checksum_filename"
-    github-release upload --replace --user go-aah --repo tools --tag "v$app_version" --name $checksum_filename --file $checksum_file
+    github-release upload --replace --user thumbai --repo thumbai --tag "v$app_version" --name $checksum_filename --file $checksum_file
 }
 
 build
