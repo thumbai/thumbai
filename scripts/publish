@@ -79,6 +79,7 @@ archive_checksum() {
             archive_dir=$(dirname "$file")
             say "Packing $archive_name.zip"
             cp $repo_base_path/sample-configs/thumbai.conf "$file/thumbai.conf"
+            cp $repo_base_path/sample-configs/thumbai.service "$file/thumbai.service"
             cp $repo_base_path/LICENSE "$file/LICENSE.txt"
             cp $repo_base_path/CREDITS "$file/CREDITS.txt"
             zip -q -r -j $archive_dir/$archive_name.zip $file

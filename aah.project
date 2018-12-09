@@ -49,7 +49,7 @@ build {
   # For valid pattern syntax, refer to https://golang.org/pkg/path/filepath/#Match
   excludes = ["*.go", ".*", "*.bak", "*.tmp", "*.pid", "thumbai-local.conf", "thumbai-prod.conf", "thumbai.conf", 
     "go.mod", "go.sum", "aah.project",
-    "vendor", "app", "build", "tests", "logs", "data", "scripts", "dev-certs", "artifacts"]
+    "vendor", "app", "build", "tests", "logs", "data", "scripts", "dev-files", "artifacts"]
 }
 
 # ---------------------------------------------------------------------------
@@ -82,7 +82,7 @@ hot_reload {
   watch {
     # Note: static directory is not required to be monitored since aah server
     # delivers up-to-date file on environment profile `dev`.
-    dir_excludes = [".*", "data", "scripts", "sample-configs", "dev-certs", "artifacts"]
+    dir_excludes = [".*", "data", "scripts", "sample-configs", "dev-files", "artifacts"]
 
     file_excludes = [".*", "*.pid", "_test.go", "LICENSE", "README.md"]
   }
