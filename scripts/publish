@@ -1,0 +1,120 @@
+#!/usr/bin/env bash
+
+# Purpose       : Script builds THUMBAI app binary for various OS and ARCH 
+#                 and publishes to GitHub Release.
+# Script License: Apache License 2.0 (https://www.apache.org/licenses/LICENSE-2.0)
+# Creator       : Jeevanandam M. (https://github.com/jeevatkm, jeeva@myjeeva.com)
+#
+# Version History
+# ---------------
+#   v1.0.0      Initial THUMBAI publish script created
+#
+# Usage:
+#	$ curl -s https://thumbai.app/publish | bash
+#	OR
+#	$ wget -qO- https://thumbai.app/publish | bash
+
+trap "exit 1" TERM
+set -e
+
+say() {
+    echo -e $1
+}
+
+repo_base_path=$TRAVIS_BUILD_DIR
+if [ -z "$repo_base_path" ]; then
+    script_path=$(realpath "$0")
+    repo_base_path=$(dirname "$script_path")
+fi
+
+build_base_dir=$repo_base_path/artifacts
+app_name=thumbai
+if [ -z "$TRAVIS_TAG" ]; then
+    app_version=$(cat VERSION)
+else
+    app_version=$TRAVIS_TAG
+fi
+app_version=${app_version#"v"}
+
+build() {
+    say "Starting THUMBAI binary cross-platform builds for v$app_version ..."
+    platforms="darwin/amd64 windows/386 windows/amd64 linux/386 linux/amd64 linux/arm64"
+    platforms="$platforms freebsd/386 freebsd/amd64"
+
+    rm -rf $build_base_dir
+    mkdir -p $build_base_dir
+
+    errors=""
+    for platform in $platforms; do
+        goos=${platform%/*}
+        goarch=${platform#*/}
+        build_dir=$build_base_dir/$app_name-v$app_version-$goos-$goarch
+        mkdir -p $build_dir
+        output="$app_name"
+        if [[ "$goos" == "windows" ]]; then output="$output.exe"; fi
+        cmd="GOOS=$goos GOARCH=$goarch AAH_APP_VERSION=$app_version aah build --single"
+        say "Running $cmd"
+        eval $cmd || errors="$errors $platform"
+        cp $repo_base_path/build/bin/$output $build_dir/
+    done
+
+    if [[ "$errors" != "" ]]; then
+        say ""
+        say "build THUMBAI script failed on: $errors"
+        exit 1
+    else 
+        say "Finished THUMBAI binary cross-platform builds for $platforms"
+    fi
+}
+
+# aah uses only zip archive for all platforms binary packing as a unified.
+# So it requires 'unzip' program for installation.
+checksum_file="$build_base_dir/sha256-checksum.txt"
+archive_checksum() {
+    say "\nStarting THUMBAI binary zip archive and checksum generations ..."
+    rm -f $checksum_file
+    for file in $build_base_dir/*/ ; do 
+        if [[ -d "$file" && ! -L "$file" ]]; then
+            archive_name=$(basename -- "$file")
+            archive_dir=$(dirname "$file")
+            say "Packing $archive_name.zip"
+            cp $repo_base_path/LICENSE "$file/LICENSE.txt"
+            cp $repo_base_path/CREDITS "$file/CREDITS.txt"
+            zip -q -r -j $archive_dir/$archive_name.zip $file
+            sha256=$(sha256sum $archive_dir/$archive_name.zip | cut -d " " -f 1)
+            echo "$sha256 $archive_name.zip" >> $checksum_file
+        fi; 
+    done
+    cat $checksum_file
+    say "Finished THUMBAI binary zip archive and checksum generations."
+}
+
+upload() {
+    say ""
+    gh_release_tmp_dir="/tmp/github-release"
+    gh_release_dist_file="linux-amd64-github-release.tar.bz2"
+    gh_release_download_uri="https://github.com/aktau/github-release/releases/download/v0.7.2/$gh_release_dist_file"
+    say "Downloading github-release binary $gh_release_dist_file"
+    curl -sL $gh_release_download_uri -o /tmp/$gh_release_dist_file
+    mkdir -p $gh_release_tmp_dir
+    tar -jxf /tmp/$gh_release_dist_file -C $gh_release_tmp_dir
+    say "Installing github-release into $GOPATH/bin"
+    cp $gh_release_tmp_dir/bin/linux/amd64/github-release $GOPATH/bin
+    github-release --version
+
+    say "\nStarting THUMBAI zip archives upload into GitHub Release v$app_version ..."
+    for file in $build_base_dir/*.zip; do
+        filename=$(basename -- "$file")
+        say "Uploading $filename"
+        github-release upload --replace --user go-aah --repo tools --tag "v$app_version" --name $filename --file $file
+    done
+    say "Finished THUMBAI zip archives upload into GitHub Release."
+
+    checksum_filename=$(basename -- "$checksum_file")
+    say "\nUploading $checksum_filename"
+    github-release upload --replace --user go-aah --repo tools --tag "v$app_version" --name $checksum_filename --file $checksum_file
+}
+
+build
+archive_checksum
+#upload

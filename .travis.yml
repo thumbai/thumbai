@@ -1,0 +1,35 @@
+language: go
+
+sudo: false
+
+# branches:
+#   except:
+    # skip tags build, we are building branch and master that is enough for
+    # consistenty check and release. Let's use Travis CI resources optimally
+    # for aah framework.
+    # - /^v[0-9.]+$/
+
+go:
+  - 1.11.x
+  - tip
+
+go_import_path: thumbai
+
+install:
+  - export GO111MODULE=on
+  - curl -s https://aahframework.org/install-cli | bash
+
+script:
+  - aah build
+
+deploy:
+  provider: script
+  skip_cleanup: true
+  script: cat ./scripts/publish | bash
+  #  script: curl -s https://thumbai.app/publish | bash
+  on:
+    tags: true
+
+matrix:
+  allow_failures:
+    - go: tip
