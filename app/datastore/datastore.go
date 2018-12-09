@@ -50,7 +50,7 @@ var (
 func Connect(_ *aah.Event) {
 	var err error
 	app := aah.App()
-	storeBasePath := app.Config().StringDefault("thumbai.admin.data_store.location", "")
+	storeBasePath := app.Config().StringDefault("thumbai.admin.data_store.directory", "")
 	if !ess.IsFileExists(storeBasePath) {
 		if err = ess.MkDirAll(storeBasePath, 0755); err != nil {
 			app.Log().Fatal(err)

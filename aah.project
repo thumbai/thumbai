@@ -30,7 +30,7 @@ build {
   # `-i` may not be required for go1.10 and above, however no impact.
   flags = ["-i"]
 
-  ldflags = ""
+  ldflags = "-s -w"
 
   tags = ""
 
@@ -48,7 +48,8 @@ build {
   #
   # For valid pattern syntax, refer to https://golang.org/pkg/path/filepath/#Match
   excludes = ["*.go", ".*", "*.bak", "*.tmp", "*.pid", "thumbai-local.conf", "thumbai-prod.conf", "thumbai.conf", 
-    "vendor", "app", "build", "tests", "logs", "data", "certs", "dev-certs"]
+    "go.mod", "go.sum", "aah.project",
+    "vendor", "app", "build", "tests", "logs", "data", "scripts", "dev-certs", "artifacts"]
 }
 
 # ---------------------------------------------------------------------------
@@ -57,7 +58,7 @@ build {
 log {
   # Log level
   # Default value is `info`.
-  #level = "info"
+  level = "debug"
 
   # Log colored output
   # Default value is `true`.
@@ -81,7 +82,7 @@ hot_reload {
   watch {
     # Note: static directory is not required to be monitored since aah server
     # delivers up-to-date file on environment profile `dev`.
-    dir_excludes = [".*", "data"]
+    dir_excludes = [".*", "data", "scripts", "sample-configs", "dev-certs", "artifacts"]
 
     file_excludes = [".*", "*.pid", "_test.go", "LICENSE", "README.md"]
   }

@@ -61,7 +61,7 @@ func Load(_ *aah.Event) {
 	log := aah.App().Log()
 	Thumbai = &vanities{RWMutex: sync.RWMutex{}, Hosts: make(map[string]*vanityHost)}
 	allVanities := All()
-	if allVanities == nil || len(allVanities) == 0 {
+	if len(allVanities) == 0 {
 		log.Info("Vanities are not yet configured on THUMBAI")
 		return
 	}

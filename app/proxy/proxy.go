@@ -49,7 +49,7 @@ func Load(_ *aah.Event) {
 	log := aah.App().Log()
 	Thumbai = &proxies{RWMutex: sync.RWMutex{}, Hosts: make(map[string]*host)}
 	allProxies := All()
-	if allProxies == nil || len(allProxies) == 0 {
+	if len(allProxies) == 0 {
 		log.Info("Proxies are not yet configured on THUMBAI")
 		return
 	}

@@ -40,13 +40,15 @@ func CheckConfig(e *aah.Event) {
 	}
 	cfg.SetString("env."+appProfile+".routes.domains.thumbai.host", adminHost)
 
-	if !cfg.IsExists("thumbai.admin.data_store.location") {
-		cfg.SetString("thumbai.admin.data_store.location", filepath.Join(app.BaseDir(), "data"))
+	if !cfg.IsExists("thumbai.admin.data_store.directory") {
+		cfg.SetString("thumbai.admin.data_store.directory", filepath.Join(app.BaseDir(), "data"))
 	}
 
 	if ess.IsStrEmpty(cfg.StringDefault("thumbai.admin.contact_email", "")) {
 		app.Log().Warn("'thumbai.admin.contact_email' value is not yet configured. Highly recommended to configure it.")
 	}
+
+	cfg.SetBool("server.access_log.enable", false)
 
 	readSectionAndSet("thumbai.server", "env."+appProfile+".server")
 	readSectionAndSet("thumbai.log", "env."+appProfile+".log")

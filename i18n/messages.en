@@ -4,14 +4,57 @@
 # Doc: https://docs.aahframework.org/i18n.html
 # ---------------------------------------------------------------------------
 
-# This structure is example purpose
-# So choose your suitable structure for your application
 label {
   pages {
-    app {
-      index {
-        title = "aah framework application - Home"
+    admin {
+      dashboard {
+        index {
+          title = "Dashboard - THUMBAI"
+        }
+        credits {
+          title = "Credits - THUMBAI"
+        }
+      }
+
+      gomod {
+        index {
+          title = "Go Modules - THUMBAI"
+        }
+      }
+
+      proxy {
+        list {
+          title = "Proxies - THUMBAI"
+        }
+        edit {
+          title = "Edit Proxy Rules: %s - THUMBAI"
+        }
+        show {
+          title = "Proxy Host: %s - THUMBAI"
+        }
+      }
+
+      tools {
+        index {
+          title = "Tools - THUMBAI"
+        }
+      }
+
+      user {
+        login {
+          title = "Login - THUMBAI"
+        }
+      }
+
+      vanity {
+        list {
+          title = "Go Vanities - THUMBAI"
+        }
+        show {
+          title = "Go Vanity Host: %s - THUMBAI"
+        }
       }
     }
   }
 }
+

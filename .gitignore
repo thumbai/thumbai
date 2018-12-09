@@ -33,3 +33,7 @@ _testmain.go
 *.test
 *.prof
 *.out
+*.bak
+
+thumbai.db
+thumbai.db.lock

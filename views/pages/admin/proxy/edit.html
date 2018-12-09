@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License. -->
 
 {{ define "title" }}
-<title>Edit Proxy Rules: {{ .Rule.Host }} - THUMBAI</title>
+<title>{{ i18n . "label.pages.admin.proxy.edit.title" .Rule.Host }}</title>
 {{ end }} 
 
 {{ define "meta_extra" }}
