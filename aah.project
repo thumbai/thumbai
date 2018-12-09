@@ -58,7 +58,7 @@ build {
 log {
   # Log level
   # Default value is `info`.
-  level = "debug"
+  level = "info"
 
   # Log colored output
   # Default value is `true`.
