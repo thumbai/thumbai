@@ -38,7 +38,7 @@ func (c *ToolsController) Index() {
 // Export method implements THUMBAI configuration dats such as vanity, proxies, etc.
 //
 // NOTE: It does not export Go modules configuration, since inferred based on target
-// enviroment.
+// environment.
 func (c *ToolsController) Export() {
 	c.Reply().
 		Header(ahttp.HeaderContentDisposition, "attachment; filename=thumbai-configurations.json").

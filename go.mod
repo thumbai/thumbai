@@ -11,3 +11,5 @@ require (
 	google.golang.org/appengine v1.3.0 // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 )
+
+replace github.com/go-aah/forge => github.com/go-aah/forge v0.7.1-0.20181210091849-dcd776030597

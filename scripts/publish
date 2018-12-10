@@ -10,9 +10,8 @@
 #   v1.0.0      Initial THUMBAI publish script created
 #
 # Usage:
-#	$ curl -s https://thumbai.app/publish | bash
-#	OR
-#	$ wget -qO- https://thumbai.app/publish | bash
+#	$ cat scripts/publish | bash
+#
 
 trap "exit 1" TERM
 set -e

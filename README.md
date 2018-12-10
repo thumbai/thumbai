@@ -2,6 +2,9 @@
   <img src="https://thumbai.app/static/img/thumbai-logo-dark-256.png" />
   <p align="center">Go Mod Repository, Go Vanity and Proxy Server</p>
 </p>
+<p align="center">
+  <p align="center"><a href="https://travis-ci.org/thumbai/thumbai"><img src="https://travis-ci.com/thumbai/thumbai.svg?branch=master" alt="Build Status"></a> <a href="https://goreportcard.com/report/github.com/thumbai/thumbai"><img src="https://goreportcard.com/badge/github.com/thumbai/thumbai" alt="Go Report Card"></a> <a href="https://github.com/thumbai/thumbai/releases/latest"><img src="https://img.shields.io/badge/version-1.0.0--beta-blue.svg" alt="Release Version"></a> <a href="https://gophers.slack.com/messages/CEQJ9EJPR/"><img src="https://img.shields.io/badge/Slack-thumbai-4d394b.svg?logo=slack" alt="Slack #thumbai"></a></p>
+</p>
 
 ## News
 
