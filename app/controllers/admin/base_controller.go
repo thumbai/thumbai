@@ -33,4 +33,5 @@ func (c *BaseController) Before() {
 		c.Abort()
 		return
 	}
+	c.AddViewArg("IsPackaged", aah.App().IsPackaged())
 }

@@ -69,7 +69,7 @@ func readSectionAndSet(srcSecKey, dstSecKey string) {
 
 func readAndSet(cfgKey string) {
 	cfgValue := aah.App().Config().StringDefault(cfgKey, "")
-	if cfgValue == "not set" || len(cfgValue) == 0 {
+	if len(cfgValue) == 0 {
 		aah.App().Log().Fatalf("'%s' config value is not provided", cfgKey)
 	}
 	aah.App().Config().SetString(strings.TrimPrefix(cfgKey, "thumbai."), cfgValue)

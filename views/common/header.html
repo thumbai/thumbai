@@ -14,6 +14,7 @@ limitations under the License. -->
 <div class="header">
   <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark p-0 shadow">
     <a class="navbar-brand pl-3" href="{{ rurl . "dashboard" }}"><img src="/thumbai/assets/img/thumbai-logo-128.png" alt="logo"></a>
+    <span class="hdr-thumbai-version noselect">{{ if .IsPackaged }}v{{ end }}{{ .AppBuildInfo.Version }}</span>
     <div class="ml-auto text-right">
       <ul class="navbar-nav pr-3">
         <li class="nav-item text-nowrap">

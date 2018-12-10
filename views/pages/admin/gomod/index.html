@@ -25,13 +25,7 @@ limitations under the License. -->
                 <span class="h1">Go Modules</span><span class="total-mod-count pl-3">({{ .Stats.TotalCount }} available & counting ...)</span>
             </div>
         </div>
-        {{ if not .Settings.Enabled }}<div class="row no-gutters mt-3">
-            <p class="alert alert-danger w-50">Go Modules Server unavailable due to prerequisites does not met on the server.</p>
-        </div>{{ end }}
-        {{ if .GoModDisabled }}<div class="row no-gutters mt-3">
-            <p class="alert alert-danger w-50">Go Modules Server disabled by administrator{{ if .AdminContactEmail }}, contact <code>{{ .AdminContactEmail }}</code>{{ end }}.</p>
-        </div>{{ end }}
-        <div class="row no-gutters w-50">
+        <div class="row no-gutters w-100">
             <div class="col mt-4">
                 <form id="goModulesForm" method="post" action="{{ rurl . "gomod_save_settings" }}">
                     <div class="form-group">
@@ -52,6 +46,19 @@ limitations under the License. -->
                     </div>
                     {{ if $gomodWritePermission }}<button id="goModulesSubmit" type="submit" class="btn btn-success float-right pl-4 pr-4" {{ if .GoModDisabled }} disabled{{ end }}>Save</button>{{ end }}
                 </form>
+            </div>
+            <div class="col mt-4">
+                <div class="p-4 mt-2"> 
+                    {{ if not .Settings.Enabled }}<div class="row no-gutters">
+                        <p class="alert alert-danger w-100">Go Modules Server unavailable due to prerequisites does not met on the server.</p>
+                    </div>{{ end }}
+                    {{ if .GoModDisabled }}<div class="row no-gutters">
+                        <p class="alert alert-danger w-100">Go Modules Server disabled by administrator{{ if .AdminContactEmail }}, contact <code>{{ .AdminContactEmail }}</code>{{ end }}.</p>
+                    </div>{{ end }}
+                    <pre><div class="row no-gutters">
+                        <p class="alert alert-info w-100">export GOPROXY={{ .Scheme }}://{{ .Host }}/repo</p>
+                    </div></pre>
+                </div>
             </div>
         </div> {{ if $gomodWritePermission }}
         <div class="row no-gutters w-50">
