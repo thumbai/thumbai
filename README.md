@@ -1,20 +1,27 @@
 <p align="center">
-    <strong>THUMBAI is currently in internal beta testing</strong>
-</p>
-<p align="center">
   <img src="https://thumbai.app/static/img/thumbai-logo-dark-256.png" />
   <p align="center">Go Mod Repository, Go Vanity and Proxy Server</p>
 </p>
 
-## About 
+## News
 
-THUMBAI app developed for [aah framework](https://aahframework.org) then I have made it generalized and with simple user interface to make it user friendly for Go community.
+* [v1.0.0-beta](https://github.com/thumbai/thumbai/releases/latest) Initial public beta release on TBD
+
+## Features 
+
+Provides an ability to have your own- 
+
+* Go Modules Respository - for organization/individual, never loose dependency libraries.
+* Go Vanity Service - Decouple SCM repository path from Go import path.
+* Simple Proxy Server - Hosted applications on the same box then simply proxy it behind.
+
+Every feature is on-demand and could be used individually. All THUMBAI features fully utilized by `aahframework.org`, `aahframe.work` and also THUMBAI proxy replaced my nginx proxy server.
 
 ![THUMBAI dashboard screenshot](https://thumbai.app/static/img/thumbai-dashboard.png)
 
-## Usage
+## Documentation & Usage
 
-**TODO**
+Go to https://thumbai.app/get-started
 
 ## Creator 
 
