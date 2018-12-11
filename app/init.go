@@ -22,6 +22,7 @@ import (
 	"strings"
 
 	"thumbai/app/access"
+	"thumbai/app/commands"
 	"thumbai/app/datastore"
 	"thumbai/app/gomod"
 	"thumbai/app/proxy"
@@ -81,4 +82,8 @@ func init() {
 		"proxyresponsehdrexists":   util.IsProxyResponseHeadersExists,
 		"join":                     strings.Join,
 	})
+
+	if err := app.AddCommand(commands.Generate); err != nil {
+		app.Log().Error(err)
+	}
 }

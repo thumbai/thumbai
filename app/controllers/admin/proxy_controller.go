@@ -443,7 +443,7 @@ func (c *ProxyController) updateRule(from, targetURL string, rule *models.ProxyR
 		})
 		return
 	}
-	proxy.Thumbai.UpdateRule(targetURL, rule)
+	_ = proxy.Thumbai.UpdateRule(targetURL, rule)
 	c.Reply().JSON(aah.Data{
 		"message": "success",
 	})
