@@ -15,16 +15,20 @@
 package settings
 
 import (
+	"strings"
+
 	"aahframe.work"
 )
 
 // THUMBAI settings
 var (
 	ServerHeader string
+	GoDocHost    string
 )
 
 // Load method loads required thumbai config values on app startup.
 func Load(_ *aah.Event) {
 	cfg := aah.App().Config()
 	ServerHeader = cfg.StringDefault("thumbai.server.header", "")
+	GoDocHost = strings.TrimSuffix(cfg.StringDefault("thumbai.admin.godoc_host", "https://godoc.org"), "/")
 }

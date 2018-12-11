@@ -13,5 +13,5 @@ See the License for the specific language governing permissions and
 limitations under the License. -->
 
 {{ define "body" -}}
-Nothing to see here; <a href="https://godoc.org/{{ .Vanity.Host }}{{ .Vanity.Path }}">see the package on godoc</a>.
+Nothing to see here; <a href="{{ .GoDocHost }}/{{ .Vanity.Host }}{{ .Vanity.Path }}">see the package on godoc</a>, will redirect in 1 seconds.
 {{- end }}

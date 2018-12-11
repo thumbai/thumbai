@@ -17,6 +17,7 @@ package controllers
 import (
 	"thumbai/app/models"
 	"thumbai/app/proxy"
+	"thumbai/app/settings"
 	"thumbai/app/vanity"
 
 	"aahframe.work"
@@ -41,5 +42,8 @@ func (c *RequestController) Handle() {
 		return
 	}
 
-	c.Reply().HTMLl("goget.html", aah.Data{"Vanity": pkg})
+	c.Reply().HTMLl("goget.html", aah.Data{
+		"Vanity":    pkg,
+		"GoDocHost": settings.GoDocHost,
+	})
 }
