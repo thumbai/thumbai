@@ -202,6 +202,7 @@ func Download(modReq *Request) error {
 	cmd := exec.Command(Settings.GoBinary, args...)
 	env := os.Environ()
 	env = append(env, fmt.Sprintf("GOPATH=%s", Settings.GoPath))
+	env = append(env, fmt.Sprintf("GOCACHE=%s", filepath.Join(Settings.GoPath, "pkg", "mod", "cache")))
 	cmd.Env = env
 	cmd.Dir = dirPath
 
