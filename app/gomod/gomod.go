@@ -17,19 +17,21 @@ package gomod
 import (
 	"bufio"
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"go/build"
-	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 	"sync"
 	"syscall"
 	"thumbai/app/models"
+	"time"
 
 	"aahframe.work"
 	"aahframe.work/essentials"
@@ -38,12 +40,15 @@ import (
 // errors
 var (
 	ErrInvalidGoModPath = errors.New("gomod: invalid path")
+	ErrGoModNotExist    = errors.New("gomod: mod not exist")
 	ErrExecFailure      = errors.New("gomod: exec failure")
 )
 
 // go mod
 var (
 	Settings = &settings{RWMutex: sync.RWMutex{}, GoVersion: "NA"}
+
+	semverPrefixRegex = regexp.MustCompile(`(^v[0-9]+\.)`)
 )
 
 type settings struct {
@@ -83,7 +88,7 @@ func Infer(_ *aah.Event) {
 	}
 
 	Settings.GoPath = inferGopath(Settings.storeSettings.GoPath)
-	Settings.GoCache = filepath.Join(Settings.GoPath, "pkg", "mod", "cache")
+	Settings.GoCache = inferGoCache()
 	Settings.ModCachePath = filepath.Join(Settings.GoPath, "pkg", "mod", "cache", "download")
 
 	if ess.IsStrEmpty(Settings.storeSettings.GoProxy) {
@@ -93,18 +98,24 @@ func Infer(_ *aah.Event) {
 	}
 
 	Settings.Enabled = true
-
-	go func() {
-		cnt := Count(Settings.ModCachePath)
-		Settings.Lock()
-		Settings.Stats.TotalCount = cnt
-		_ = SaveStats(Settings.Stats)
-		Settings.Unlock()
-	}()
+	go countGoMods()
 }
 
 // FSPathDelimiter is used for mod cache operations.
 const FSPathDelimiter = "/@v/"
+
+// Module struct to parse JSON output of command `go mod` plus THUMBAI needs.
+type Module struct {
+	Path        string
+	DecodedPath string
+	Version     string
+	Error       string
+	Info        string
+	GoMod       string
+	Zip         string
+	Dir         string
+	Action      string
+}
 
 // InferRequest method parse the go mod request into Request object.
 //
@@ -115,73 +126,82 @@ const FSPathDelimiter = "/@v/"
 // {module}/@v/{version}.mod fetches the go.mod file for that version.
 //
 // {module}/@v/{version}.zip fetches the zip file for that version.
-func InferRequest(modReqPath string) (*Request, error) {
+func InferRequest(modReqPath string) (*Module, error) {
 	parts := strings.Split(modReqPath, FSPathDelimiter)
 	if len(parts) != 2 {
 		return nil, ErrInvalidGoModPath
 	}
 
-	req := &Request{Module: parts[0],
-		ModuleFilePath: filepath.Join(Settings.ModCachePath, parts[0]),
-		FilePath:       filepath.Join(Settings.ModCachePath, modReqPath)}
+	mod := &Module{Path: parts[0]}
 	if parts[1] == "list" {
-		req.Action = parts[1]
-	} else {
-		i := strings.LastIndexByte(parts[1], '.')
-		if i == -1 {
-			return nil, ErrInvalidGoModPath
+		mod.Action = parts[1]
+		if !ess.IsFileExists(filepath.Join(Settings.ModCachePath, modReqPath)) {
+			return mod, ErrGoModNotExist
 		}
-		req.Version = parts[1][:i]
-		req.Action = parts[1][i+1:]
+		return mod, nil
 	}
 
-	return req, nil
+	i := strings.LastIndexByte(parts[1], '.')
+	if i == -1 {
+		return nil, ErrInvalidGoModPath
+	}
+	mod.Version = parts[1][:i]
+	mod.Action = parts[1][i+1:]
+	if !ess.IsFileExists(filepath.Join(Settings.ModCachePath, modReqPath)) {
+		if err := checkAndCreateInfoFile(mod); err == nil {
+			return mod, nil // good to go
+		}
+		return mod, ErrGoModNotExist
+	}
+	return mod, nil
 }
 
 var goPrg = []byte(`package main
 
-    import (
-        "fmt"
-    )
-    
-    func main() {
-        fmt.Println("thumbai temp go project")
-    }
-	`)
+import (
+	"fmt"
+)
 
-var goMod = `module thumbai.app/tempproject
+func main() {
+	fmt.Println("thumbai temp go project")
+}
+`)
 
-require %s %s
-`
+var goMod = []byte(`module thumbai.app/tempproject`)
 
 const tempFilePerm = os.FileMode(0644)
 
 var modMutex = map[string]bool{}
 
-// Download method downloads the requested go module using 'go get'
+// Download method downloads the requested go module path using 'go mod' or 'go get'
 // which populates the mod cache.
-func Download(modReq *Request) error {
+func Download(mod *Module) (*Module, error) {
+	defer countGoMods()
 	app := aah.App()
-	mutexModPath := modReq.Module + "@" + modReq.Version
+	mutexModPath := modPath(mod)
 	app.Log().Info("Download request recevied for ", mutexModPath)
-	srcZipPath := filepath.Join(Settings.ModCachePath, modReq.Module, "@v", modReq.Version+".zip")
+	srcZipPath := filepath.Join(Settings.ModCachePath, mod.Path, "@v", mod.Version+".zip")
 	if ess.IsFileExists(srcZipPath) {
-		app.Log().Info("Module ", mutexModPath, " already exists on server")
-		return nil
+		app.Log().Info("Module ", mutexModPath, " already exists on repository")
+		return nil, nil
 	}
 	if _, found := modMutex[mutexModPath]; found {
-		// Download already in-progress
-		return nil
+		app.Log().Infof("Download already in-progress for '%s'", mutexModPath)
+		return nil, nil
 	}
-	defer func() { delete(modMutex, mutexModPath) }()
+	defer func() {
+		delete(modMutex, mutexModPath)
+	}()
 
-	decodedPath, err := DecodePath(modReq.Module)
+	var err error
+	mod.DecodedPath, err = DecodePath(mod.Path)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	dirPath, err := ioutil.TempDir("", "tempgoproject")
+
+	dirPath, err := createTempProject()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer func() {
 		if err = os.RemoveAll(dirPath); err != nil {
@@ -189,46 +209,77 @@ func Download(modReq *Request) error {
 		}
 	}()
 
-	if err = ioutil.WriteFile(filepath.Join(dirPath, "main.go"), goPrg, tempFilePerm); err != nil {
-		return err
-	}
-	if err = ioutil.WriteFile(filepath.Join(dirPath, "go.mod"), []byte(fmt.Sprintf(goMod, decodedPath, modReq.Version)), tempFilePerm); err != nil {
-		return err
+	downloadMode := "gomod"
+	if ess.IsStrEmpty(mod.Version) || !semverPrefixRegex.MatchString(mod.Version) {
+		downloadMode = "goget" // such as version => `latest`, `branchname`
 	}
 
-	args := []string{"mod", "download"}
-	if modReq.gogetRequired() {
-		args = []string{"get", decodedPath + "@" + modReq.Version}
+	args := []string{}
+	switch downloadMode {
+	case "gomod":
+		args = append(args, "mod", "download", "-json", decodedModPath(mod))
+	case "goget":
+		args = append(args, "get", decodedModPath(mod))
 	}
-	app.Log().Info("Executing ", Settings.GoBinary, " ", strings.Join(args, " "))
-	cmd := exec.Command(Settings.GoBinary, args...)
+
 	env := os.Environ()
 	env = append(env, fmt.Sprintf("GOPATH=%s", Settings.GoPath))
 	env = append(env, fmt.Sprintf("GOCACHE=%s", Settings.GoCache))
+
+	cmd := exec.Command(Settings.GoBinary, args...)
 	cmd.Env = env
 	cmd.Dir = dirPath
+	stdOut, stdErr := &bytes.Buffer{}, &bytes.Buffer{}
+	cmd.Stdout, cmd.Stderr = stdOut, stdErr
 
-	stderrReader, err := cmd.StderrPipe()
-	if err != nil {
-		return err
-	}
-	buf := new(bytes.Buffer)
-	scanner := bufio.NewScanner(stderrReader)
-	go func() {
-		for scanner.Scan() {
-			fmt.Fprintln(buf, scanner.Text())
-		}
-	}()
-
+	app.Log().Info("Executing ", Settings.GoBinary, " ", strings.Join(args, " "))
 	status, errInfo := inferExitStatus(cmd, cmd.Run())
 	if status != 0 {
-		app.Log().Error(strings.TrimSpace(buf.String()))
+		app.Log().Error(strings.TrimSpace(stdErr.String()))
 		app.Log().Error(errInfo)
-		return ErrExecFailure
+		return nil, ErrExecFailure
 	}
-	processModAndUpdateCount(buf)
-	app.Log().Infof("Module %s@%s downloaded successfully", decodedPath, modReq.Version)
-	return nil
+
+	// handle result based on mode
+	resultMod := &Module{}
+	switch downloadMode {
+	case "gomod":
+		if err = json.NewDecoder(stdOut).Decode(resultMod); err != nil {
+			return nil, errors.New(stdErr.String())
+		}
+		if len(resultMod.Error) > 0 {
+			return nil, errors.New(resultMod.Error)
+		}
+		resultMod.Path = mod.Path
+		resultMod.DecodedPath = mod.DecodedPath
+		resultMod.Action = mod.Action
+	case "goget":
+		modVersion := inferGoGetModVersion(mod, stdErr.Bytes())
+		resultMod = mod
+		resultMod.Version = modVersion
+		if ess.IsStrEmpty(resultMod.Version) {
+			tcmd := exec.Command(Settings.GoBinary, "mod", "download", "-json", decodedModPath(mod))
+			tcmd.Env = env
+			tcmd.Dir = dirPath
+			b, err := tcmd.Output()
+			if err == nil {
+				resultMod = &Module{}
+				if err = json.NewDecoder(bytes.NewReader(b)).Decode(resultMod); err != nil {
+					return nil, err
+				}
+				if len(resultMod.Error) > 0 {
+					return nil, errors.New(resultMod.Error)
+				}
+				resultMod.Path = mod.Path
+				resultMod.DecodedPath = mod.DecodedPath
+				resultMod.Action = mod.Action
+			}
+		}
+		_ = checkAndCreateInfoFile(resultMod)
+	}
+
+	app.Log().Infof("Module [%s@%s] downloaded successfully into repository", resultMod.Path, resultMod.Version)
+	return resultMod, nil
 }
 
 const modExt = ".mod"
@@ -249,39 +300,6 @@ func Count(dir string) int64 {
 		return nil
 	})
 	return count
-}
-
-//‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-// Request type and its methods
-//______________________________________________________________________________
-
-// Request struct holds parsed values of module request info.
-type Request struct {
-	Module         string
-	Version        string
-	FilePath       string
-	ModuleFilePath string
-	Action         string
-}
-
-func (r *Request) gogetRequired() bool {
-	return r.Version == "latest" || r.Version == "master"
-}
-
-//‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-// Package Unexported methods
-//______________________________________________________________________________
-
-func inferExitStatus(cmd *exec.Cmd, err error) (int, string) {
-	if err == nil {
-		ws := cmd.ProcessState.Sys().(syscall.WaitStatus)
-		return ws.ExitStatus(), ""
-	}
-	if ee, ok := err.(*exec.ExitError); ok {
-		ws := ee.Sys().(syscall.WaitStatus)
-		return ws.ExitStatus(), ee.String()
-	}
-	return 1, err.Error()
 }
 
 // GoVersion method returns go version
@@ -305,48 +323,152 @@ func InferGo111AndAbove(ver string) bool {
 	return verNum >= float64(1.11)
 }
 
-func processModAndUpdateCount(r io.Reader) {
-	Settings.Lock()
-	defer Settings.Unlock()
-	mods := map[string]bool{}
-	scanner := bufio.NewScanner(r)
-	for scanner.Scan() {
-		ln := strings.TrimSpace(scanner.Text())
-		if len(ln) > 0 {
-			if strings.HasPrefix(ln, "go: finding") || strings.HasPrefix(ln, "go: downloading") {
-				parts := strings.Fields(ln)[2:]
-				if len(parts) >= 2 {
-					mods[parts[0]+"@"+parts[1]] = true
-				}
+//‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+// Package Unexported methods
+//______________________________________________________________________________
+
+func inferExitStatus(cmd *exec.Cmd, err error) (int, string) {
+	if err == nil {
+		ws := cmd.ProcessState.Sys().(syscall.WaitStatus)
+		return ws.ExitStatus(), ""
+	}
+	if ee, ok := err.(*exec.ExitError); ok {
+		ws := ee.Sys().(syscall.WaitStatus)
+		return ws.ExitStatus(), ee.String()
+	}
+	return 1, err.Error()
+}
+
+const (
+	modVersionTimeFormat  = "20060102150405"
+	modInfoFileTimeFormat = "2006-01-02T15:04:05Z"
+)
+
+func checkAndCreateInfoFile(mod *Module) error {
+	infoFile := filepath.Join(Settings.ModCachePath, mod.Path, "@v", mod.Version+".info")
+	if ess.IsFileExists(infoFile) {
+		return errors.New(".info file already exist")
+	}
+	if !ess.IsFileExists(filepath.Join(Settings.ModCachePath, mod.Path, "@v", mod.Version+".mod")) {
+		return errors.New(".mod file not exist")
+	}
+
+	if verParts := strings.Split(mod.Version, "-"); len(verParts) == 3 {
+		mtime := verParts[1]
+		if i := strings.IndexByte(verParts[1], '.'); i > 0 {
+			mtime = verParts[1][i+1:]
+		}
+		if t, err := time.Parse(modVersionTimeFormat, mtime); err == nil {
+			var buf bytes.Buffer
+			if err = json.NewEncoder(&buf).Encode(map[string]string{
+				"Version": mod.Version,
+				"Time":    t.Format(modInfoFileTimeFormat),
+			}); err != nil {
+				return errors.New("unable to create info JSON")
+			}
+			fname := filepath.Join(Settings.ModCachePath, mod.Path, "@v", mod.Version+".info")
+			aah.App().Log().Debug("Creating ", fname)
+			if err = ioutil.WriteFile(fname, buf.Bytes(), 0600); err == nil {
+				return nil // good to go
 			}
 		}
 	}
-	Settings.Stats.TotalCount += int64(len(mods))
+	return errors.New("create '.info' file is not applicable")
+}
+
+func modPath(mod *Module) string {
+	if ess.IsStrEmpty(mod.Version) {
+		return mod.Path + "@latest"
+	}
+	return mod.Path + "@" + mod.Version
+}
+
+func decodedModPath(mod *Module) string {
+	if ess.IsStrEmpty(mod.Version) {
+		return mod.DecodedPath + "@latest"
+	}
+	return mod.DecodedPath + "@" + mod.Version
+}
+
+func createTempProject() (string, error) {
+	dirPath, err := ioutil.TempDir("", "tempgoproject")
+	if err != nil {
+		return "", err
+	}
+	if err = ioutil.WriteFile(filepath.Join(dirPath, "main.go"), goPrg, tempFilePerm); err != nil {
+		return "", err
+	}
+	if err = ioutil.WriteFile(filepath.Join(dirPath, "go.mod"), goMod, tempFilePerm); err != nil {
+		return "", err
+	}
+	return dirPath, nil
+}
+
+func countGoMods() {
+	cnt := Count(Settings.ModCachePath)
+	Settings.Lock()
+	Settings.Stats.TotalCount = cnt
 	_ = SaveStats(Settings.Stats)
+	Settings.Unlock()
+}
+
+func inferGoGetModVersion(mod *Module, b []byte) string {
+	scanner := bufio.NewScanner(bytes.NewReader(b))
+	prefix := fmt.Sprintf("go: downloading %s", mod.Path)
+	for scanner.Scan() {
+		ln := strings.TrimSpace(scanner.Text())
+		if len(ln) > 0 {
+			if strings.HasPrefix(ln, prefix) {
+				parts := strings.Fields(ln)
+				if len(parts) >= 4 {
+					return parts[3]
+				}
+				return ""
+			}
+		}
+	}
+	return ""
 }
 
 func inferGoBinary(current string) (string, error) {
-	var currentExists bool
+	app := aah.App()
 	if !ess.IsStrEmpty(current) {
-		currentExists = ess.IsFileExists(current)
+		if !ess.IsFileExists(current) {
+			app.Log().Warnf("%s configured Go binary is not exists on server, will infer from server if possible", current)
+			return exec.LookPath("go")
+		}
+		return current, nil
 	}
-	if ess.IsStrEmpty(current) || !currentExists {
-		aah.App().Log().Warnf("%s configured go binary is not exists on server, will infer from server if possible", current)
-		return exec.LookPath("go")
-	}
-	return current, nil
+
+	app.Log().Warn("Go binary is not defined within THUMBAI, will infer from server environment, if possible")
+	return exec.LookPath("go")
 }
 
 func inferGopath(current string) string {
-	var currentExists bool
+	app := aah.App()
 	if !ess.IsStrEmpty(current) {
-		currentExists = ess.IsFileExists(current)
-	}
-	if ess.IsStrEmpty(current) || !currentExists {
-		aah.App().Log().Warnf("%s GOPATH is not exists on server, will infer from server if possible", current)
-		if paths := filepath.SplitList(build.Default.GOPATH); len(paths) > 0 {
-			return paths[0]
+		if !ess.IsFileExists(current) {
+			app.Log().Warnf("GOPATH: %s directory is not exists on server, will create it", current)
+			if err := ess.MkDirAll(current, 0755); err != nil {
+				app.Log().Error(err)
+			}
 		}
+		return current
+	}
+
+	app.Log().Warn("GOPATH value is not defined within THUMBAI, will infer from server environment, if possible")
+	if paths := filepath.SplitList(build.Default.GOPATH); len(paths) > 0 {
+		app.Log().Infof("Inferred GOPATH is '%s'", paths[0])
+		return paths[0]
 	}
 	return current
+}
+
+func inferGoCache() string {
+	cmd := exec.Command(Settings.GoBinary, "env", "GOCACHE")
+	b, err := cmd.CombinedOutput()
+	if err != nil {
+		return filepath.Join(Settings.GoPath, "pkg", "go-build-cache")
+	}
+	return string(b)
 }

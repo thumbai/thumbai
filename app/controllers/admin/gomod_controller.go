@@ -149,7 +149,7 @@ func (c *GoModController) Publish(pubReq *models.PublishRequest) {
 				aah.App().Log().Errorf("Publish: invalid module path '%s'", m)
 				continue
 			}
-			if err := gomod.Download(&gomod.Request{Module: parts[0], Version: parts[1]}); err != nil {
+			if _, err := gomod.Download(&gomod.Module{Path: parts[0], Version: parts[1]}); err != nil {
 				aah.App().Log().Error(err)
 			}
 		}
