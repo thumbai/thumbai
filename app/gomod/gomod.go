@@ -52,6 +52,7 @@ type settings struct {
 	GoBinary      string
 	GoVersion     string
 	GoPath        string
+	GoCache       string
 	GoProxy       string
 	ModCachePath  string
 	Stats         *models.ModuleStats
@@ -82,6 +83,7 @@ func Infer(_ *aah.Event) {
 	}
 
 	Settings.GoPath = inferGopath(Settings.storeSettings.GoPath)
+	Settings.GoCache = filepath.Join(Settings.GoPath, "pkg", "mod", "cache")
 	Settings.ModCachePath = filepath.Join(Settings.GoPath, "pkg", "mod", "cache", "download")
 
 	if ess.IsStrEmpty(Settings.storeSettings.GoProxy) {
@@ -202,7 +204,7 @@ func Download(modReq *Request) error {
 	cmd := exec.Command(Settings.GoBinary, args...)
 	env := os.Environ()
 	env = append(env, fmt.Sprintf("GOPATH=%s", Settings.GoPath))
-	env = append(env, fmt.Sprintf("GOCACHE=%s", filepath.Join(Settings.GoPath, "pkg", "mod", "cache")))
+	env = append(env, fmt.Sprintf("GOCACHE=%s", Settings.GoCache))
 	cmd.Env = env
 	cmd.Dir = dirPath
 
