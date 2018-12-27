@@ -8,7 +8,7 @@
 
 ## News
 
-* [v1.0.0-beta.2](https://github.com/thumbai/thumbai/releases/latest) Initial public beta release on Dec 26, 2018.
+* [v1.0.0-beta.2](https://github.com/thumbai/thumbai/releases/latest) Second public beta release on Dec 26, 2018.
 * [v1.0.0-beta](https://github.com/thumbai/thumbai/releases/tag/v1.0.0-beta) Initial public beta release on Dec 10, 2018.
 
 ## Features 
