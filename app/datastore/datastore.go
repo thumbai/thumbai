@@ -132,7 +132,7 @@ func Del(bucketName, key string) error {
 // BucketKeys method returns all the bucket keys for given name.
 func BucketKeys(name string) []string {
 	var keys []string
-	thumbaiDB.View(func(tx *bolt.Tx) error {
+	_ = thumbaiDB.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(name))
 		if err := b.ForEach(func(k, _ []byte) error {
 			keys = append(keys, string(k))
