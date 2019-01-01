@@ -58,12 +58,12 @@ func (c *RequestController) Health() {
 	}
 	if !gomod.Settings.Enabled || access.GoModDisabled {
 		result["gomod_repository"] = aah.Data{
-			"status":      "fail",
+			"status":      "service unavailable",
 			"status_code": http.StatusServiceUnavailable,
 		}
 	} else {
 		result["gomod_repository"] = aah.Data{
-			"status":      "pass",
+			"status":      "service available",
 			"status_code": http.StatusOK,
 		}
 	}

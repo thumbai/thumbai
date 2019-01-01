@@ -16,6 +16,7 @@ package proxy
 
 import (
 	"aahframe.work"
+	"aahframe.work/ahttp"
 	"net/http"
 	"net/http/httptest"
 	"sync"
@@ -39,25 +40,27 @@ func Health(ctx *aah.Context) []aah.Data {
 }
 
 func checkHealth(h *host) aah.Data {
-	w := httptest.NewRecorder()
-
 	reqPath := h.HealthCheckPath
 	if len(reqPath) == 0 {
 		reqPath = "/"
 	}
 	r, _ := http.NewRequest(http.MethodGet, reqPath, nil)
+	r.Header.Set(ahttp.HeaderHost, h.Name)
+	r.Host = h.Name
 
+	w := httptest.NewRecorder()
 	h.LastRule.Proxy.ServeHTTP(w, r)
-	if w.Result().StatusCode == http.StatusOK {
+	if w.Result().StatusCode >= http.StatusOK &&
+		w.Result().StatusCode < http.StatusBadRequest {
 		return aah.Data{
-			"status":      "pass",
+			"status":      "available",
 			"host":        h.Name,
 			"status_code": w.Result().StatusCode,
 		}
 	}
 
 	return aah.Data{
-		"status":      "fail",
+		"status":      "unavailable",
 		"host":        h.Name,
 		"status_code": w.Result().StatusCode,
 	}
