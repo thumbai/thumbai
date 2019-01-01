@@ -246,9 +246,10 @@ func (p *proxies) DeleteRule(hostname, targetURL string) {
 // Host struct holds the proxy pass and redirects processor.
 type host struct {
 	sync.RWMutex
-	Name       string
-	LastRule   *rule
-	ProxyRules []*rule
+	Name            string // hostname
+	LastRule        *rule
+	ProxyRules      []*rule
+	HealthCheckPath string
 }
 
 type restrictFile struct {
@@ -493,7 +494,12 @@ func (r *rule) createReverseProxy(targetURL string, skipTLSVerify bool) error {
 
 		if r.ReqHdr != nil {
 			for k, v := range r.ReqHdr.Add {
-				req.Header.Add(k, v)
+				if k == "Host" {
+					req.Host = v
+					req.Header.Set(k, v)
+				} else {
+					req.Header.Add(k, v)
+				}
 			}
 			for _, k := range r.ReqHdr.Remove {
 				req.Header.Del(k)
@@ -508,6 +514,9 @@ func (r *rule) createReverseProxy(targetURL string, skipTLSVerify bool) error {
 			for _, k := range r.ResHdr.Remove {
 				w.Header.Del(k)
 			}
+		}
+		if len(settings.ServerHeader) > 0 {
+			w.Header.Del(ahttp.HeaderServer)
 		}
 		return nil
 	}

@@ -15,6 +15,9 @@
 package controllers
 
 import (
+	"net/http"
+	"thumbai/app/access"
+	"thumbai/app/gomod"
 	"thumbai/app/models"
 	"thumbai/app/proxy"
 	"thumbai/app/settings"
@@ -46,4 +49,23 @@ func (c *RequestController) Handle() {
 		"Vanity":    pkg,
 		"GoDocHost": settings.GoDocHost,
 	})
+}
+
+// Health method returns the health of the proxies and go mod respository.
+func (c *RequestController) Health() {
+	result := aah.Data{
+		"proxies": proxy.Health(c.Context),
+	}
+	if !gomod.Settings.Enabled || access.GoModDisabled {
+		result["gomod_repository"] = aah.Data{
+			"status":      "fail",
+			"status_code": http.StatusServiceUnavailable,
+		}
+	} else {
+		result["gomod_repository"] = aah.Data{
+			"status":      "pass",
+			"status_code": http.StatusOK,
+		}
+	}
+	c.Reply().JSON(result)
 }
