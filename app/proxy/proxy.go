@@ -529,7 +529,16 @@ func (r *rule) createReverseProxy(targetURL string, skipTLSVerify bool) error {
 		transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	}
 
-	r.Proxy = &httputil.ReverseProxy{Director: director, Transport: transport, ModifyResponse: modifyResponse}
+	r.Proxy = &httputil.ReverseProxy{
+		Director:       director,
+		Transport:      transport,
+		ModifyResponse: modifyResponse,
+		ErrorLog:       aah.App().Log().ToGoLogger(),
+		ErrorHandler: func(rw http.ResponseWriter, req *http.Request, err error) {
+			aah.App().Log().Errorf("thumbai: proxy error: %v", err)
+			rw.WriteHeader(http.StatusBadGateway)
+		},
+	}
 
 	return nil
 }
