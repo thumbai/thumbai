@@ -25,7 +25,7 @@ Every feature is on-demand and could be used individually. All THUMBAI features 
 
 ## Documentation & Usage
 
-Go to https://thumbai.app/get-started
+Go to https://thumbai.app/docs/get-started
 
 ## Creator 
 
